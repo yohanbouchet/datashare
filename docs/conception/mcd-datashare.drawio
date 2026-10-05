@@ -1,0 +1,51 @@
+<mxfile host="65bd71144e">
+    <diagram id="mcd-datashare" name="MCD DataShare">
+        <mxGraphModel dx="965" dy="1007" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1270" pageHeight="620" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="titre" parent="1" style="text;html=1;fontSize=20;fontStyle=1;align=left;verticalAlign=middle;" value="MCD – DataShare (méthode Merise)" vertex="1">
+                    <mxGeometry height="40" width="500" x="40" y="10" as="geometry"/>
+                </mxCell>
+                <mxCell id="utilisateur" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=10;spacingTop=4;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="&lt;div style=&quot;text-align:center&quot;&gt;&lt;b&gt;UTILISATEUR&lt;/b&gt;&lt;/div&gt;&lt;hr&gt;&lt;u&gt;id_utilisateur&lt;/u&gt;&lt;br&gt;email&lt;br&gt;mot_de_passe_hache&lt;br&gt;date_creation" vertex="1">
+                    <mxGeometry height="130" width="210" x="40" y="110" as="geometry"/>
+                </mxCell>
+                <mxCell id="posseder" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;" value="POSSÉDER" vertex="1">
+                    <mxGeometry height="60" width="130" x="320" y="145" as="geometry"/>
+                </mxCell>
+                <mxCell id="fichier" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=10;spacingTop=4;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="&lt;div style=&quot;text-align:center&quot;&gt;&lt;b&gt;FICHIER&lt;/b&gt;&lt;/div&gt;&lt;hr&gt;&lt;u&gt;id_fichier&lt;/u&gt;&lt;br&gt;nom_original&lt;br&gt;taille_octets&lt;br&gt;type_mime&lt;br&gt;nom_stockage&lt;br&gt;jeton&lt;br&gt;mot_de_passe_hache (facultatif)&lt;br&gt;date_envoi&lt;br&gt;date_expiration" vertex="1">
+                    <mxGeometry height="220" width="240" x="520" y="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="etiqueter" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;" value="ÉTIQUETER" vertex="1">
+                    <mxGeometry height="60" width="130" x="830" y="145" as="geometry"/>
+                </mxCell>
+                <mxCell id="tag" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=10;spacingTop=4;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="&lt;div style=&quot;text-align:center&quot;&gt;&lt;b&gt;TAG&lt;/b&gt;&lt;/div&gt;&lt;hr&gt;&lt;u&gt;id_tag&lt;/u&gt;&lt;br&gt;libelle" vertex="1">
+                    <mxGeometry height="90" width="180" x="1030" y="130" as="geometry"/>
+                </mxCell>
+                <mxCell id="lien1" edge="1" parent="1" source="utilisateur" style="endArrow=none;html=1;fontStyle=1;fontSize=13;labelBackgroundColor=#ffffff;" target="posseder" value="0,n">
+                    <mxGeometry relative="1" x="-0.5" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="lien2" edge="1" parent="1" source="fichier" style="endArrow=none;html=1;fontStyle=1;fontSize=13;labelBackgroundColor=#ffffff;" target="posseder" value="1,1">
+                    <mxGeometry relative="1" x="-0.5" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="lien3" edge="1" parent="1" source="fichier" style="endArrow=none;html=1;fontStyle=1;fontSize=13;labelBackgroundColor=#ffffff;" target="etiqueter" value="0,n">
+                    <mxGeometry relative="1" x="-0.5" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="lien4" edge="1" parent="1" source="tag" style="endArrow=none;html=1;fontStyle=1;fontSize=13;labelBackgroundColor=#ffffff;" target="etiqueter" value="1,1">
+                    <mxGeometry relative="1" x="-0.5" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="regles" parent="1" style="shape=note;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=10;spacingTop=6;size=15;fillColor=#f5f5f5;strokeColor=#666666;" value="&lt;b&gt;Lecture des cardinalités&lt;/b&gt;&lt;br&gt;• Un UTILISATEUR possède 0 à n FICHIERS ; un FICHIER est possédé par 1 et 1 seul UTILISATEUR.&lt;br&gt;• Un FICHIER porte 0 à n TAGS ; un TAG est porté par 1 et 1 seul FICHIER.&lt;br&gt;&lt;br&gt;&lt;b&gt;Règles de gestion&lt;/b&gt;&lt;br&gt;• RG1 – email unique ; mot de passe d’au moins 8 caractères, stocké haché et salé (US03).&lt;br&gt;• RG2 – un fichier appartient à un seul utilisateur, le seul à pouvoir le lister et le supprimer (US05, US06).&lt;br&gt;• RG3 – jeton : chaîne longue, aléatoire, unique et non prédictible, utilisée dans le lien de téléchargement (US01, US02).&lt;br&gt;• RG4 – date_expiration = date_envoi + 1 à 7 jours (7 par défaut) ; le statut « actif / expiré » est calculé, il n’est pas stocké.&lt;br&gt;• RG5 – mot de passe du fichier facultatif (au moins 6 caractères), stocké haché (US01, US02).&lt;br&gt;• RG6 – nom_stockage : nom généré pour le fichier sur le disque, jamais le nom d’origine (évite les doublons et les attaques par chemin).&lt;br&gt;• RG7 – taille maximale 1 Go et extensions interdites : contrôlées par l’API avant l’enregistrement (US01).&lt;br&gt;• RG8 – tag : texte libre de 30 caractères maximum, pas de doublon pour un même fichier ; supprimé avec son fichier (US01, US08).&lt;br&gt;• RG9 – une tâche planifiée supprime les fichiers expirés, sur le disque et en base, au moins une fois par jour (fréquence configurable) (US01, US10)." vertex="1">
+                    <mxGeometry height="250" width="1170" x="40" y="330" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

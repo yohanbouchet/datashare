@@ -1,0 +1,91 @@
+<mxfile host="65bd71144e">
+    <diagram id="archi-datashare" name="Architecture DataShare">
+        <mxGraphModel dx="559" dy="417" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1460" pageHeight="800" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="titre" parent="1" style="text;html=1;fontSize=20;fontStyle=1;align=left;verticalAlign=middle;" value="Architecture – DataShare (React · NestJS · PostgreSQL · stockage local)" vertex="1">
+                    <mxGeometry height="40" width="900" x="20" y="10" as="geometry"/>
+                </mxCell>
+                <mxCell id="proprietaire" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" value="Propriétaire&lt;br&gt;(utilisateur connecté)" vertex="1">
+                    <mxGeometry height="70" width="40" x="60" y="170" as="geometry"/>
+                </mxCell>
+                <mxCell id="destinataire" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" value="Destinataire&lt;br&gt;(lien de partage,&lt;br&gt;sans compte)" vertex="1">
+                    <mxGeometry height="70" width="40" x="60" y="420" as="geometry"/>
+                </mxCell>
+                <mxCell id="front" parent="1" style="swimlane;whiteSpace=wrap;html=1;startSize=30;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;fontSize=14;" value="Front-end – React (application dans le navigateur)" vertex="1">
+                    <mxGeometry height="530" width="350" x="190" y="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="f-pages" parent="front" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=12;" value="&lt;b&gt;Pages (React Router)&lt;/b&gt;&lt;br&gt;Connexion · Inscription · Téléversement&lt;br&gt;Mon espace · Téléchargement (public)" vertex="1">
+                    <mxGeometry height="80" width="310" x="20" y="45" as="geometry"/>
+                </mxCell>
+                <mxCell id="f-composants" parent="front" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=12;" value="&lt;b&gt;Composants réutilisables&lt;/b&gt;&lt;br&gt;Bouton · Champ · Liste déroulante&lt;br&gt;Bandeau (info / alerte / erreur) · En-tête · Sélecteur" vertex="1">
+                    <mxGeometry height="80" width="310" x="20" y="145" as="geometry"/>
+                </mxCell>
+                <mxCell id="f-etat" parent="front" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=12;" value="&lt;b&gt;Contexte d’authentification (état global)&lt;/b&gt;&lt;br&gt;garde le JWT, protège les routes privées" vertex="1">
+                    <mxGeometry height="70" width="310" x="20" y="245" as="geometry"/>
+                </mxCell>
+                <mxCell id="f-validation" parent="front" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=12;" value="&lt;b&gt;Validation des formulaires (côté client)&lt;/b&gt;&lt;br&gt;email, mots de passe, taille ≤ 1 Go, expiration" vertex="1">
+                    <mxGeometry height="70" width="310" x="20" y="335" as="geometry"/>
+                </mxCell>
+                <mxCell id="f-services" parent="front" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=12;" value="&lt;b&gt;Services API&lt;/b&gt;&lt;br&gt;appels HTTP vers l’API&lt;br&gt;ajout de l’en-tête Authorization: Bearer &amp;lt;JWT&amp;gt;" vertex="1">
+                    <mxGeometry height="80" width="310" x="20" y="425" as="geometry"/>
+                </mxCell>
+                <mxCell id="back" parent="1" style="swimlane;whiteSpace=wrap;html=1;startSize=30;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;fontSize=14;" value="Back-end – API REST NestJS (Node.js)" vertex="1">
+                    <mxGeometry height="530" width="480" x="680" y="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="b-controleurs" parent="back" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=12;" value="&lt;b&gt;Contrôleurs (routes REST)&lt;/b&gt;&lt;br&gt;AuthController · FilesController · DownloadController&lt;br&gt;+ validation des DTO (class-validator) côté serveur" vertex="1">
+                    <mxGeometry height="80" width="440" x="20" y="45" as="geometry"/>
+                </mxCell>
+                <mxCell id="b-garde" parent="back" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;" value="&lt;b&gt;Garde JWT&lt;/b&gt; : vérifie le jeton sur les routes protégées" vertex="1">
+                    <mxGeometry height="40" width="440" x="20" y="140" as="geometry"/>
+                </mxCell>
+                <mxCell id="b-services" parent="back" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=12;" value="&lt;b&gt;Services (logique métier)&lt;/b&gt;&lt;br&gt;AuthService (US03, US04) · FilesService (US01, US05, US06)&lt;br&gt;DownloadService (US02) – hachage bcrypt, génération du jeton" vertex="1">
+                    <mxGeometry height="80" width="440" x="20" y="195" as="geometry"/>
+                </mxCell>
+                <mxCell id="b-donnees" parent="back" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=12;" value="&lt;b&gt;Accès aux données&lt;/b&gt;&lt;br&gt;TypeORM (repositories)" vertex="1">
+                    <mxGeometry height="80" width="210" x="20" y="295" as="geometry"/>
+                </mxCell>
+                <mxCell id="b-stockage" parent="back" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=12;" value="&lt;b&gt;StorageService&lt;/b&gt;&lt;br&gt;écriture / lecture des fichiers&lt;br&gt;(local, remplaçable par S3)" vertex="1">
+                    <mxGeometry height="80" width="210" x="250" y="295" as="geometry"/>
+                </mxCell>
+                <mxCell id="b-purge" parent="back" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=12;" value="&lt;b&gt;Tâche planifiée&lt;/b&gt;&lt;br&gt;purge quotidienne des fichiers expirés (RG9)" vertex="1">
+                    <mxGeometry height="80" width="210" x="20" y="395" as="geometry"/>
+                </mxCell>
+                <mxCell id="b-logs" parent="back" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=12;" value="&lt;b&gt;Logs structurés (JSON)&lt;/b&gt;&lt;br&gt;temps de réponse, taille des fichiers" vertex="1">
+                    <mxGeometry height="80" width="210" x="250" y="395" as="geometry"/>
+                </mxCell>
+                <mxCell id="bdd" parent="1" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;" value="&lt;b&gt;PostgreSQL&lt;/b&gt;&lt;br&gt;(conteneur Docker)&lt;br&gt;tables utilisateur,&lt;br&gt;fichier, tag" vertex="1">
+                    <mxGeometry height="120" width="170" x="1260" y="300" as="geometry"/>
+                </mxCell>
+                <mxCell id="disque" parent="1" style="shape=folder;whiteSpace=wrap;html=1;tabWidth=60;tabHeight=14;tabPosition=left;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=12;" value="&lt;b&gt;Stockage local&lt;/b&gt;&lt;br&gt;dossier uploads/&lt;br&gt;(volume Docker)" vertex="1">
+                    <mxGeometry height="100" width="170" x="1260" y="460" as="geometry"/>
+                </mxCell>
+                <mxCell id="flux1" edge="1" parent="1" source="proprietaire" style="html=1;endArrow=classic;startArrow=classic;labelBackgroundColor=#ffffff;fontSize=11;" target="front" value="HTTPS">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="flux2" edge="1" parent="1" source="destinataire" style="html=1;endArrow=classic;startArrow=classic;labelBackgroundColor=#ffffff;fontSize=11;" target="front" value="HTTPS">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="flux3" edge="1" parent="1" source="f-services" style="html=1;endArrow=classic;startArrow=classic;labelBackgroundColor=#ffffff;fontSize=11;exitX=1;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=1;entryDx=0;entryDy=0;" target="b-controleurs" value="&lt;b&gt;API REST · JSON&lt;/b&gt;&lt;br&gt;upload : multipart/form-data&lt;br&gt;téléchargement : flux du fichier&lt;br&gt;JWT dans l’en-tête Authorization">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="flux4" edge="1" parent="1" source="b-donnees" style="html=1;endArrow=classic;startArrow=classic;labelBackgroundColor=#ffffff;fontSize=11;" target="bdd" value="SQL">
+                    <mxGeometry relative="1" x="0.5445" as="geometry">
+                        <mxPoint as="offset"/>
+                        <Array as="points">
+                            <mxPoint x="930" y="360"/>
+                            <mxPoint x="1170" y="360"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="flux5" edge="1" parent="1" source="b-stockage" style="html=1;endArrow=classic;startArrow=classic;labelBackgroundColor=#ffffff;fontSize=11;" target="disque" value="lecture / écriture">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="legende" parent="1" style="shape=note;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=10;spacingTop=6;size=15;fillColor=#f5f5f5;strokeColor=#666666;" value="&lt;b&gt;Lecture du schéma&lt;/b&gt;&lt;br&gt;• Le front ne parle jamais directement à la base ni au disque : tout passe par l’API.&lt;br&gt;• Back-end en couches : Contrôleur (reçoit et valide la requête) → Service (règles métier) → Accès aux données / Stockage.&lt;br&gt;• Routes publiques : inscription, connexion, informations et téléchargement d’un fichier via son jeton. Toutes les autres exigent un JWT valide.&lt;br&gt;• Le stockage est isolé dans StorageService : passer à AWS S3 ne changerait que cette brique." vertex="1">
+                    <mxGeometry height="130" width="1410" x="20" y="630" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
