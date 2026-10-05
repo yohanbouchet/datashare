@@ -4,6 +4,7 @@ node_modules/
 # Résultats de compilation
 dist/
 build/
+*.tsbuildinfo
 
 # Secrets et configuration locale (mots de passe de la base, clé JWT)
 .env
