@@ -33,7 +33,7 @@ import { AppService } from './app.service.js';
         host: config.getOrThrow<string>('POSTGRES_HOST'),
         // Une valeur lue dans un .env est toujours du TEXTE ("5432") : on la convertit en nombre.
         // Le <number> seul ne convertit rien, il ne fait que "promettre" le type à TypeScript.
-        port: config.getOrThrow<number>('POSTGRES_PORT'),
+        port: Number(config.getOrThrow<string>('POSTGRES_PORT')),
         username: config.getOrThrow<string>('POSTGRES_USER'),
         password: config.getOrThrow<string>('POSTGRES_PASSWORD'),
         database: config.getOrThrow<string>('POSTGRES_DB'),
