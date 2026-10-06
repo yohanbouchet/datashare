@@ -1,122 +1,35 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+// Composant racine provisoire de DataShare.
+// Rôle à l'étape 2 : prouver que le front (port 5173) et l'API (port 3000) communiquent.
+// Il sera remplacé par les vrais écrans (connexion, téléversement, mon espace…) à partir de l'étape 3.
+
+// useState = la "mémoire" du composant ; useEffect = une action déclenchée par l'affichage.
+import { useEffect, useState } from 'react';
 
 function App() {
-  const [count, setCount] = useState(0)
+  // Mémoire du composant : le texte à afficher, "Chargement…" au départ
+  const [message, setMessage] = useState<string>('Chargement…');
 
+  // Au premier affichage de la page, on appelle l'API une seule fois ([] = une seule fois)
+  useEffect(() => {
+    // L'adresse de l'API vient de frontend/.env (VITE_API_URL) : rien n'est écrit en dur.
+    fetch(import.meta.env.VITE_API_URL)
+      .then((response) => {
+        // fetch ne considère pas un 404 ou un 500 comme une erreur : on le vérifie nous-mêmes
+        if (!response.ok) throw new Error(`Erreur HTTP ${response.status}`);
+        return response.text();
+      })
+      .then((texte) => setMessage(texte)) // on range la réponse dans la mémoire → l'écran se met à jour
+      .catch(() => setMessage("Impossible de joindre l'API")); // API arrêtée, CORS refusé…
+  }, []);
+
+  // Le JSX ci-dessous décrit l'écran ; {message} affiche la valeur actuelle de la mémoire.
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+    <main>
+      <h1>DataShare</h1>
+      <p>Réponse de l'API : {message}</p>
+    </main>
+  );
 }
 
-export default App
+// Export par défaut : permet à main.tsx d'importer ce composant.
+export default App;
