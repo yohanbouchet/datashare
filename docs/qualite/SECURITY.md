@@ -31,7 +31,9 @@ Légende : ✅ en place · 🔜 prévu (étape indiquée)
 | Mesure | État | Détail |
 |---|---|---|
 | CORS restreint | ✅ | Seule l'origine du front (`FRONTEND_URL`) est autorisée ; jamais `*` |
-| Mots de passe hachés et salés (bcrypt) | 🔜 étape 3 | US03 : le mot de passe n'est jamais stocké ni renvoyé |
+| Mots de passe hachés et salés (bcrypt) | ✅ | US03 : coût 12 (≈ 0,2 s par hachage, freine la force brute) ; sel aléatoire intégré ; seule l'empreinte `$2b$12$…` est stockée |
+| Aucune empreinte dans les réponses | ✅ | La réponse d'inscription est construite champ par champ (`id`, `email`, `createdAt`) : `select: false` ne protège que les lectures en base, pas l'objet qui vient d'être créé |
+| Doublon d'email simultané | ✅ | Erreur PostgreSQL `23505` (contrainte UNIQUE) convertie en 409, au lieu d'une erreur 500 |
 | Authentification par JWT à durée limitée | 🔜 étape 3 | US04 : jeton valable 1 h (`JWT_EXPIRES_IN`) |
 | Message de connexion identique en cas d'échec | 🔜 étape 3 | Empêche de deviner quels emails ont un compte (énumération) |
 | Validation des données côté serveur | ✅ | DTO + `class-validator`, `ValidationPipe` global : toute donnée invalide est refusée (400) avant d'atteindre le service |
@@ -67,3 +69,8 @@ Les vulnérabilités du back-end concernent des dépendances **indirectes**, pri
 Analyse détaillée et décision (corriger, accepter ou ignorer) : 🔜 étape 5, avec un scan complémentaire des images Docker par `trivy`.
 
 ⚠️ La commande `npm audit fix --force` n'est pas utilisée : elle peut installer des versions majeures incompatibles.
+
+### Scripts d'installation des paquets
+
+npm 11 bloque par défaut les scripts exécutés à l'installation d'un paquet (vecteur d'attaque connu de la chaîne d'approvisionnement).
+`bcrypt` en déclare un, mais il est livré avec une version précompilée : il fonctionne sans que son script soit autorisé (vérifié le 07/10/2026). Le blocage est donc conservé.

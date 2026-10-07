@@ -31,5 +31,6 @@
 |---|---|---|---|---|
 | 06/10/2026 | backend | 2 tests d'exemple (générateur) | ✅ 2/2 | — |
 | 07/10/2026 | backend | Validation de l'inscription, test manuel `curl` : données valides (201, email normalisé), email invalide + mot de passe court (400, 2 messages), champ `role` ajouté (400) | ✅ 3/3 | — |
+| 07/10/2026 | backend | Inscription, test manuel `curl` : compte créé (201, réponse sans empreinte), même email en majuscules (409), empreinte `$2b$12$…` en base | ✅ 3/3 | — |
 
 🔜 Rapport de couverture et capture d'écran (étape 5).

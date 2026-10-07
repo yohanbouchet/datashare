@@ -12,5 +12,7 @@ import { User } from './user.entity.js';
   imports: [TypeOrmModule.forFeature([User])],
   // providers : les services (logique métier) que NestJS crée et fournit aux autres pièces du module.
   providers: [UsersService],
+  // exports : rend UsersService utilisable par les modules qui importent UsersModule (ici AuthModule).
+  exports: [UsersService],
 })
 export class UsersModule {}
