@@ -25,16 +25,30 @@ Projet 3 du Master Expert DevOps – OpenClassrooms (« Pilotez le développemen
 datashare/
 ├── backend/            API NestJS
 ├── frontend/           Application React
-├── docs/conception/    MCD, schéma d'architecture, contrat d'interface
+├── docs/
+│   ├── conception/     MCD, schéma d'architecture, contrat d'interface
+│   └── qualite/        Suivi qualité : TESTING, SECURITY, PERF, MAINTENANCE
 ├── docker-compose.yml  Service PostgreSQL
 └── .env.example        Modèle des variables d'environnement (racine)
 ```
 
 ## Prérequis
 
-- **Node.js 24** (LTS) et npm
-- **Docker** et **Docker Compose**
-- Git
+| Outil | Version | Installation (documentation officielle) |
+|---|---|---|
+| Node.js (avec npm) | 24 LTS | https://nodejs.org/fr/download |
+| Docker Engine + Docker Compose | Docker 29, Compose v2 ou plus | https://docs.docker.com/engine/install/ |
+| Git | récente | https://git-scm.com/downloads |
+
+Vérifier les versions installées :
+
+```bash
+node --version            # v24.x attendu
+npm --version
+docker --version
+docker compose version
+git --version
+```
 
 ## Installation
 
@@ -118,6 +132,15 @@ chacune remplace une commande plus longue.
 Les fichiers `.env` contiennent des secrets : ils sont exclus de Git. Seuls les modèles `.env.example` sont publiés.
 
 ## Documentation
+
+Suivi de la qualité et de la maintenance (tenu à jour au fil du projet) :
+
+- [TESTING.md](docs/qualite/TESTING.md) – plan de tests et résultats
+- [SECURITY.md](docs/qualite/SECURITY.md) – mesures de sécurité et scans des dépendances
+- [PERF.md](docs/qualite/PERF.md) – tests de performance et métriques
+- [MAINTENANCE.md](docs/qualite/MAINTENANCE.md) – procédures (base de données, migrations, dépendances, journaux)
+
+Conception :
 
 - [Modèle conceptuel de données (MCD)](docs/conception/mcd-datashare.drawio)
 - [Schéma d'architecture](docs/conception/architecture-datashare.drawio)
