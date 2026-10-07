@@ -30,5 +30,6 @@
 | Date | Projet | Tests | Résultat | Couverture |
 |---|---|---|---|---|
 | 06/10/2026 | backend | 2 tests d'exemple (générateur) | ✅ 2/2 | — |
+| 07/10/2026 | backend | Validation de l'inscription, test manuel `curl` : données valides (201, email normalisé), email invalide + mot de passe court (400, 2 messages), champ `role` ajouté (400) | ✅ 3/3 | — |
 
 🔜 Rapport de couverture et capture d'écran (étape 5).

@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
 import { UsersModule } from './users/users.module.js';
+import { AuthModule } from './auth/auth.module.js';
 
 // @Module : le "sommaire" de l'application. Il liste les briques à charger (imports),
 // les points d'entrée HTTP (controllers) et la logique métier (providers).
@@ -47,6 +48,8 @@ import { UsersModule } from './users/users.module.js';
     }),
 
     UsersModule,
+
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
