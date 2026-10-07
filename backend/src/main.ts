@@ -3,6 +3,7 @@
 import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
+import helmet from 'helmet';
 import { AppModule } from './app.module.js';
 
 // async / await : certaines étapes prennent du temps (connexion à la base…) ;
@@ -10,6 +11,12 @@ import { AppModule } from './app.module.js';
 async function bootstrap() {
   // ① Fabrique l'application (charge tous les modules déclarés dans AppModule)
   const app = await NestFactory.create(AppModule);
+
+  // 🔒 Helmet : en-têtes de sécurité HTTP sur toutes les réponses
+  // (masque la technologie du serveur, interdit l'affichage dans le cadre d'un autre site,
+  // impose HTTPS en production…). Placé en premier pour s'appliquer à toutes les routes.
+  app.use(helmet());
+
   // Récupère le service de configuration (il a déjà lu le .env)
   const config = app.get(ConfigService);
 

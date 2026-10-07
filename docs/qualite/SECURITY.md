@@ -38,7 +38,7 @@ Légende : ✅ en place · 🔜 prévu (étape indiquée)
 | Champs inattendus refusés | ✅ | `whitelist` + `forbidNonWhitelisted` : un client ne peut pas ajouter un champ comme `role` ou `id` (400) |
 | Email normalisé | ✅ | Espaces retirés et minuscules avant contrôle : une seule adresse = un seul compte |
 | Longueur du mot de passe bornée | ✅ | 8 caractères minimum (US03), 72 maximum (limite de bcrypt, au-delà les caractères seraient ignorés) |
-| Technologie du serveur non divulguée | 🔜 étape 3 | En-tête `X-Powered-By: Express` à supprimer (en-têtes de sécurité HTTP) |
+| En-têtes de sécurité HTTP (`helmet`) | ✅ | Appliqués à toutes les réponses : `X-Powered-By` supprimé (technologie du serveur masquée), `X-Content-Type-Options: nosniff`, `X-Frame-Options` et `frame-ancestors` (anti-clickjacking), `Strict-Transport-Security` (HTTPS imposé en production), `Referrer-Policy: no-referrer` (les liens de partage ne fuient pas vers d'autres sites), `Content-Security-Policy` |
 | Accès limité à ses propres fichiers | 🔜 étape 4 | L'identité vient du JWT, jamais d'un paramètre ; réponse 404 pour le fichier d'un autre |
 | Lien de partage non prédictible | 🔜 étape 4 | Jeton aléatoire long, distinct de l'identifiant interne |
 | Contrôle de la taille et des extensions | 🔜 étape 4 | 1 Go maximum (contrôle dans le navigateur, à l'arrivée et pendant la réception) ; extensions exécutables refusées |
