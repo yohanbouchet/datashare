@@ -17,7 +17,11 @@ export function Accueil() {
       {/* h1 : le titre principal de la page (un seul par page, repère pour l'accessibilité) */}
       <h1 className="accueil__titre">Tu veux partager un fichier ?</h1>
       {/* aria-label : le bouton ne contient qu'une icône, ce texte est lu par les lecteurs d'écran */}
-      <Link to="/connexion" className="accueil__bouton" aria-label="Téléverser un fichier">
+      <Link
+        to="/connexion"
+        className="accueil__bouton"
+        aria-label="Téléverser un fichier"
+      >
         {/* Icône « nuage avec flèche » ; aria-hidden : décorative, ignorée par les lecteurs d'écran */}
         <svg
           width="40"

@@ -10,13 +10,13 @@
 // Utilisé par :
 //   - index.html (balise <script>)
 // ================================================================================================
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import { BrowserRouter } from 'react-router'
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import { BrowserRouter } from 'react-router';
 
 // Styles globaux de l'application (couleurs, polices…).
-import './index.css'
-import App from './App.tsx'
+import './index.css';
+import App from './App.tsx';
 
 // createRoot : React prend le contrôle de la balise <div id="root"> d'index.html
 // et y dessine le composant App. Le "!" indique à TypeScript que cette balise existe forcément.
@@ -30,4 +30,4 @@ createRoot(document.getElementById('root')!).render(
       <App />
     </BrowserRouter>
   </StrictMode>,
-)
+);

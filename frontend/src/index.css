@@ -19,7 +19,12 @@
   /* Boutons et liens */
   --couleur-sombre: #2c2c2c; /* boutons noirs de l'en-tête */
   --couleur-bouton-rond: #100218; /* bouton rond de l'accueil */
-  --couleur-anneau: rgba(47, 25, 13, 0.15); /* anneau autour du bouton rond (#2F190D à 15 %) */
+  --couleur-anneau: rgba(
+    47,
+    25,
+    13,
+    0.15
+  ); /* anneau autour du bouton rond (#2F190D à 15 %) */
   --couleur-accent: #e27f29; /* liens orange (« Créer un compte ») */
   --couleur-accent-texte: #ba681f; /* texte des boutons orange */
   --couleur-accent-fond: #ffeeec; /* fond des boutons orange */
