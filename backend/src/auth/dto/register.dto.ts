@@ -1,5 +1,15 @@
-// DTO d'inscription (US03) : décrit et valide les données envoyées sur POST /api/auth/register.
-// Toute donnée qui ne respecte pas ces règles est refusée avec une erreur 400, avant d'atteindre le service.
+// ================================================================================================
+// Fichier : register.dto.ts
+// Rôle : DTO d'inscription (US03) : forme et règles des données de POST /api/auth/register.
+//   Toute donnée invalide est refusée (400) par le ValidationPipe global avant d'atteindre le service.
+//   Normalise l'email (minuscules, sans espaces) ; mot de passe de 8 à 72 caractères.
+// Utilise :
+//   - class-validator, class-transformer (paquets npm) : règles et transformation
+// Utilisé par :
+//   - auth.controller.ts (@Body)
+//   - auth.service.ts (register)
+//   - main.ts (ValidationPipe qui l'applique)
+// ================================================================================================
 import { Transform } from 'class-transformer';
 import { IsEmail, IsString, MaxLength, MinLength } from 'class-validator';
 

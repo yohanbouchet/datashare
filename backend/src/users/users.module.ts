@@ -1,5 +1,14 @@
-// Module "users" : regroupe tout ce qui concerne les comptes utilisateurs (entité, service).
-// Un module NestJS = un "service de l'entreprise" avec son propre bureau ; il est déclaré dans app.module.ts.
+// ================================================================================================
+// Fichier : users.module.ts
+// Rôle : Module « users » : regroupe ce qui concerne les comptes (entité, service).
+//   Donne accès à la table users et partage UsersService avec les autres modules (exports).
+// Utilise :
+//   - user.entity.ts (User)
+//   - users.service.ts (UsersService)
+// Utilisé par :
+//   - app.module.ts (imports)
+//   - auth/auth.module.ts (imports : pour utiliser UsersService)
+// ================================================================================================
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 // Imports en ".js" (règle ESM) : on vise le fichier compilé, TypeScript retrouve le .ts correspondant.

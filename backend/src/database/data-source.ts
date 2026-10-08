@@ -1,5 +1,14 @@
-// Source de données autonome, utilisée par l'outil en ligne de commande de TypeORM (migrations).
-// L'API, elle, se connecte via app.module.ts ; ce fichier sert seulement aux commandes migration:*.
+// ================================================================================================
+// Fichier : data-source.ts
+// Rôle : Source de données AUTONOME, utilisée uniquement par les commandes de migration TypeORM.
+//   L'API, elle, se connecte via app.module.ts. Ce fichier sert à npm run migration:generate / run / revert.
+// Utilise :
+//   - .env (racine) : variables POSTGRES_* (lues avec process.loadEnvFile)
+//   - users/user.entity.ts (User) : entité comparée à la base
+//   - dist/database/migrations/*.js : les migrations compilées
+// Utilisé par :
+//   - package.json (scripts migration:*)
+// ================================================================================================
 import { DataSource } from 'typeorm';
 import { User } from '../users/user.entity.js';
 

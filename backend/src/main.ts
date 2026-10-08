@@ -1,5 +1,15 @@
-// Point d'entrée de l'API : c'est le premier fichier exécuté (npm run start:dev).
-// Il fabrique l'application à partir d'AppModule, applique les réglages globaux, puis ouvre le port.
+// ================================================================================================
+// Fichier : main.ts
+// Rôle : Point d'entrée de l'API : premier fichier exécuté (npm run start:dev).
+//   Fabrique l'application à partir d'AppModule, applique les réglages globaux (helmet, préfixe /api,
+//   validation des données, CORS), puis ouvre le port 3000.
+// Utilise :
+//   - app.module.ts (AppModule) : la liste des modules à charger
+//   - @nestjs/config (ConfigService) : lit FRONTEND_URL dans le .env racine
+//   - helmet (paquet npm) : en-têtes de sécurité HTTP
+// Utilisé par :
+//   - personne : c'est le point de départ (lancé par Node.js)
+// ================================================================================================
 import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';

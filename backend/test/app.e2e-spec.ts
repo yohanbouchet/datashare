@@ -1,7 +1,14 @@
-// Test "end-to-end" (de bout en bout) d'exemple, généré par NestJS : lancé avec "npm run test:e2e".
-// Contrairement au test unitaire, il démarre l'application complète (dont la connexion à la base)
-// et envoie de vraies requêtes HTTP, comme le ferait le navigateur.
-// Remarque : le préfixe /api est appliqué dans main.ts, qui n'est pas utilisé ici : la route reste "/".
+// ================================================================================================
+// Fichier : app.e2e-spec.ts
+// Rôle : Test de bout en bout (e2e) d'exemple PROVISOIRE, généré par NestJS (npm run test:e2e).
+//   Démarre l'application complète (avec la base) et envoie de vraies requêtes HTTP.
+//   Remarque : le préfixe /api est appliqué dans main.ts, non utilisé ici : la route reste « / ».
+// Utilise :
+//   - src/app.module.ts (AppModule) : l'application complète
+//   - supertest (paquet npm) : requêtes HTTP de test
+// Utilisé par :
+//   - Vitest (vitest.config.e2e.ts)
+// ================================================================================================
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 // supertest : outil qui envoie des requêtes HTTP à l'application sans ouvrir de vrai port réseau.

@@ -1,5 +1,13 @@
-// Module "auth" : l'authentification (inscription US03, connexion US04, JWT).
-// Il regroupe son contrôleur (les routes /api/auth/...), son service (la logique) et ses DTO (dossier dto/).
+// ================================================================================================
+// Fichier : auth.module.ts
+// Rôle : Module « auth » : l'authentification (inscription US03, puis connexion US04 et JWT).
+//   Regroupe son contrôleur (routes /api/auth/...), son service (la logique) et ses DTO (dossier dto/).
+// Utilise :
+//   - users/users.module.ts (UsersModule) : fournit UsersService
+//   - auth.controller.ts (AuthController), auth.service.ts (AuthService)
+// Utilisé par :
+//   - app.module.ts (imports)
+// ================================================================================================
 import { Module } from '@nestjs/common';
 import { UsersModule } from '../users/users.module.js';
 import { AuthController } from './auth.controller.js';

@@ -1,4 +1,12 @@
-// Test unitaire d'exemple du contrôleur (généré par NestJS, exécuté par Vitest avec "npm test").
+// ================================================================================================
+// Fichier : app.controller.spec.ts
+// Rôle : Test unitaire d'exemple PROVISOIRE (généré par NestJS) du contrôleur AppController.
+//   Vérifie que GET /api renvoie « Hello World! ». Exécuté par Vitest (npm test).
+// Utilise :
+//   - app.controller.ts, app.service.ts : les pièces testées
+// Utilisé par :
+//   - Vitest (vitest.config.ts)
+// ================================================================================================
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';

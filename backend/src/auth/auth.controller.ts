@@ -1,4 +1,15 @@
-// Contrôleur d'authentification : reçoit les requêtes /api/auth/... et délègue le travail à AuthService.
+// ================================================================================================
+// Fichier : auth.controller.ts
+// Rôle : Contrôleur d'authentification : reçoit les requêtes /api/auth/... (couche « contrôleur »).
+//   Ne contient aucune logique : il valide les données (via le DTO) et transmet à AuthService.
+//   Routes : POST /api/auth/register (US03).
+// Utilise :
+//   - auth.service.ts (AuthService) : fait le travail
+//   - dto/register.dto.ts (RegisterDto) : forme et règles des données reçues
+// Utilisé par :
+//   - auth.module.ts (déclaré dans controllers)
+//   - le front (formulaire d'inscription, à venir)
+// ================================================================================================
 import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service.js';
 import { RegisterDto } from './dto/register.dto.js';

@@ -1,3 +1,14 @@
+// ================================================================================================
+// Fichier : app.module.ts
+// Rôle : Module racine de l'API : le « sommaire » de l'application.
+//   Charge la configuration (.env), ouvre la connexion à PostgreSQL et déclare tous les modules fonctionnels.
+// Utilise :
+//   - .env (racine) : variables POSTGRES_* lues par ConfigModule / ConfigService
+//   - users/users.module.ts (UsersModule), auth/auth.module.ts (AuthModule)
+//   - app.controller.ts, app.service.ts : exemple provisoire (GET /api)
+// Utilisé par :
+//   - main.ts (NestFactory.create(AppModule))
+// ================================================================================================
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';

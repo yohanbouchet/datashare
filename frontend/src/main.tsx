@@ -1,4 +1,14 @@
-// Point d'entrée du front-end : c'est le premier fichier exécuté par le navigateur.
+// ================================================================================================
+// Fichier : main.tsx
+// Rôle : Point d'entrée du front-end : premier fichier exécuté par le navigateur.
+//   Branche React sur la balise <div id="root"> de index.html et y affiche le composant App.
+// Utilise :
+//   - App.tsx (App) : le composant racine
+//   - index.css : styles globaux
+//   - index.html (balise root)
+// Utilisé par :
+//   - index.html (balise <script>)
+// ================================================================================================
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 // Styles globaux de l'application (couleurs, polices…).

@@ -1,5 +1,12 @@
-// Service d'exemple généré par NestJS (provisoire), appelé par AppController.
-// Dans l'architecture en couches, le service contient la logique métier ; ici, il renvoie juste un texte.
+// ================================================================================================
+// Fichier : app.service.ts
+// Rôle : Service d'exemple PROVISOIRE (généré par NestJS) : renvoie « Hello World! ».
+//   Illustre la séparation contrôleur / service ; sera supprimé avec app.controller.ts.
+// Utilise :
+//   - rien
+// Utilisé par :
+//   - app.controller.ts
+// ================================================================================================
 import { Injectable } from '@nestjs/common';
 
 // @Injectable : NestJS peut créer ce service et l'injecter dans le contrôleur.

@@ -1,6 +1,13 @@
-// Entité User : la description de la table "users" en TypeScript (issue du MCD : entité UTILISATEUR).
-// TypeORM lit cette classe pour savoir quelles colonnes existent et comment les lire / écrire.
-// Les "décorateurs" (@Entity, @Column…) sont des étiquettes posées sur la classe et ses propriétés.
+// ================================================================================================
+// Fichier : user.entity.ts
+// Rôle : Entité User : la table « users » décrite en TypeScript (entité UTILISATEUR du MCD).
+//   TypeORM s'en sert pour lire et écrire les comptes, et pour générer les migrations.
+// Utilise :
+//   - typeorm (paquet npm) : décorateurs @Entity, @Column…
+// Utilisé par :
+//   - users.module.ts (forFeature), users.service.ts (Repository<User>)
+//   - database/data-source.ts (génération des migrations)
+// ================================================================================================
 import {
   Column,
   CreateDateColumn,

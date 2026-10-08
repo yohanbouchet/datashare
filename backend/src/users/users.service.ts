@@ -1,4 +1,13 @@
-// Service "users" : accès à la table users (lire et créer des comptes) via le Repository de TypeORM.
+// ================================================================================================
+// Fichier : users.service.ts
+// Rôle : Service « users » : accès à la table users (lire et créer des comptes).
+//   Seule pièce qui parle à la table users, via le Repository de TypeORM (aucun SQL écrit à la main).
+// Utilise :
+//   - user.entity.ts (User) : la forme d'un compte
+//   - @nestjs/typeorm / typeorm : Repository<User> fourni par NestJS
+// Utilisé par :
+//   - auth/auth.service.ts (findByEmail, create)
+// ================================================================================================
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';

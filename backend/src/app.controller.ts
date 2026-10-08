@@ -1,5 +1,13 @@
-// Contrôleur d'exemple généré par NestJS (provisoire) : il répond "Hello World!" sur GET /api.
-// Il sert de test de connexion avec le front ; il sera supprimé quand les vraies routes existeront.
+// ================================================================================================
+// Fichier : app.controller.ts
+// Rôle : Contrôleur d'exemple PROVISOIRE (généré par NestJS) : GET /api → « Hello World! ».
+//   Sert de test de connexion avec le front. Il sera supprimé quand les vraies routes seront en place.
+// Utilise :
+//   - app.service.ts (AppService) : fournit le texte
+// Utilisé par :
+//   - app.module.ts (déclaré dans controllers)
+//   - frontend/src/App.tsx (appel fetch)
+// ================================================================================================
 import { Controller, Get } from '@nestjs/common';
 import { AppService } from './app.service.js';
 

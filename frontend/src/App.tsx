@@ -1,8 +1,15 @@
-// Composant racine provisoire de DataShare.
-// Rôle à l'étape 2 : prouver que le front (port 5173) et l'API (port 3000) communiquent.
-// Il sera remplacé par les vrais écrans (connexion, téléversement, mon espace…) à partir de l'étape 3.
-
-// useState = la "mémoire" du composant ; useEffect = une action déclenchée par l'affichage.
+// ================================================================================================
+// Fichier : App.tsx
+// Rôle : Composant racine PROVISOIRE de DataShare.
+//   Étape 2 : prouve que le front (port 5173) et l'API (port 3000) communiquent, en affichant la
+//   réponse de GET /api. Sera remplacé par les vrais écrans (connexion, téléversement, mon espace…).
+// Utilise :
+//   - frontend/.env (VITE_API_URL) : adresse de l'API
+//   - react (useState, useEffect)
+// Utilisé par :
+//   - main.tsx
+// ================================================================================================
+// useState = la « mémoire » du composant ; useEffect = une action déclenchée par l'affichage.
 import { useEffect, useState } from 'react';
 
 function App() {

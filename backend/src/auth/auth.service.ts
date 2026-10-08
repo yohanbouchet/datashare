@@ -1,4 +1,15 @@
-// Service "auth" : logique de l'inscription (US03) ; la connexion (US04) viendra ensuite.
+// ================================================================================================
+// Fichier : auth.service.ts
+// Rôle : Service d'authentification : logique de l'inscription (US03) ; la connexion (US04) viendra ici.
+//   Vérifie que l'email est libre, hache le mot de passe (bcrypt), crée le compte, renvoie une réponse
+//   sans empreinte. Transforme les doublons en erreur 409.
+// Utilise :
+//   - users/users.service.ts (UsersService) : findByEmail, create
+//   - dto/register.dto.ts (RegisterDto) : données déjà validées
+//   - bcrypt (paquet npm) : hachage salé du mot de passe
+// Utilisé par :
+//   - auth.controller.ts (register)
+// ================================================================================================
 import { ConflictException, Injectable } from '@nestjs/common';
 import bcrypt from 'bcrypt';
 import { UsersService } from '../users/users.service.js';

@@ -1,7 +1,14 @@
-// Migration n°1 : création de la table "users" (générée par "npm run migration:generate", puis relue).
-// Une migration = une modification de la structure de la base, versionnée dans Git et rejouable
-// sur n'importe quelle machine. Le nombre dans le nom est la date de création (horodatage en millisecondes) :
-// il fixe l'ordre d'exécution des migrations.
+// ================================================================================================
+// Fichier : 1791355761850-CreateUsers.ts
+// Rôle : Migration n°1 : création de la table « users » (générée par npm run migration:generate, puis relue).
+//   Une migration = une modification de la structure de la base, versionnée dans Git et rejouable.
+//   Le nombre dans le nom est sa date de création (horodatage) : il fixe l'ordre d'exécution.
+// Utilise :
+//   - typeorm (QueryRunner) : exécute le SQL
+// Utilisé par :
+//   - database/data-source.ts (liste des migrations)
+//   - npm run migration:run / migration:revert
+// ================================================================================================
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class CreateUsers1791355761850 implements MigrationInterface {
