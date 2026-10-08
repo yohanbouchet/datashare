@@ -16,7 +16,7 @@
 
 | Fonctionnalité | US | Cas testés | Type | Critère d'acceptation | État |
 |---|---|---|---|---|---|
-| Inscription | US03 | Compte créé ; email déjà utilisé ; email invalide ; mot de passe < 8 caractères ; mot de passe non renvoyé | Unitaire + e2e | 201 ; 409 ; 400 ; 400 ; aucune empreinte dans la réponse | 🔜 |
+| Inscription | US03 | Compte créé ; email déjà utilisé ; email invalide ; mot de passe < 8 caractères ; mot de passe non renvoyé | Unitaire + e2e | 201 ; 409 ; 400 ; 400 ; aucune empreinte dans la réponse | ✅ unitaire (8 tests) · 🔜 e2e |
 | Connexion | US04 | Identifiants corrects ; mot de passe faux ; email inconnu | Unitaire + e2e | 200 + JWT ; 401 avec le même message dans les deux cas d'échec | 🔜 |
 | Route protégée | US04 | Avec JWT valide ; sans JWT ; JWT expiré | e2e | 200 ; 401 ; 401 | 🔜 |
 | Téléversement | US01 | Fichier valide ; > 1 Go ; extension interdite ; durée hors 1–7 ; sans connexion | Unitaire + e2e | 201 + jeton ; 413 ; 400 ; 400 ; 401 | 🔜 |
@@ -32,5 +32,6 @@
 | 06/10/2026 | backend | 2 tests d'exemple (générateur) | ✅ 2/2 | — |
 | 07/10/2026 | backend | Validation de l'inscription, test manuel `curl` : données valides (201, email normalisé), email invalide + mot de passe court (400, 2 messages), champ `role` ajouté (400) | ✅ 3/3 | — |
 | 07/10/2026 | backend | Inscription, test manuel `curl` : compte créé (201, réponse sans empreinte), même email en majuscules (409), empreinte `$2b$12$…` en base | ✅ 3/3 | — |
+| 08/10/2026 | backend | Tests unitaires de l'inscription avec doublures : AuthService (compte créé sans empreinte, mot de passe haché, email déjà pris → 409 sans création, doublon simultané 23505 → 409, autres erreurs remontées), UsersService (recherche, création), AuthController (délégation) | ✅ 9/9 | auth.service.ts : 100 % des lignes |
 
 🔜 Rapport de couverture et capture d'écran (étape 5).
