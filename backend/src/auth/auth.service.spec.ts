@@ -1,16 +1,18 @@
 // ================================================================================================
 // Fichier : auth.service.spec.ts
-// Rôle : Tests unitaires de AuthService – inscription (US03) (Vitest : npm test).
-//   UsersService est remplacé par une doublure (mock) : pas de base de données.
+// Rôle : Tests unitaires de AuthService – inscription (US03) et connexion (US04) (Vitest : npm test).
+//   UsersService et JwtService sont remplacés par des doublures (mocks) : pas de base de données.
 //   Cas testés : voir le plan de tests docs/qualite/TESTING.md.
 // Utilise :
 //   - auth.service.ts (la pièce testée)
-//   - users/users.service.ts (UsersService, remplacé par la doublure)
-//   - bcrypt (pour vérifier que l'empreinte correspond au mot de passe)
+//   - users/users.service.ts (UsersService, remplacé par une doublure)
+//   - @nestjs/jwt (JwtService, remplacé par une doublure)
+//   - bcrypt (pour fabriquer et vérifier de vraies empreintes)
 // Utilisé par :
 //   - Vitest (vitest.config.ts)
 // ================================================================================================
-import { ConflictException } from '@nestjs/common';
+import { ConflictException, UnauthorizedException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 import bcrypt from 'bcrypt';
 import { UsersService } from '../users/users.service.js';
@@ -21,7 +23,13 @@ describe('AuthService', () => {
 
   // Doublure de UsersService : vi.fn() crée une fausse fonction dont on choisit la réponse
   // dans chaque test, et qui enregistre comment elle a été appelée.
-  const usersService = { findByEmail: vi.fn(), create: vi.fn() };
+  const usersService = {
+    findByEmail: vi.fn(),
+    findByEmailWithPassword: vi.fn(),
+    create: vi.fn(),
+  };
+  // Doublure de JwtService : renvoie toujours le même faux jeton.
+  const jwtService = { signAsync: vi.fn().mockResolvedValue('faux.jeton.jwt') };
   const dto = { email: 'claire@mail.fr', password: 'motdepasse8' };
   const createdAt = new Date('2026-10-08T08:00:00Z');
 
@@ -33,6 +41,7 @@ describe('AuthService', () => {
         AuthService,
         // "Quand AuthService demande UsersService, donne-lui la doublure."
         { provide: UsersService, useValue: usersService },
+        { provide: JwtService, useValue: jwtService },
       ],
     }).compile();
     service = module.get<AuthService>(AuthService);
@@ -94,6 +103,61 @@ describe('AuthService', () => {
       usersService.create.mockRejectedValue(new Error('Base indisponible'));
 
       await expect(service.register(dto)).rejects.toThrow('Base indisponible');
+    });
+  });
+
+  describe('login', () => {
+    // Vraie empreinte bcrypt de "motdepasse8", calculée une seule fois (coût 4 : rapide, pour les tests).
+    let passwordHash: string;
+    beforeAll(async () => {
+      passwordHash = await bcrypt.hash(dto.password, 4);
+    });
+
+    it('renvoie un JWT et l’utilisateur sans empreinte si les identifiants sont corrects', async () => {
+      usersService.findByEmailWithPassword.mockResolvedValue({
+        id: 1,
+        email: dto.email,
+        passwordHash,
+      });
+
+      const result = await service.login(dto);
+
+      expect(result).toEqual({
+        accessToken: 'faux.jeton.jwt',
+        user: { id: 1, email: dto.email },
+      });
+      // Le jeton contient l'identifiant (sub) et l'email, rien d'autre
+      expect(jwtService.signAsync).toHaveBeenCalledWith({
+        sub: 1,
+        email: dto.email,
+      });
+    });
+
+    it('refuse un mauvais mot de passe (401) sans délivrer de jeton', async () => {
+      usersService.findByEmailWithPassword.mockResolvedValue({
+        id: 1,
+        email: dto.email,
+        passwordHash,
+      });
+
+      await expect(
+        service.login({ email: dto.email, password: 'mauvais123' }),
+      ).rejects.toThrow(UnauthorizedException);
+      expect(jwtService.signAsync).not.toHaveBeenCalled();
+    });
+
+    it('refuse un email inconnu avec le MÊME message, après une comparaison factice', async () => {
+      usersService.findByEmailWithPassword.mockResolvedValue(null);
+      // "Espion" sur bcrypt.compare : on vérifie qu'il est appelé même si le compte n'existe pas
+      const compareSpy = vi.spyOn(bcrypt, 'compare');
+
+      await expect(service.login(dto)).rejects.toThrow(
+        'Email ou mot de passe incorrect',
+      );
+      // 🔒 Comparaison faite quand même (empreinte factice) : la durée ne révèle pas que l'email est inconnu
+      expect(compareSpy).toHaveBeenCalledTimes(1);
+      expect(jwtService.signAsync).not.toHaveBeenCalled();
+      compareSpy.mockRestore();
     });
   });
 });
