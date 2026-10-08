@@ -14,7 +14,7 @@
 // Utilisé par :
 //   - App.tsx (route « /connexion »), Header.tsx et Accueil.tsx (liens)
 // ================================================================================================
-import { useState, type FormEvent } from 'react';
+import { useState, type SubmitEvent } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router';
 import { Bandeau } from '../components/Bandeau.tsx';
 import { Champ } from '../components/Champ.tsx';
@@ -61,8 +61,9 @@ export function Connexion() {
     return resultat;
   }
 
-  // async : la soumission attend la réponse de l'API
-  async function soumettre(evenement: FormEvent<HTMLFormElement>) {
+  // async : la soumission attend la réponse de l'API.
+  // SubmitEvent : le type de l'événement « envoi du formulaire » (FormEvent est déclaré obsolète dans React 19).
+  async function soumettre(evenement: SubmitEvent<HTMLFormElement>) {
     // preventDefault : empêche le navigateur de recharger la page (comportement par défaut d'un formulaire)
     evenement.preventDefault();
     setErreurServeur(null);
