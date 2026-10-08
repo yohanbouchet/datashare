@@ -205,3 +205,115 @@ a {
     font-size: 1.6rem;
   }
 }
+
+/* ================================================================================================
+   Formulaires (Connexion, Créer un compte…)
+   ================================================================================================ */
+.formulaire {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* ---- Champ (« Input Component ») ---- */
+.champ {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.champ__label {
+  font-size: 1rem;
+}
+
+.champ__saisie {
+  font: inherit;
+  padding: 0.65rem 1rem;
+  border: 1px solid var(--couleur-bordure);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.champ__saisie::placeholder {
+  color: var(--couleur-texte-doux);
+}
+
+/* Champ en erreur : bordure rouge (repérée par aria-invalid, donc cohérente avec l'accessibilité) */
+.champ__saisie[aria-invalid='true'] {
+  border-color: var(--couleur-erreur);
+}
+
+.champ__erreur {
+  margin: 0;
+  color: var(--couleur-erreur);
+  font-size: 0.9rem;
+}
+
+/* ---- Lien orange (« Créer un compte », « J'ai déjà un compte ») ---- */
+.lien-accent {
+  align-self: center;
+  color: var(--couleur-accent);
+  text-decoration: none;
+  margin-top: 0.5rem;
+}
+
+.lien-accent:hover {
+  text-decoration: underline;
+}
+
+/* ---- Bouton orange pleine largeur (« Button Component ») ---- */
+.bouton-principal {
+  font: inherit;
+  padding: 0.65rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--couleur-accent-bord);
+  background: var(--couleur-accent-fond);
+  color: var(--couleur-accent-texte);
+  cursor: pointer;
+}
+
+.bouton-principal:hover:not(:disabled) {
+  filter: brightness(0.97);
+}
+
+/* Bouton désactivé : gris, comme dans la maquette */
+.bouton-principal:disabled {
+  background: #f3eeea;
+  border-color: var(--couleur-bordure);
+  color: var(--couleur-texte-doux);
+  cursor: not-allowed;
+}
+
+/* ---- Bandeau (« Callout Component ») ---- */
+.bandeau {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 0.8rem;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  border: 1px solid;
+  font-size: 0.95rem;
+}
+
+.bandeau svg {
+  flex-shrink: 0;
+}
+
+.bandeau--info {
+  background: var(--info-fond);
+  border-color: var(--info-bord);
+  color: var(--info-texte);
+}
+
+.bandeau--alerte {
+  background: var(--alerte-fond);
+  border-color: var(--alerte-bord);
+  color: var(--alerte-texte);
+}
+
+.bandeau--erreur {
+  background: var(--erreur-fond);
+  border-color: var(--erreur-bord);
+  color: var(--erreur-texte);
+}
