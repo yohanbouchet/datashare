@@ -51,6 +51,14 @@ Légende : ✅ en place · 🔜 prévu (étape indiquée)
 | Mot de passe de fichier hors de l'URL | 🔜 étape 4 | Envoyé dans le corps d'une requête POST, jamais dans l'adresse |
 | Limitation des tentatives | 🔜 étape 5 | `@nestjs/throttler` sur la connexion et la vérification de mot de passe de fichier |
 
+### Front-end
+
+| Mesure | État | Détail |
+|---|---|---|
+| Conservation du JWT | ✅ | `sessionStorage` : survit au rechargement, effacé à la fermeture de l'onglet ; combiné à la durée de vie d'1 h du jeton. Évolution possible : cookie `HttpOnly` (inaccessible au JavaScript), qui demanderait une protection CSRF |
+| Session vérifiée au démarrage | ✅ | Le jeton conservé est contrôlé par `GET /api/auth/me` ; jeton expiré ou invalide → effacé |
+| Jeton jamais dans l'adresse | ✅ | Envoyé uniquement dans l'en-tête `Authorization` par le service API |
+
 ### Risques web classiques
 
 | Risque | Protection |
