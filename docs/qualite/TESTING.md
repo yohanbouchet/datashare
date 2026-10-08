@@ -18,7 +18,7 @@
 |---|---|---|---|---|---|
 | Inscription | US03 | Compte créé ; email déjà utilisé ; email invalide ; mot de passe < 8 caractères ; mot de passe non renvoyé | Unitaire + e2e | 201 ; 409 ; 400 ; 400 ; aucune empreinte dans la réponse | ✅ unitaire (8 tests) · 🔜 e2e |
 | Connexion | US04 | Identifiants corrects ; mot de passe faux ; email inconnu (comparaison factice) | Unitaire + e2e | 200 + JWT ; 401 avec le même message dans les deux cas d'échec, sans jeton délivré | ✅ unitaire (3 tests) · 🔜 e2e |
-| Route protégée | US04 | Avec JWT valide ; sans JWT ; JWT expiré | e2e | 200 ; 401 ; 401 | 🔜 |
+| Route protégée | US04 | Avec JWT valide ; sans JWT ; mauvais format ; JWT invalide ou expiré | Unitaire + e2e | 200 ; 401 ; 401 ; 401 | ✅ unitaire (garde : 4 tests) · 🔜 e2e |
 | Téléversement | US01 | Fichier valide ; > 1 Go ; extension interdite ; durée hors 1–7 ; sans connexion | Unitaire + e2e | 201 + jeton ; 413 ; 400 ; 400 ; 401 | 🔜 |
 | Téléchargement | US02 | Lien valide ; lien inconnu ; lien expiré ; mot de passe juste / faux | Unitaire + e2e | 200 ; 404 ; 410 ; 200 / 401 | 🔜 |
 | Historique | US05 | Fichiers de l'utilisateur seulement ; filtre actifs / expirés | Unitaire + e2e | Aucun fichier d'un autre compte | 🔜 |
@@ -35,5 +35,6 @@
 | 08/10/2026 | backend | Tests unitaires de l'inscription avec doublures : AuthService (compte créé sans empreinte, mot de passe haché, email déjà pris → 409 sans création, doublon simultané 23505 → 409, autres erreurs remontées), UsersService (recherche, création), AuthController (délégation) | ✅ 9/9 | auth.service.ts : 100 % des lignes |
 | 08/10/2026 | backend | Connexion, test manuel `curl` : identifiants corrects (200 + JWT, email en majuscules accepté), mauvais mot de passe (401), email inconnu (401, même message et même durée ≈ 0,21 s) | ✅ 3/3 | — |
 | 08/10/2026 | backend | Tests unitaires de la connexion : JWT délivré avec `sub` et `email` seulement, mauvais mot de passe → 401 sans jeton, email inconnu → même message et comparaison bcrypt factice effectuée | ✅ 12/12 (total) | — |
+| 08/10/2026 | backend | Garde JWT et `GET /api/auth/me` : tests unitaires (4 cas de la garde, routes login et me du contrôleur) + test manuel `curl` (jeton valide 200, sans jeton 401, jeton modifié d'un caractère 401) | ✅ 18/18 (total) · ✅ 3/3 manuel | — |
 
 🔜 Rapport de couverture et capture d'écran (étape 5).
