@@ -1,42 +1,36 @@
 // ================================================================================================
 // Fichier : App.tsx
-// Rôle : Composant racine PROVISOIRE de DataShare.
-//   Étape 2 : prouve que le front (port 5173) et l'API (port 3000) communiquent, en affichant la
-//   réponse de GET /api. Sera remplacé par les vrais écrans (connexion, téléversement, mon espace…).
+// Rôle : Composant racine : la table de navigation (quelle adresse affiche quelle page).
+//   Toutes les pages sont « enfants » du Layout : elles partagent l'en-tête et le pied de page.
 // Utilise :
-//   - frontend/.env (VITE_API_URL) : adresse de l'API
-//   - react (useState, useEffect)
+//   - react-router (Routes, Route)
+//   - components/Layout.tsx ; pages/Accueil, Connexion, Inscription, PageIntrouvable
 // Utilisé par :
 //   - main.tsx
 // ================================================================================================
-// useState = la « mémoire » du composant ; useEffect = une action déclenchée par l'affichage.
-import { useEffect, useState } from 'react';
+import { Route, Routes } from 'react-router';
+import { Layout } from './components/Layout.tsx';
+import { Accueil } from './pages/Accueil.tsx';
+import { Connexion } from './pages/Connexion.tsx';
+import { Inscription } from './pages/Inscription.tsx';
+import { PageIntrouvable } from './pages/PageIntrouvable.tsx';
 
 function App() {
-  // Mémoire du composant : le texte à afficher, "Chargement…" au départ
-  const [message, setMessage] = useState<string>('Chargement…');
-
-  // Au premier affichage de la page, on appelle l'API une seule fois ([] = une seule fois)
-  useEffect(() => {
-    // L'adresse de l'API vient de frontend/.env (VITE_API_URL) : rien n'est écrit en dur.
-    fetch(import.meta.env.VITE_API_URL)
-      .then((response) => {
-        // fetch ne considère pas un 404 ou un 500 comme une erreur : on le vérifie nous-mêmes
-        if (!response.ok) throw new Error(`Erreur HTTP ${response.status}`);
-        return response.text();
-      })
-      .then((texte) => setMessage(texte)) // on range la réponse dans la mémoire → l'écran se met à jour
-      .catch(() => setMessage("Impossible de joindre l'API")); // API arrêtée, CORS refusé…
-  }, []);
-
-  // Le JSX ci-dessous décrit l'écran ; {message} affiche la valeur actuelle de la mémoire.
   return (
-    <main>
-      <h1>DataShare</h1>
-      <p>Réponse de l'API : {message}</p>
-    </main>
+    // Routes : regarde l'adresse actuelle et affiche la première Route qui correspond
+    <Routes>
+      {/* Route parente sans adresse : le Layout entoure toutes les pages (affichées dans son <Outlet />) */}
+      <Route element={<Layout />}>
+        <Route path="/" element={<Accueil />} />
+        {/* /connexion → page de connexion (US04) */}
+        <Route path="/connexion" element={<Connexion />} />
+        {/* /inscription → page de création de compte (US03) */}
+        <Route path="/inscription" element={<Inscription />} />
+        {/* path="*" : toute autre adresse → page introuvable (doit rester en dernier) */}
+        <Route path="*" element={<PageIntrouvable />} />
+      </Route>
+    </Routes>
   );
 }
 
-// Export par défaut : permet à main.tsx d'importer ce composant.
 export default App;

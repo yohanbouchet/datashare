@@ -1,111 +1,202 @@
+/* ================================================================================================
+   Fichier : index.css
+   Rôle : Styles globaux de l'application, d'après les maquettes Figma.
+     Les couleurs et réglages communs sont des VARIABLES (--nom) définies une seule fois dans :root,
+     puis réutilisées partout : changer une couleur = modifier une seule ligne.
+     Mobile d'abord : les règles de base visent le téléphone, @media (min-width: 768px) adapte à l'ordinateur.
+   Utilise :
+     - police DM Sans (chargée dans index.html)
+   Utilisé par :
+     - main.tsx (import './index.css') ; classes utilisées dans components/ et pages/
+   ================================================================================================ */
+
+/* ---- Variables : couleurs relevées dans Figma (panneau « Couleurs » des maquettes) ---- */
 :root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
-
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
-
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
+  /* Textes */
+  --couleur-texte: #1e1e1e;
+  --couleur-texte-doux: #b3b3b3; /* textes d'aide dans les champs (placeholder) */
+  --couleur-bordure: #d9d9d9; /* bordure des champs */
+  /* Boutons et liens */
+  --couleur-sombre: #2c2c2c; /* boutons noirs de l'en-tête */
+  --couleur-bouton-rond: #100218; /* bouton rond de l'accueil */
+  --couleur-anneau: rgba(47, 25, 13, 0.15); /* anneau autour du bouton rond (#2F190D à 15 %) */
+  --couleur-accent: #e27f29; /* liens orange (« Créer un compte ») */
+  --couleur-accent-texte: #ba681f; /* texte des boutons orange */
+  --couleur-accent-fond: #ffeeec; /* fond des boutons orange */
+  --couleur-accent-bord: #ffa569; /* bordure des boutons orange */
+  --couleur-erreur: #f14343; /* messages d'erreur sous les champs */
+  /* Bandeaux (« Callout Component ») : information, alerte, erreur */
+  --info-fond: #e2ecff;
+  --info-bord: #b1c9f5;
+  --info-texte: #2a3f72;
+  --alerte-fond: #fff5ed;
+  --alerte-bord: #e6cbb5;
+  --alerte-texte: #aa642b;
+  --erreur-fond: #ffe2e2;
+  --erreur-bord: #e8a6a6;
+  --erreur-texte: #9c3333;
+  /* Fond et cartes */
+  --couleur-carte: #ffffff;
+  /* Dégradé linéaire de la maquette : #FFB88C (haut) → #DE6262 (bas) */
+  --degrade-fond: linear-gradient(170deg, #ffb88c 0%, #de6262 100%);
+  --rayon: 12px;
+  --ombre-carte: 0 8px 24px rgba(0, 0, 0, 0.15);
+  font-family: 'DM Sans', system-ui, sans-serif;
+  color: var(--couleur-texte);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
-}
-
-#root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
+/* box-sizing : la largeur d'un bloc inclut ses marges intérieures (calculs plus simples) */
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
 body {
   margin: 0;
+  min-height: 100vh;
+  background: var(--degrade-fond);
+  background-attachment: fixed;
 }
 
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
+a {
+  color: inherit;
 }
 
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
+/* Accessibilité : contour bien visible sur l'élément sélectionné au clavier (touche Tab) */
+:focus-visible {
+  outline: 3px solid var(--couleur-sombre);
+  outline-offset: 2px;
+}
+
+/* Accessibilité : lien « Aller au contenu », caché hors écran, il apparaît quand on le sélectionne au clavier */
+.lien-evitement {
+  position: absolute;
+  left: -9999px;
+}
+.lien-evitement:focus {
+  left: 1rem;
+  top: 1rem;
+  z-index: 10;
+  background: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+}
+
+/* ---- Mise en page commune (Layout) : en-tête / contenu / pied de page ---- */
+.mise-en-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.en-tete {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem; /* espace minimal entre le logo et le bouton */
+  padding: 1rem 1.5rem;
+}
+
+/* Très petits écrans (moins de 360 px) : logo un peu réduit pour laisser la place au bouton */
+@media (max-width: 359px) {
+  .en-tete {
+    padding: 1rem;
+  }
+  .en-tete__logo {
+    font-size: 1.4rem;
   }
 }
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
-p {
-  margin: 0;
+
+.en-tete__logo {
+  font-size: 1.8rem;
+  font-weight: 700;
+  text-decoration: none;
+  color: var(--couleur-texte);
 }
 
-code,
-.counter {
-  font-family: var(--mono);
+.bouton-sombre {
+  background: var(--couleur-sombre);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap; /* le texte du bouton reste sur une seule ligne, même sur petit écran */
+}
+
+/* flex: 1 : le contenu prend toute la hauteur disponible et centre la carte */
+.contenu {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+/* Pied de page masqué sur mobile, comme dans les maquettes */
+.pied-de-page {
+  display: none;
+  color: #fff;
+  padding: 1rem 1.5rem;
+  font-size: 0.9rem;
+}
+
+/* ---- Carte blanche centrale (Connexion, Créer un compte, Télécharger…) ---- */
+.carte {
+  background: var(--couleur-carte);
+  border-radius: var(--rayon);
+  box-shadow: var(--ombre-carte);
+  padding: 1.5rem 2rem;
+  width: 100%;
+  max-width: 36rem;
+}
+
+.carte__titre {
+  margin: 0 0 1.5rem;
+  text-align: center;
+  font-size: 1.6rem;
+}
+
+/* ---- Page d'accueil ---- */
+.accueil {
+  text-align: center;
+}
+
+.accueil__titre {
+  font-weight: 400;
+  font-size: 1.8rem;
+  margin: 0 0 1.5rem;
+}
+
+/* Bouton rond sombre ; box-shadow dessine l'anneau clair autour */
+.accueil__bouton {
   display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
+  align-items: center;
+  justify-content: center;
+  width: 5.5rem;
+  height: 5.5rem;
+  border-radius: 50%;
+  background: var(--couleur-bouton-rond);
+  color: #fff;
+  box-shadow: 0 0 0 1.4rem var(--couleur-anneau);
 }
 
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+/* ---- Écrans d'ordinateur (768 px de large et plus) ---- */
+@media (min-width: 768px) {
+  .en-tete {
+    padding: 1rem 5.5rem;
+  }
+  .en-tete__logo {
+    font-size: 1.6rem;
+  }
+  .pied-de-page {
+    display: block;
+    padding: 1rem 5.5rem;
+  }
+  .accueil__titre {
+    font-size: 1.6rem;
+  }
 }

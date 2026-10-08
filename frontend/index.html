@@ -1,12 +1,38 @@
 <!doctype html>
-<html lang="en">
+<!--
+  ================================================================================================
+  Fichier : index.html
+  Rôle : Page HTML unique de l'application (« SPA » : une seule page, React change son contenu).
+    Charge la police des maquettes (DM Sans) et le point d'entrée main.tsx dans la balise <div id="root">.
+  Utilise :
+    - src/main.tsx : le code React
+    - Google Fonts : police DM Sans
+  Utilisé par :
+    - Vite (npm run dev / npm run build) et le navigateur
+  ================================================================================================
+-->
+<!-- lang="fr" : indispensable à l'accessibilité, les lecteurs d'écran prononcent le texte en français -->
+<html lang="fr">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <!-- viewport : la page s'adapte à la largeur de l'écran (indispensable pour le mobile) -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>frontend</title>
+    <meta
+      name="description"
+      content="DataShare : partagez vos fichiers avec un lien sécurisé et temporaire."
+    />
+    <!-- Police DM Sans (celle des maquettes). preconnect : ouvre la connexion au plus tôt (performance) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <title>DataShare</title>
   </head>
   <body>
+    <!-- React dessine toute l'application dans cette balise -->
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
