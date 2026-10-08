@@ -4,6 +4,7 @@
 //   Branche React sur la balise <div id="root"> de index.html et y affiche le composant App.
 // Utilise :
 //   - App.tsx (App) : le composant racine
+//   - context/AuthProvider.tsx (AuthProvider) : mémoire de connexion partagée
 //   - index.css : styles globaux
 //   - index.html (balise root)
 //   - react-router (BrowserRouter)
@@ -13,6 +14,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router';
+import { AuthProvider } from './context/AuthProvider.tsx';
 
 // Styles globaux de l'application (couleurs, polices…).
 import './index.css';
@@ -27,7 +29,10 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     {/* BrowserRouter : lit l'adresse du navigateur (/connexion…) et la transmet à toute l'application */}
     <BrowserRouter>
-      <App />
+      {/* AuthProvider : met la mémoire de connexion à disposition de toute l'application */}
+      <AuthProvider>
+        <App />
+      </AuthProvider>
     </BrowserRouter>
   </StrictMode>,
 );

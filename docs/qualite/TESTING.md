@@ -36,6 +36,7 @@
 | 08/10/2026 | backend | Connexion, test manuel `curl` : identifiants corrects (200 + JWT, email en majuscules accepté), mauvais mot de passe (401), email inconnu (401, même message et même durée ≈ 0,21 s) | ✅ 3/3 | — |
 | 08/10/2026 | backend | Tests unitaires de la connexion : JWT délivré avec `sub` et `email` seulement, mauvais mot de passe → 401 sans jeton, email inconnu → même message et comparaison bcrypt factice effectuée | ✅ 12/12 (total) | — |
 | 08/10/2026 | backend | Garde JWT et `GET /api/auth/me` : tests unitaires (4 cas de la garde, routes login et me du contrôleur) + test manuel `curl` (jeton valide 200, sans jeton 401, jeton modifié d'un caractère 401) | ✅ 18/18 (total) · ✅ 3/3 manuel | — |
+| 08/10/2026 | frontend | Session au rechargement (F5), test manuel navigateur : jeton valide → en-tête « Mon espace » ; jeton modifié → `GET /api/auth/me` 401, jeton effacé, en-tête « Se connecter » | ✅ 2/2 | — |
 
 🔜 Rapport de couverture et capture d'écran (étape 5).
 
@@ -54,4 +55,5 @@ ou les vérifications avant commit.
 | 07/10/2026 | Tests unitaires en échec après ajout de dépendances aux services | Tests unitaires | Les tests ne fournissaient pas les dépendances (base, services) | Doublures (mocks) de `UsersService`, du Repository et de `JwtService` |
 | 08/10/2026 | La connexion répondait 201 au lieu de 200 | Vérification du code de retour (`curl`) | Code par défaut d'un POST dans NestJS | `@HttpCode(HttpStatus.OK)`, conforme au contrat d'interface |
 | 08/10/2026 | Import inutile `import { request } from 'http'` dans le contrôleur | Relecture du code | Import automatique ajouté par l'éditeur pendant la saisie | Ligne supprimée ; relecture des imports ajoutée au contrôle avant commit |
-
+| 08/10/2026 | Avertissement « Fast refresh only works when a file only exports components » | Analyse statique (Oxlint) | Le contexte React et son composant étaient exportés par le même fichier | Séparation en `AuthContext.ts` (contexte), `AuthProvider.tsx` (composant) et `useAuth.ts` (hook) |
+| 08/10/2026 | Page entièrement blanche après l'ajout de « Mon espace » dans l'en-tête | Test manuel (navigateur) + Oxlint (`rules-of-hooks`) | Hook `useAuth()` appelé en dehors de la fonction du composant `Header` | Appel déplacé au début de la fonction du composant ; règle rappelée en commentaire |
