@@ -37,6 +37,7 @@
 | 08/10/2026 | backend | Tests unitaires de la connexion : JWT délivré avec `sub` et `email` seulement, mauvais mot de passe → 401 sans jeton, email inconnu → même message et comparaison bcrypt factice effectuée | ✅ 12/12 (total) | — |
 | 08/10/2026 | backend | Garde JWT et `GET /api/auth/me` : tests unitaires (4 cas de la garde, routes login et me du contrôleur) + test manuel `curl` (jeton valide 200, sans jeton 401, jeton modifié d'un caractère 401) | ✅ 18/18 (total) · ✅ 3/3 manuel | — |
 | 08/10/2026 | frontend | Session au rechargement (F5), test manuel navigateur : jeton valide → en-tête « Mon espace » ; jeton modifié → `GET /api/auth/me` 401, jeton effacé, en-tête « Se connecter » | ✅ 2/2 | — |
+| 08/10/2026 | frontend | Page Créer un compte, test manuel navigateur : champs vides (messages email et mot de passe), mot de passe de 5 caractères, vérification différente, email déjà utilisé (bandeau « Cet email est déjà utilisé » renvoyé par l'API), nouveau compte → page Connexion avec bandeau « Ton compte est créé » | ✅ 5/5 | — |
 
 🔜 Rapport de couverture et capture d'écran (étape 5).
 
