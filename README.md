@@ -142,6 +142,7 @@ Suivi de la qualité et de la maintenance (tenu à jour au fil du projet) :
 
 Conception :
 
+- [Choix technologiques justifiés](docs/conception/choix-techniques.md)
 - [Modèle conceptuel de données (MCD)](docs/conception/mcd-datashare.drawio)
 - [Schéma d'architecture](docs/conception/architecture-datashare.drawio)
 - [Contrat d'interface de l'API](docs/conception/contrat-interface.md)

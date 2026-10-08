@@ -38,3 +38,20 @@
 | 08/10/2026 | backend | Garde JWT et `GET /api/auth/me` : tests unitaires (4 cas de la garde, routes login et me du contrôleur) + test manuel `curl` (jeton valide 200, sans jeton 401, jeton modifié d'un caractère 401) | ✅ 18/18 (total) · ✅ 3/3 manuel | — |
 
 🔜 Rapport de couverture et capture d'écran (étape 5).
+
+## 4. Anomalies détectées et corrigées
+
+Anomalies relevées pendant le développement par les tests (automatiques et manuels), la relecture du code
+ou les vérifications avant commit.
+
+| Date | Anomalie | Détectée par | Cause | Correction |
+|---|---|---|---|---|
+| 05/10/2026 | Échec de connexion à la base juste après `docker compose up` | Test manuel (`psql`) | Conteneur encore en initialisation (`health: starting`) | Attente du healthcheck : `docker compose up -d --wait` |
+| 05/10/2026 | Port de la base transmis comme texte (`"5432"`) au lieu d'un nombre | Relecture du code | `getOrThrow<number>` ne convertit pas, il ne fait qu'annoncer un type | Conversion explicite `Number(...)` (commit `826295d`) |
+| 06/10/2026 | La page React affichait du HTML au lieu de la réponse de l'API | Test manuel (navigateur) | `VITE_API_URL` placée dans le `.env` racine, non lu par Vite : appel vers une adresse `undefined` | Variable déplacée dans `frontend/.env` ; principe « chaque application lit son `.env` » documenté |
+| 06/10/2026 | Changement de la règle CORS sans effet apparent | Test manuel (navigateur) | Réponse servie depuis le cache du navigateur (code 304) | Test refait cache désactivé : blocage CORS confirmé |
+| 07/10/2026 | API qui ne démarre pas après ajout de l'inscription | Test manuel (`curl` : connexion refusée) | `UsersModule` déclaré dans `controllers` au lieu de `imports` | Module déplacé dans `imports` |
+| 07/10/2026 | Tests unitaires en échec après ajout de dépendances aux services | Tests unitaires | Les tests ne fournissaient pas les dépendances (base, services) | Doublures (mocks) de `UsersService`, du Repository et de `JwtService` |
+| 08/10/2026 | La connexion répondait 201 au lieu de 200 | Vérification du code de retour (`curl`) | Code par défaut d'un POST dans NestJS | `@HttpCode(HttpStatus.OK)`, conforme au contrat d'interface |
+| 08/10/2026 | Import inutile `import { request } from 'http'` dans le contrôleur | Relecture du code | Import automatique ajouté par l'éditeur pendant la saisie | Ligne supprimée ; relecture des imports ajoutée au contrôle avant commit |
+
