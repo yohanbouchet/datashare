@@ -34,8 +34,10 @@ Légende : ✅ en place · 🔜 prévu (étape indiquée)
 | Mots de passe hachés et salés (bcrypt) | ✅ | US03 : coût 12 (≈ 0,2 s par hachage, freine la force brute) ; sel aléatoire intégré ; seule l'empreinte `$2b$12$…` est stockée |
 | Aucune empreinte dans les réponses | ✅ | La réponse d'inscription est construite champ par champ (`id`, `email`, `createdAt`) : `select: false` ne protège que les lectures en base, pas l'objet qui vient d'être créé |
 | Doublon d'email simultané | ✅ | Erreur PostgreSQL `23505` (contrainte UNIQUE) convertie en 409, au lieu d'une erreur 500 |
-| Authentification par JWT à durée limitée | 🔜 étape 3 | US04 : jeton valable 1 h (`JWT_EXPIRES_IN`) |
-| Message de connexion identique en cas d'échec | 🔜 étape 3 | Empêche de deviner quels emails ont un compte (énumération) |
+| Authentification par JWT à durée limitée | ✅ | US04 : jeton signé (HS256) avec `JWT_SECRET` (clé aléatoire de 48 octets, hors du code), valable 1 h (`JWT_EXPIRES_IN`) ; il ne contient que `sub` (id) et `email`, jamais de donnée sensible (son contenu est lisible, seule la signature le protège) |
+| Message de connexion identique en cas d'échec | ✅ | « Email ou mot de passe incorrect » (401) dans les deux cas : on ne peut pas deviner quels emails ont un compte (énumération) |
+| Durée de réponse identique en cas d'échec | ✅ | Si l'email est inconnu, bcrypt compare quand même avec une empreinte factice : ≈ 0,21 s dans les deux cas (mesuré), le chronomètre ne révèle rien |
+| Empreinte lue uniquement pour la connexion | ✅ | `findByEmailWithPassword` est la seule requête qui demande `password_hash` |
 | Validation des données côté serveur | ✅ | DTO + `class-validator`, `ValidationPipe` global : toute donnée invalide est refusée (400) avant d'atteindre le service |
 | Champs inattendus refusés | ✅ | `whitelist` + `forbidNonWhitelisted` : un client ne peut pas ajouter un champ comme `role` ou `id` (400) |
 | Email normalisé | ✅ | Espaces retirés et minuscules avant contrôle : une seule adresse = un seul compte |

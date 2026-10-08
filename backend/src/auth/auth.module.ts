@@ -5,21 +5,35 @@
 // Utilise :
 //   - users/users.module.ts (UsersModule) : fournit UsersService
 //   - auth.controller.ts (AuthController), auth.service.ts (AuthService)
+//   - @nestjs/jwt (JwtModule)
+//   - .env (JWT_SECRET, JWT_EXPIRES_IN)
 // Utilisé par :
 //   - app.module.ts (imports)
 // ================================================================================================
 import { Module } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
 import { UsersModule } from '../users/users.module.js';
 import { AuthController } from './auth.controller.js';
 import { AuthService } from './auth.service.js';
 
 @Module({
-  // imports : les autres modules dont ce module a besoin. UsersModule fournit UsersService
-  // (grâce à son "exports"), utilisé par AuthService pour lire et créer les comptes.
-  imports: [UsersModule],
-  // controllers : les classes qui reçoivent les requêtes HTTP de ce module.
+  imports: [
+    // UsersModule fournit UsersService (lire et créer les comptes).
+    UsersModule,
+    // JwtModule fournit JwtService, qui fabrique et vérifie les JWT.
+    // "Async" + useFactory : comme pour la base, les réglages sont lus dans le .env au démarrage.
+    JwtModule.registerAsync({
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        // 🔒 Clé de signature, jamais écrite dans le code
+        secret: config.getOrThrow<string>('JWT_SECRET'),
+        // Durée de vie du jeton (1h) : passé ce délai, il faut se reconnecter
+        signOptions: { expiresIn: config.getOrThrow('JWT_EXPIRES_IN') },
+      }),
+    }),
+  ],
   controllers: [AuthController],
-  // providers : les services que NestJS crée et injecte (ici dans AuthController).
   providers: [AuthService],
 })
 export class AuthModule {}

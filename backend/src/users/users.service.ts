@@ -6,7 +6,7 @@
 //   - user.entity.ts (User) : la forme d'un compte
 //   - @nestjs/typeorm / typeorm : Repository<User> fourni par NestJS
 // Utilisé par :
-//   - auth/auth.service.ts (findByEmail, create)
+//   - auth/auth.service.ts (findByEmail, findByEmailWithPassword, create)
 // ================================================================================================
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -25,6 +25,15 @@ export class UsersService {
   // 🔒 Requête paramétrée générée par TypeORM : pas d'injection SQL possible.
   findByEmail(email: string): Promise<User | null> {
     return this.usersRepository.findOneBy({ email });
+  }
+
+  // Cherche un compte AVEC son empreinte, uniquement pour vérifier un mot de passe (connexion).
+  // 🔒 passwordHash est en select: false : on doit le demander explicitement, ici et nulle part ailleurs.
+  findByEmailWithPassword(email: string): Promise<User | null> {
+    return this.usersRepository.findOne({
+      where: { email },
+      select: { id: true, email: true, passwordHash: true },
+    });
   }
 
   // Crée et enregistre un compte. Reçoit l'empreinte, JAMAIS le mot de passe en clair.
