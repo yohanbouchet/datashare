@@ -1,18 +1,24 @@
 // ================================================================================================
 // Fichier : files.service.ts
-// Rôle : Service des fichiers (logique métier) : historique d'un utilisateur (US05) et suppression (US06).
+// Rôle : Service des fichiers (logique métier) : téléversement (US01), historique (US05) et suppression (US06).
 //   Lit la table files via le Repository de TypeORM, filtre selon le statut (actifs / expirés / tous),
 //   et construit une réponse sans aucune donnée sensible (l'empreinte du mot de passe devient un simple booléen).
-//   Accueillera ensuite le téléversement (US01) et la purge planifiée.
+//   Accueillera ensuite la purge planifiée.
 // Utilise :
 //   - file.entity.ts (FileEntity) : la table files (et sa relation tags)
-//   - dto/list-files-query.dto.ts (type StatutFichier)
+//   - dto/list-files-query.dto.ts (type StatutFichier), dto/upload-file.dto.ts (UploadFileDto)
+//   - auth/auth.service.ts (BCRYPT_ROUNDS) ; bcrypt (hachage du mot de passe du fichier)
+//   - node:crypto (randomBytes : jeton du lien de partage)
 //   - storage.service.ts (StorageService) : suppression du fichier sur le disque
 //   - typeorm : Repository, MoreThan, LessThanOrEqual (requêtes paramétrées, sans SQL écrit à la main)
 // Utilisé par :
-//   - files.controller.ts (findForUser, remove)
+//   - files.controller.ts (create, findForUser, remove)
 // ================================================================================================
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   LessThanOrEqual,
@@ -20,12 +26,18 @@ import {
   Repository,
   type FindOptionsWhere,
 } from 'typeorm';
+import bcrypt from 'bcrypt';
+import { randomBytes } from 'node:crypto';
+import { BCRYPT_ROUNDS } from '../auth/auth.service.js';
 import type { StatutFichier } from './dto/list-files-query.dto.js';
+import { UploadFileDto } from './dto/upload-file.dto.js';
 import { FileEntity } from './file.entity.js';
 import { StorageService } from './storage.service.js';
 
 // Plus grand entier d'une colonne integer PostgreSQL (2^31 - 1) : au-delà, la requête planterait (500)
 const ID_MAX = 2_147_483_647;
+// Une journée en millisecondes (les dates JavaScript se calculent en millisecondes)
+const UN_JOUR = 24 * 60 * 60 * 1000;
 
 // Forme d'une ligne de l'historique renvoyée au front (contrat d'interface, § 4.2)
 export interface FichierHistorique {
@@ -40,6 +52,11 @@ export interface FichierHistorique {
   token: string;
 }
 
+// Réponse du téléversement (contrat d'interface, § 4.1) : une ligne d'historique + le type du fichier
+export interface FichierTeleverse extends FichierHistorique {
+  mimeType: string;
+}
+
 @Injectable()
 export class FilesService {
   // @InjectRepository : NestJS fournit « l'archiviste » de la table files ; StorageService : le « magasinier »
@@ -48,6 +65,58 @@ export class FilesService {
     private readonly filesRepository: Repository<FileEntity>,
     private readonly storageService: StorageService,
   ) {}
+
+  // Téléversement (US01) : le fichier est déjà sur le disque (multer) ; on l'enregistre en base.
+  // En cas d'erreur, televersement.filter.ts efface le fichier du disque.
+  async create(
+    userId: number,
+    fichier: Express.Multer.File,
+    dto: UploadFileDto,
+  ): Promise<FichierTeleverse> {
+    // La colonne original_name accepte 255 caractères : au-delà, 400 plutôt qu'une erreur 500
+    if (fichier.originalname.length > 255) {
+      throw new BadRequestException(
+        'Le nom du fichier ne doit pas dépasser 255 caractères',
+      );
+    }
+
+    // 🔒 Mot de passe facultatif : seule son empreinte bcrypt est stockée (même coût que les comptes)
+    const passwordHash = dto.password
+      ? await bcrypt.hash(dto.password, BCRYPT_ROUNDS)
+      : null;
+
+    // create prépare l'objet, save l'enregistre (INSERT) avec ses tags (cascade: true sur la relation)
+    const enregistre = await this.filesRepository.save(
+      this.filesRepository.create({
+        originalName: fichier.originalname,
+        size: fichier.size,
+        mimeType: fichier.mimetype,
+        // Nom aléatoire choisi par storage.service.ts au moment de l'écriture sur le disque
+        storageName: fichier.filename,
+        // 🔒 Jeton du lien de partage : 32 octets aléatoires (256 bits), impossible à deviner,
+        // sans rapport avec l'id ; base64url = caractères sans risque dans une adresse
+        token: randomBytes(32).toString('base64url'),
+        passwordHash,
+        expiresAt: new Date(Date.now() + dto.expiresInDays * UN_JOUR),
+        userId,
+        tags: dto.tags.map((label) => ({ label })),
+      }),
+    );
+
+    // 🔒 Réponse construite champ par champ : jamais l'empreinte ni le nom de stockage
+    return {
+      id: enregistre.id,
+      originalName: enregistre.originalName,
+      size: enregistre.size,
+      mimeType: enregistre.mimeType,
+      createdAt: enregistre.createdAt,
+      expiresAt: enregistre.expiresAt,
+      isExpired: false,
+      isProtected: passwordHash !== null,
+      tags: dto.tags,
+      token: enregistre.token,
+    };
+  }
 
   async findForUser(
     userId: number,

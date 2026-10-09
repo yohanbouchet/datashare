@@ -11,6 +11,7 @@
 //   - @nestjs/jwt (JwtService) : fabrique le JWT avec JWT_SECRET (configuré dans auth.module.ts)
 //   - bcrypt (paquet npm) : hachage et comparaison des mots de passe
 // Utilisé par :
+//   - files/files.service.ts (BCRYPT_ROUNDS : même coût pour le mot de passe d'un fichier)
 //   - auth.controller.ts (register, login)
 // ================================================================================================
 import {
@@ -26,7 +27,7 @@ import { LoginDto } from './dto/login.dto.js';
 
 // 🔒 Coût de bcrypt : 12 = environ 0,2 s par hachage. Assez lent pour décourager les attaques
 // par force brute, assez rapide pour l'utilisateur.
-const BCRYPT_ROUNDS = 12;
+export const BCRYPT_ROUNDS = 12;
 // Code d'erreur PostgreSQL "violation de contrainte UNIQUE".
 const PG_UNIQUE_VIOLATION = '23505';
 // 🔒 Empreinte bcrypt factice (coût 12) : comparée quand l'email est inconnu, pour que la réponse
