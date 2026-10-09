@@ -2,15 +2,27 @@
 // Fichier : files.controller.ts
 // Rôle : Contrôleur (le « guichet ») des fichiers du propriétaire : reçoit les requêtes /api/files.
 //   Toutes ses routes sont protégées par la garde JWT. Il ne fait aucun traitement : il transmet au service.
-//   Routes : GET /api/files?status=active|expired|all (US05, historique).
+//   Routes : GET /api/files?status=active|expired|all (US05, historique) ; DELETE /api/files/:id (US06, suppression).
 // Utilise :
-//   - files.service.ts (FilesService) : findForUser
+//   - files.service.ts (FilesService) : findForUser, remove
 //   - dto/list-files-query.dto.ts (ListFilesQueryDto) : contrôle du paramètre ?status=…
 //   - auth/jwt-auth.guard.ts (JwtAuthGuard, type AuthenticatedRequest) : vigile + utilisateur du jeton
 // Utilisé par :
 //   - files.module.ts (controllers) ; le front (écran « Mon espace », à venir)
 // ================================================================================================
-import { Controller, Get, Query, Req, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  NotFoundException,
+  Param,
+  ParseIntPipe,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import type { AuthenticatedRequest } from '../auth/jwt-auth.guard.js';
 import { ListFilesQueryDto } from './dto/list-files-query.dto.js';
@@ -34,5 +46,24 @@ export class FilesController {
     @Query() query: ListFilesQueryDto,
   ) {
     return this.filesService.findForUser(request.user.sub, query.status);
+  }
+
+  // DELETE /api/files/:id : supprime un fichier de l'utilisateur connecté (US06) → 204 sans contenu.
+  // ParseIntPipe : l'id de l'adresse (texte) devient un nombre ; « abc » → 404 « Fichier introuvable »
+  // (exceptionFactory) plutôt qu'un 400 technique, conformément au contrat d'interface.
+  // 🔒 Le propriétaire vient du jeton (sub) : le service refuse (404) le fichier d'un autre.
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  remove(
+    @Req() request: AuthenticatedRequest,
+    @Param(
+      'id',
+      new ParseIntPipe({
+        exceptionFactory: () => new NotFoundException('Fichier introuvable'),
+      }),
+    )
+    id: number,
+  ) {
+    return this.filesService.remove(request.user.sub, id);
   }
 }

@@ -4,7 +4,7 @@
 //   Déclare les tables files et tags, le contrôleur (routes /api/files) et le service.
 // Utilise :
 //   - file.entity.ts (FileEntity), tag.entity.ts (Tag)
-//   - files.controller.ts (FilesController), files.service.ts (FilesService)
+//   - files.controller.ts (FilesController), files.service.ts (FilesService), storage.service.ts (StorageService)
 //   - auth/auth.module.ts (AuthModule) : fournit JwtService à la garde JWT
 // Utilisé par :
 //   - app.module.ts (imports)
@@ -16,6 +16,7 @@ import { Tag } from './tag.entity.js';
 import { AuthModule } from '../auth/auth.module.js';
 import { FilesController } from './files.controller.js';
 import { FilesService } from './files.service.js';
+import { StorageService } from './storage.service.js';
 
 @Module({
   // forFeature : ce module a le droit d'utiliser les tables files et tags (cloisonnement)
@@ -23,6 +24,6 @@ import { FilesService } from './files.service.js';
   imports: [TypeOrmModule.forFeature([FileEntity, Tag]), AuthModule],
   // controllers : les guichets (routes HTTP) ; providers : les services injectés
   controllers: [FilesController],
-  providers: [FilesService],
+  providers: [FilesService, StorageService],
 })
 export class FilesModule {}

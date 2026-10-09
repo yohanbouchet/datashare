@@ -126,7 +126,7 @@ chacune remplace une commande plus longue.
 
 | Fichier | Lu par | Variables |
 |---|---|---|
-| `.env` (racine) | Docker Compose, API | `POSTGRES_*`, `FRONTEND_URL` |
+| `.env` (racine) | Docker Compose, API | `POSTGRES_*`, `FRONTEND_URL`, `JWT_SECRET`, `JWT_EXPIRES_IN`, `UPLOAD_DIR` |
 | `frontend/.env` | Vite | `VITE_API_URL` |
 
 Les fichiers `.env` contiennent des secrets : ils sont exclus de Git. Seuls les modèles `.env.example` sont publiés.

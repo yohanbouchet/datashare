@@ -22,7 +22,7 @@
 | Téléversement | US01 | Fichier valide ; > 1 Go ; extension interdite ; durée hors 1–7 ; sans connexion | Unitaire + e2e | 201 + jeton ; 413 ; 400 ; 400 ; 401 | 🔜 |
 | Téléchargement | US02 | Lien valide ; lien inconnu ; lien expiré ; mot de passe juste / faux | Unitaire + e2e | 200 ; 404 ; 410 ; 200 / 401 | 🔜 |
 | Historique | US05 | Fichiers de l'utilisateur seulement ; filtre actifs (par défaut) / expirés / tous ; filtre invalide ; sans connexion | Unitaire + e2e | Aucun fichier d'un autre compte ; aucune empreinte dans la réponse ; 400 ; 401 | ✅ unitaire (5 tests) · 🔜 e2e |
-| Suppression | US06 | Son propre fichier ; fichier d'un autre | Unitaire + e2e | 204 et fichier effacé du disque ; 404 | 🔜 |
+| Suppression | US06 | Son propre fichier ; fichier d'un autre ; id invalide ou hors limites ; sans connexion | Unitaire + e2e | 204, ligne, tags et fichier effacés (base puis disque) ; 404 sans rien supprimer ; 404 ; 401 | ✅ unitaire (3 tests) · 🔜 e2e |
 | Parcours complet | — | Inscription → connexion → téléversement → téléchargement | Cypress | Parcours sans erreur | 🔜 étape 5 |
 
 ## 3. Résultats
@@ -40,6 +40,8 @@
 | 08/10/2026 | frontend | Page Créer un compte, test manuel navigateur : champs vides (messages email et mot de passe), mot de passe de 5 caractères, vérification différente, email déjà utilisé (bandeau « Cet email est déjà utilisé » renvoyé par l'API), nouveau compte → page Connexion avec bandeau « Ton compte est créé » | ✅ 5/5 | — |
 | 09/10/2026 | backend | Historique `GET /api/files` : tests unitaires (filtre utilisateur toujours présent, filtres actifs / expirés / tous, réponse sans empreinte avec `isExpired`, `isProtected` et tags, délégation du contrôleur) | ✅ 23/23 (total) | — |
 | 09/10/2026 | backend | Historique, test manuel `curl` avec des données de test : par défaut 2 fichiers actifs, `status=expired` 1 fichier, `status=all` 3 fichiers, jamais le fichier d'un autre compte ni d'empreinte ; filtre invalide (400, message en français) ; paramètre `userId` ajouté (400) ; sans jeton (401) | ✅ 6/6 | — |
+| 09/10/2026 | backend | Suppression `DELETE /api/files/:id`, test manuel `curl` : fichier d'un autre compte (404, intact), son fichier (204 : ligne, tag et fichier du disque effacés), 2e suppression (404), fichier absent du disque (204), id `abc` (404), id `99999999999` (500 → corrigé : 404), id `0` et `-5` (404), sans jeton (401) | ✅ 9/9 après correction | — |
+| 09/10/2026 | backend | Tests unitaires de la suppression : recherche par numéro ET propriétaire, base puis disque (ordre vérifié), 404 sans suppression, 404 sans requête pour un id hors limites | ✅ 26/26 (total) | — |
 
 🔜 Rapport de couverture et capture d'écran (étape 5).
 
@@ -65,3 +67,4 @@ ou les vérifications avant commit.
 | 08/10/2026 | « Cannot access 'FileEntity' before initialization » à la génération de la migration | Vérification avant livraison (génération de migration sur une copie) | Import mutuel entre `FileEntity` et `Tag` en modules ESM : la classe est lue avant d'être définie | Type `Relation<…>` de TypeORM sur les propriétés de relation |
 | 09/10/2026 | Compilation impossible : `FileEntity` et `Tag` importés depuis le mauvais fichier | Compilation TypeScript | Chaque classe doit être importée depuis le fichier où elle est écrite | Une ligne d'import par fichier (`user.entity`, `file.entity`, `tag.entity`) |
 | 09/10/2026 | Paramètre inattendu (`?userId=2`) refusé avec un message en anglais (« property userId should not exist ») | Test manuel (`curl`) | Message par défaut de `forbidNonWhitelisted` (le refus 400 est correct, seule la langue diffère) | 🔜 Message en français prévu à l'étape 5 (option `exceptionFactory` du `ValidationPipe`) |
+| 09/10/2026 | Suppression avec un id énorme (`99999999999`) : erreur 500 | Test manuel (`curl`, cas limite) | `ParseIntPipe` accepte le nombre, mais il dépasse la limite d'une colonne `integer` PostgreSQL (2 147 483 647) : la requête échoue | Vérification de l'intervalle (1 à 2 147 483 647) avant la requête → 404 ; test unitaire de non-régression |

@@ -1,17 +1,18 @@
 // ================================================================================================
 // Fichier : files.service.ts
-// Rôle : Service des fichiers (logique métier) : pour l'instant, l'historique d'un utilisateur (US05).
+// Rôle : Service des fichiers (logique métier) : historique d'un utilisateur (US05) et suppression (US06).
 //   Lit la table files via le Repository de TypeORM, filtre selon le statut (actifs / expirés / tous),
 //   et construit une réponse sans aucune donnée sensible (l'empreinte du mot de passe devient un simple booléen).
-//   Accueillera ensuite la suppression (US06) et la purge planifiée.
+//   Accueillera ensuite le téléversement (US01) et la purge planifiée.
 // Utilise :
 //   - file.entity.ts (FileEntity) : la table files (et sa relation tags)
 //   - dto/list-files-query.dto.ts (type StatutFichier)
+//   - storage.service.ts (StorageService) : suppression du fichier sur le disque
 //   - typeorm : Repository, MoreThan, LessThanOrEqual (requêtes paramétrées, sans SQL écrit à la main)
 // Utilisé par :
-//   - files.controller.ts (findForUser)
+//   - files.controller.ts (findForUser, remove)
 // ================================================================================================
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   LessThanOrEqual,
@@ -21,6 +22,10 @@ import {
 } from 'typeorm';
 import type { StatutFichier } from './dto/list-files-query.dto.js';
 import { FileEntity } from './file.entity.js';
+import { StorageService } from './storage.service.js';
+
+// Plus grand entier d'une colonne integer PostgreSQL (2^31 - 1) : au-delà, la requête planterait (500)
+const ID_MAX = 2_147_483_647;
 
 // Forme d'une ligne de l'historique renvoyée au front (contrat d'interface, § 4.2)
 export interface FichierHistorique {
@@ -37,10 +42,11 @@ export interface FichierHistorique {
 
 @Injectable()
 export class FilesService {
-  // @InjectRepository : NestJS fournit « l'archiviste » de la table files
+  // @InjectRepository : NestJS fournit « l'archiviste » de la table files ; StorageService : le « magasinier »
   constructor(
     @InjectRepository(FileEntity)
     private readonly filesRepository: Repository<FileEntity>,
+    private readonly storageService: StorageService,
   ) {}
 
   async findForUser(
@@ -89,5 +95,27 @@ export class FilesService {
       tags: f.tags.map((t) => t.label),
       token: f.token,
     }));
+  }
+
+  // Suppression d'un fichier (US06) : 404 s'il n'existe pas ou appartient à un autre, sinon base puis disque.
+  async remove(userId: number, id: number): Promise<void> {
+    // Numéro impossible (≤ 0 ou au-delà d'un integer) : 404 sans interroger la base
+    if (id < 1 || id > ID_MAX) {
+      throw new NotFoundException('Fichier introuvable');
+    }
+    // 🔒 Recherche par numéro ET propriétaire : le fichier d'un autre est introuvable.
+    // Même réponse 404 dans les deux cas : on ne révèle même pas son existence.
+    const fichier = await this.filesRepository.findOne({
+      where: { id, userId },
+      select: { id: true, storageName: true },
+    });
+    if (!fichier) {
+      throw new NotFoundException('Fichier introuvable');
+    }
+
+    // Ordre voulu : la ligne en base d'abord (ses tags partent avec, ON DELETE CASCADE), puis le disque.
+    // En cas de panne entre les deux, il reste au pire un fichier orphelin, jamais une ligne vers un fichier absent.
+    await this.filesRepository.delete({ id: fichier.id });
+    await this.storageService.remove(fichier.storageName);
   }
 }
