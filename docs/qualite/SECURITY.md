@@ -54,9 +54,13 @@ Légende : ✅ en place · 🔜 prévu (étape indiquée)
 | Identifiant d'adresse contrôlé | ✅ | US06 : id non numérique ou hors limites → 404, sans requête en base (plus d'erreur 500) |
 | Historique sans donnée sensible | ✅ | US05 : la réponse est construite champ par champ ; l'empreinte du mot de passe de fichier devient un simple booléen `isProtected` |
 | Paramètre de filtre contrôlé | ✅ | US05 : `status` limité à `active`, `expired` ou `all` (DTO), sinon 400 |
-| Lien de partage non prédictible | 🔜 étape 4 | Jeton aléatoire long, distinct de l'identifiant interne |
-| Contrôle de la taille et des extensions | 🔜 étape 4 | 1 Go maximum (contrôle dans le navigateur, à l'arrivée et pendant la réception) ; extensions exécutables refusées |
-| Fichiers stockés sous un nom généré | 🔜 étape 4 | Jamais le nom d'origine : évite les doublons et les attaques par chemin (`../`) ; ✅ le service de stockage refuse déjà tout nom contenant un chemin (défense en profondeur) |
+| Lien de partage non prédictible | ✅ | US01 : jeton de 32 octets aléatoires (`crypto.randomBytes`, 256 bits) encodé en base64url (43 caractères), sans rapport avec l'identifiant interne ; contrainte `UNIQUE` en base |
+| Contrôle de la taille | ✅ back · 🔜 front | US01 : 1 Go maximum, à trois niveaux : dans le navigateur (avant l'envoi, à venir), à l'arrivée (`Content-Length` annoncé > 1 Go → 413 sans lire le contenu) et pendant la réception (multer interrompt au-delà de 1 Go → 413, morceau reçu effacé) |
+| Extensions exécutables refusées | ✅ | US01 : `.exe .msi .bat .cmd .com .scr .ps1 .vbs .js .jar .sh` (liste configurable, `FORBIDDEN_EXTENSIONS`), quelle que soit la casse ; refus avant toute écriture sur le disque (400) |
+| Aucun fichier orphelin | ✅ | US01 : si une donnée est invalide ou si l'enregistrement échoue, le fichier déjà reçu est effacé du disque (filtre d'exceptions de la route) ; erreur imprévue → 500 sans détail technique, détail dans le journal |
+| Réception en flux | ✅ | US01 : le fichier est écrit sur le disque au fil de la réception (jamais 1 Go en mémoire) ; un seul fichier et 20 champs au plus par envoi |
+| Mot de passe de fichier haché | ✅ | US01 : bcrypt coût 12 (comme les comptes), 6 à 72 caractères ; seule l'empreinte est stockée, la réponse indique seulement `isProtected` |
+| Fichiers stockés sous un nom généré | ✅ | US01 : nom aléatoire de 64 caractères hexadécimaux, jamais le nom d'origine (pas de doublon, pas d'attaque par chemin `../`, nom non devinable) ; le service de stockage refuse en plus tout nom contenant un chemin (défense en profondeur) |
 | Accès au disque centralisé | ✅ | Un seul service (`StorageService`) lit et écrit les fichiers, dans le dossier `UPLOAD_DIR` (hors de Git) |
 | Mot de passe de fichier hors de l'URL | 🔜 étape 4 | Envoyé dans le corps d'une requête POST, jamais dans l'adresse |
 | Limitation des tentatives | 🔜 étape 5 | `@nestjs/throttler` sur la connexion et la vérification de mot de passe de fichier |

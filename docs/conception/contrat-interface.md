@@ -119,12 +119,12 @@ L'identité de l'utilisateur est toujours déduite du JWT, jamais d'un paramètr
 
 | Champ | Type | Règle |
 |---|---|---|
-| `file` | fichier | Obligatoire, 1 Go maximum, extension non interdite |
+| `file` | fichier | Obligatoire, 1 Go maximum, extension non interdite, nom de 255 caractères maximum |
 | `expiresInDays` | entier | Facultatif, de 1 à 7, 7 par défaut |
 | `password` | texte | Facultatif, 6 caractères minimum s'il est renseigné |
-| `tags` | liste de textes | Facultatif, 30 caractères maximum par tag, pas de doublon |
+| `tags` | liste de textes | Facultatif, 10 tags maximum, 30 caractères maximum par tag, pas de doublon (champ répété : `tags=a`, `tags=b`) |
 
-Extensions interdites (configurables) : `.exe .msi .bat .cmd .com .scr .ps1 .vbs .js .jar .sh`
+Extensions interdites (configurables, variable `FORBIDDEN_EXTENSIONS`) : `.exe .msi .bat .cmd .com .scr .ps1 .vbs .js .jar .sh`
 
 **Réponse 201**
 
@@ -143,7 +143,7 @@ Extensions interdites (configurables) : `.exe .msi .bat .cmd .com .scr .ps1 .vbs
 ```
 
 **Erreurs**
-- 400 : fichier absent, durée hors de 1 à 7, mot de passe trop court, tag trop long ou en double, « Ce type de fichier n'est pas autorisé »
+- 400 : « Aucun fichier envoyé », durée hors de 1 à 7, mot de passe trop court, tag trop long, en double ou plus de 10 tags, nom de fichier trop long, « Ce type de fichier n'est pas autorisé »
 - 401 : non authentifié
 - 413 : « La taille des fichiers est limitée à 1 Go »
 
