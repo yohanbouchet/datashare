@@ -1,8 +1,14 @@
+# =====================================================================
+# Fichiers que Git ne doit jamais suivre, pour TOUT le projet (backend/ et frontend/).
+# Fichier unique, à la racine : une règle sans chemin s'applique dans tous les dossiers.
+# =====================================================================
+
 # Dépendances installées par npm (se réinstallent avec "npm install")
 node_modules/
 
-# Résultats de compilation
+# Résultats de compilation (dist-ssr : variante produite par Vite)
 dist/
+dist-ssr/
 build/
 *.tsbuildinfo
 
@@ -10,6 +16,8 @@ build/
 .env
 .env.*
 !.env.example
+# Fichiers de configuration locale de Vite (ex. .env.local)
+*.local
 
 # Fichiers déposés par les utilisateurs
 uploads/
@@ -17,6 +25,24 @@ uploads/
 # Rapports générés par les tests
 coverage/
 
-# Journaux et fichiers système
+# Journaux (dont ceux de npm, yarn, pnpm en cas d'erreur)
+logs/
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Réglages personnels des éditeurs de code (sauf la liste d'extensions VS Code recommandées)
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Fichiers système (macOS)
 .DS_Store
