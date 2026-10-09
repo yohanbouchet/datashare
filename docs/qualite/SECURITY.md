@@ -23,6 +23,11 @@ Légende : ✅ en place · 🔜 prévu (étape indiquée)
 | Base non exposée sur le réseau | ✅ | Port publié uniquement sur `127.0.0.1` (`docker-compose.yml`) |
 | Unicité de l'email garantie par la base | ✅ | Contrainte `UNIQUE` (migration `CreateUsers`) : protège aussi contre deux inscriptions simultanées |
 | Empreinte du mot de passe jamais lue par défaut | ✅ | `select: false` sur `password_hash` : elle ne peut pas être renvoyée par erreur dans une réponse |
+| Fichier rattaché à un compte existant | ✅ | Clé étrangère `files.user_id` → `users.id` (`ON DELETE CASCADE`) |
+| Lien de partage unique | ✅ | Contrainte `UNIQUE` sur `files.token` (64 caractères) ; génération aléatoire à l'US01 |
+| Nom de stockage généré et unique | ✅ | Colonne `files.storage_name` (`UNIQUE`), distincte du nom d'origine |
+| Empreinte du mot de passe de fichier jamais lue par défaut | ✅ | `select: false` sur `files.password_hash` (facultatif) |
+| Tags sans doublon et supprimés avec leur fichier | ✅ | `UNIQUE (file_id, label)` et clé étrangère `ON DELETE CASCADE` |
 | Structure de la base versionnée | ✅ | Migrations TypeORM ; `synchronize: false` interdit toute modification automatique des tables |
 | Protection contre les injections SQL | ✅ | Requêtes paramétrées générées par TypeORM (les valeurs ne sont jamais concaténées au SQL) |
 

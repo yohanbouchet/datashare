@@ -4,7 +4,7 @@
 //   Charge la configuration (.env), ouvre la connexion à PostgreSQL et déclare tous les modules fonctionnels.
 // Utilise :
 //   - .env (racine) : variables POSTGRES_* lues par ConfigModule / ConfigService
-//   - users/users.module.ts (UsersModule), auth/auth.module.ts (AuthModule)
+//   - users/users.module.ts (UsersModule), auth/auth.module.ts (AuthModule), files/files.module.ts (FilesModule)
 //   - app.controller.ts, app.service.ts : exemple provisoire (GET /api)
 // Utilisé par :
 //   - main.ts (NestFactory.create(AppModule))
@@ -18,6 +18,7 @@ import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
 import { UsersModule } from './users/users.module.js';
 import { AuthModule } from './auth/auth.module.js';
+import { FilesModule } from './files/files.module.js';
 
 // @Module : le "sommaire" de l'application. Il liste les briques à charger (imports),
 // les points d'entrée HTTP (controllers) et la logique métier (providers).
@@ -61,6 +62,8 @@ import { AuthModule } from './auth/auth.module.js';
     UsersModule,
 
     AuthModule,
+
+    FilesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

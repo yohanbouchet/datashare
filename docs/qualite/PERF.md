@@ -32,7 +32,7 @@ et pour les transferts : **taille des fichiers**.
 | Téléversement et téléchargement en flux (*streaming*) | 🔜 étape 4 | Un fichier de 1 Go n'est jamais chargé entièrement en mémoire |
 | Téléchargement confié au navigateur | 🔜 étape 4 | Écriture directe sur le disque de l'utilisateur |
 | Contrôle de la taille pendant la réception | 🔜 étape 4 | Arrêt immédiat au-delà de 1 Go |
-| Index sur la date d'expiration | 🔜 étape 4 | Purge rapide même avec beaucoup de fichiers |
+| Index sur la date d'expiration | ✅ migration `CreateFilesAndTags` | Purge rapide même avec beaucoup de fichiers |
 | Statut « expiré » calculé et non stocké | ✅ conception | Aucune mise à jour massive à minuit |
 
 ## 5. Analyse et pistes d'optimisation
