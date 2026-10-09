@@ -1,5 +1,5 @@
 // ================================================================================================
-// Fichier : Inscription.tsx
+// Fichier : Register.tsx
 // Rôle : Page « Créer un compte » (adresse « /inscription », US03), conforme à la maquette.
 //   1. Validation côté client : email au bon format, mot de passe d'au moins 8 caractères,
 //      vérification identique au mot de passe ; message sous chaque champ concerné.
@@ -7,102 +7,102 @@
 //   3. Succès → page Connexion avec le bandeau « Ton compte est créé » (l'inscription ne connecte pas) ;
 //      échec → bandeau d'erreur avec le message de l'API (« Cet email est déjà utilisé », serveur injoignable…).
 // Utilise :
-//   - services/api.ts (authApi.inscription, ApiError)
+//   - services/api.ts (authApi.register, ApiError)
 //   - context/useAuth.ts (utilisateur : redirection si déjà connecté)
-//   - components/Champ.tsx, components/Bandeau.tsx
+//   - components/Field.tsx, components/Banner.tsx
 //   - react-router (Link, Navigate, useNavigate)
 // Utilisé par :
-//   - App.tsx (route « /inscription »), Connexion.tsx (lien « Créer un compte »)
+//   - App.tsx (route « /inscription »), Login.tsx (lien « Créer un compte »)
 // ================================================================================================
 import { useState, type SubmitEvent } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router';
-import { Bandeau } from '../components/Bandeau.tsx';
-import { Champ } from '../components/Champ.tsx';
+import { Banner } from '../components/Banner.tsx';
+import { Field } from '../components/Field.tsx';
 import { useAuth } from '../context/useAuth.ts';
 import { ApiError, authApi } from '../services/api.ts';
 
 // Vérification simple du format « quelque-chose@domaine.extension » (le serveur revérifie de toute façon)
-const FORMAT_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // Messages d'erreur par champ ; le « ? » rend chaque case facultative (présente seulement en cas d'erreur)
-interface ErreursInscription {
+interface RegisterErrors {
   email?: string;
   password?: string;
   confirmation?: string;
 }
 
-export function Inscription() {
+export function Register() {
   // Le contexte sert seulement à savoir si quelqu'un est déjà connecté : s'inscrire ne connecte pas
-  const { utilisateur } = useAuth();
-  const naviguer = useNavigate();
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   // Mémoire du formulaire
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [erreurs, setErreurs] = useState<ErreursInscription>({});
-  const [erreurServeur, setErreurServeur] = useState<string | null>(null);
-  const [envoiEnCours, setEnvoiEnCours] = useState(false);
+  const [errors, setErrors] = useState<RegisterErrors>({});
+  const [serverError, setServerError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
   const [confirmation, setConfirmation] = useState('');
 
   // Déjà connecté : inutile d'afficher le formulaire
-  if (utilisateur) {
+  if (user) {
     return <Navigate to="/" replace />;
   }
 
   // Validation côté client : confort de l'utilisateur (le serveur reste l'arbitre final)
-  function valider(): ErreursInscription {
-    const resultat: ErreursInscription = {};
-    if (!FORMAT_EMAIL.test(email.trim())) {
-      resultat.email = "L'adresse email n'est pas valide";
+  function validate(): RegisterErrors {
+    const result: RegisterErrors = {};
+    if (!EMAIL_PATTERN.test(email.trim())) {
+      result.email = "L'adresse email n'est pas valide";
     }
     // Règle de l'US03 (le serveur applique la même règle avec le DTO)
     if (password.length < 8) {
-      resultat.password = 'Le mot de passe doit contenir au moins 8 caractères';
+      result.password = 'Le mot de passe doit contenir au moins 8 caractères';
     }
     // Vérification uniquement côté client : protège contre les fautes de frappe, l'API n'en a pas besoin
     if (confirmation !== password) {
-      resultat.confirmation = 'Les mots de passe ne correspondent pas';
+      result.confirmation = 'Les mots de passe ne correspondent pas';
     }
-    return resultat;
+    return result;
   }
 
   // async : la soumission attend la réponse de l'API.
   // SubmitEvent : le type de l'événement « envoi du formulaire ».
-  async function soumettre(evenement: SubmitEvent<HTMLFormElement>) {
+  async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     // preventDefault : empêche le navigateur de recharger la page (comportement par défaut d'un formulaire)
-    evenement.preventDefault();
-    setErreurServeur(null);
-    const erreursTrouvees = valider();
-    setErreurs(erreursTrouvees);
-    if (Object.keys(erreursTrouvees).length > 0) return;
+    event.preventDefault();
+    setServerError(null);
+    const foundErrors = validate();
+    setErrors(foundErrors);
+    if (Object.keys(foundErrors).length > 0) return;
 
-    setEnvoiEnCours(true);
+    setSubmitting(true);
     try {
-      await authApi.inscription(email.trim(), password);
+      await authApi.register(email.trim(), password);
       // state : information transmise à la page Connexion, qui affiche alors le bandeau bleu
-      naviguer('/connexion', { state: { compteCree: true } });
-    } catch (erreur) {
+      navigate('/connexion', { state: { accountCreated: true } });
+    } catch (error) {
       // ApiError : message prévu par l'API ou par le service ; autre erreur : message générique
-      setErreurServeur(
-        erreur instanceof ApiError
-          ? erreur.message
+      setServerError(
+        error instanceof ApiError
+          ? error.message
           : 'Une erreur inattendue est survenue.',
       );
     } finally {
       // finally : exécuté dans tous les cas, succès ou échec
-      setEnvoiEnCours(false);
+      setSubmitting(false);
     }
   }
 
   return (
-    <section className="carte">
-      <h1 className="carte__titre">Créer un compte</h1>
+    <section className="card">
+      <h1 className="card__title">Créer un compte</h1>
 
-      {erreurServeur && <Bandeau variante="erreur">{erreurServeur}</Bandeau>}
+      {serverError && <Banner variant="error">{serverError}</Banner>}
 
       {/* noValidate : on désactive les bulles du navigateur pour afficher nos propres messages en français */}
-      <form className="formulaire" onSubmit={soumettre} noValidate>
-        <Champ
+      <form className="form" onSubmit={handleSubmit} noValidate>
+        <Field
           id="email"
           label="Email"
           type="email"
@@ -110,9 +110,9 @@ export function Inscription() {
           onChange={setEmail}
           placeholder="Saisissez votre email..."
           autoComplete="email"
-          erreur={erreurs.email}
+          error={errors.email}
         />
-        <Champ
+        <Field
           id="password"
           label="Mot de passe"
           type="password"
@@ -120,10 +120,10 @@ export function Inscription() {
           onChange={setPassword}
           placeholder="Saisissez votre mot de passe..."
           autoComplete="new-password"
-          erreur={erreurs.password}
+          error={errors.password}
         />
 
-        <Champ
+        <Field
           id="confirmation"
           label="Vérification du mot de passe"
           type="password"
@@ -131,20 +131,16 @@ export function Inscription() {
           onChange={setConfirmation}
           placeholder="Saisissez le à nouveau"
           autoComplete="new-password"
-          erreur={erreurs.confirmation}
+          error={errors.confirmation}
         />
 
-        <Link to="/connexion" className="lien-accent">
+        <Link to="/connexion" className="link-accent">
           J'ai déjà un compte
         </Link>
 
         {/* disabled pendant l'envoi : évite les doubles clics (et donc les doubles requêtes) */}
-        <button
-          type="submit"
-          className="bouton-principal"
-          disabled={envoiEnCours}
-        >
-          {envoiEnCours ? 'Création…' : 'Créer mon compte'}
+        <button type="submit" className="button-primary" disabled={submitting}>
+          {submitting ? 'Création…' : 'Créer mon compte'}
         </button>
       </form>
     </section>

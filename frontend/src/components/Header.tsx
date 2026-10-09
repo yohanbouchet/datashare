@@ -7,7 +7,7 @@
 // Utilise :
 //   - context/useAuth.ts (useAuth) : utilisateur connecté et état de chargement
 //   - react-router (Link) : liens internes sans rechargement de la page
-//   - index.css : classes en-tete, en-tete__logo, bouton-sombre
+//   - index.css : classes header, header__logo, button-dark
 // Utilisé par :
 //   - components/Layout.tsx
 // ================================================================================================
@@ -19,23 +19,23 @@ import { useAuth } from '../context/useAuth.ts';
 export function Header() {
   // ⚠️ Un hook (fonction "use…") s'appelle TOUJOURS à l'intérieur d'un composant, en haut de sa fonction :
   // React l'exécute à chaque affichage du composant. Appelé hors d'une fonction, il plante l'application.
-  const { utilisateur, chargement } = useAuth();
+  const { user, loading } = useAuth();
 
   return (
     // <header> : balise « sémantique », les lecteurs d'écran l'annoncent comme l'en-tête de la page
-    <header className="en-tete">
+    <header className="header">
       {/* Link : change de page SANS recharger le site (contrairement à une balise <a> classique) */}
-      <Link to="/" className="en-tete__logo">
+      <Link to="/" className="header__logo">
         DataShare
       </Link>
       {/* Choix en cascade « condition ? A : B » :
           vérification en cours → rien ; connecté → « Mon espace » ; sinon → « Se connecter » */}
-      {chargement ? null : utilisateur ? (
-        <Link to="/mon-espace" className="bouton-sombre">
+      {loading ? null : user ? (
+        <Link to="/mon-espace" className="button-dark">
           Mon espace
         </Link>
       ) : (
-        <Link to="/connexion" className="bouton-sombre">
+        <Link to="/connexion" className="button-dark">
           Se connecter
         </Link>
       )}

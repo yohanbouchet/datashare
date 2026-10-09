@@ -44,21 +44,23 @@ describe('FilesController', () => {
   });
 
   it("list transmet l'identifiant du jeton et le filtre au service", async () => {
-    const reponse = [{ id: 1 }];
-    filesService.findForUser.mockResolvedValue(reponse);
+    const expected = [{ id: 1 }];
+    filesService.findForUser.mockResolvedValue(expected);
 
-    expect(await controller.list(request, { status: 'expired' })).toBe(reponse);
+    expect(await controller.list(request, { status: 'expired' })).toBe(
+      expected,
+    );
     expect(filesService.findForUser).toHaveBeenCalledWith(7, 'expired');
   });
 
   it("upload transmet l'identifiant du jeton, le fichier et les champs au service", async () => {
-    const fichier = { originalname: 'photo.jpg' } as Express.Multer.File;
+    const file = { originalname: 'photo.jpg' } as Express.Multer.File;
     const dto: UploadFileDto = { expiresInDays: 3, tags: ['photos'] };
-    const reponse = { id: 12, token: 'jeton' };
-    filesService.create.mockResolvedValue(reponse);
+    const expected = { id: 12, token: 'jeton' };
+    filesService.create.mockResolvedValue(expected);
 
-    expect(await controller.upload(request, fichier, dto)).toBe(reponse);
-    expect(filesService.create).toHaveBeenCalledWith(7, fichier, dto);
+    expect(await controller.upload(request, file, dto)).toBe(expected);
+    expect(filesService.create).toHaveBeenCalledWith(7, file, dto);
   });
 
   it("remove transmet l'identifiant du jeton et le numéro du fichier au service", async () => {

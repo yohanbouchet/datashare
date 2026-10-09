@@ -14,16 +14,16 @@ import { validate } from 'class-validator';
 import { UploadFileDto } from './upload-file.dto.js';
 
 // Transforme puis valide ; renvoie le DTO obtenu et la liste des messages d'erreur
-async function verifier(champs: Record<string, unknown>) {
-  const dto = plainToInstance(UploadFileDto, champs);
-  const erreurs = await validate(dto);
-  const messages = erreurs.flatMap((e) => Object.values(e.constraints ?? {}));
+async function check(fields: Record<string, unknown>) {
+  const dto = plainToInstance(UploadFileDto, fields);
+  const errors = await validate(dto);
+  const messages = errors.flatMap((e) => Object.values(e.constraints ?? {}));
   return { dto, messages };
 }
 
 describe('UploadFileDto', () => {
   it('applique les valeurs par défaut : 7 jours, pas de mot de passe, aucun tag', async () => {
-    const { dto, messages } = await verifier({});
+    const { dto, messages } = await check({});
 
     expect(messages).toEqual([]);
     expect(dto.expiresInDays).toBe(7);
@@ -32,16 +32,16 @@ describe('UploadFileDto', () => {
   });
 
   it('convertit la durée reçue en texte et accepte 1 à 7 jours', async () => {
-    for (const duree of ['1', '7']) {
-      const { dto, messages } = await verifier({ expiresInDays: duree });
+    for (const duration of ['1', '7']) {
+      const { dto, messages } = await check({ expiresInDays: duration });
       expect(messages).toEqual([]);
       expect(typeof dto.expiresInDays).toBe('number');
     }
   });
 
   it('refuse une durée de 0, 8 ou non entière', async () => {
-    for (const duree of ['0', '8', '2.5', 'abc']) {
-      const { messages } = await verifier({ expiresInDays: duree });
+    for (const duration of ['0', '8', '2.5', 'abc']) {
+      const { messages } = await check({ expiresInDays: duration });
       expect(messages).toContain(
         "La durée d'expiration doit être comprise entre 1 et 7 jours",
       );
@@ -49,32 +49,32 @@ describe('UploadFileDto', () => {
   });
 
   it('refuse un mot de passe de moins de 6 caractères et traite un champ vide comme absent', async () => {
-    expect((await verifier({ password: 'abc' })).messages).toContain(
+    expect((await check({ password: 'abc' })).messages).toContain(
       'Le mot de passe du fichier doit contenir au moins 6 caractères',
     );
-    const vide = await verifier({ password: '' });
-    expect(vide.messages).toEqual([]);
-    expect(vide.dto.password).toBeUndefined();
+    const empty = await check({ password: '' });
+    expect(empty.messages).toEqual([]);
+    expect(empty.dto.password).toBeUndefined();
   });
 
   it('transforme un tag unique en liste et retire les espaces et les tags vides', async () => {
-    expect((await verifier({ tags: ' photos ' })).dto.tags).toEqual(['photos']);
-    expect((await verifier({ tags: ['a', ' ', 'b'] })).dto.tags).toEqual([
+    expect((await check({ tags: ' photos ' })).dto.tags).toEqual(['photos']);
+    expect((await check({ tags: ['a', ' ', 'b'] })).dto.tags).toEqual([
       'a',
       'b',
     ]);
   });
 
   it('refuse un tag de plus de 30 caractères, un doublon et plus de 10 tags', async () => {
-    const onze = Array.from({ length: 11 }, (_, i) => `tag${i}`);
+    const eleven = Array.from({ length: 11 }, (_, i) => `tag${i}`);
 
-    expect((await verifier({ tags: ['x'.repeat(31)] })).messages).toContain(
+    expect((await check({ tags: ['x'.repeat(31)] })).messages).toContain(
       'Un tag ne doit pas dépasser 30 caractères',
     );
-    expect((await verifier({ tags: ['a', 'a'] })).messages).toContain(
+    expect((await check({ tags: ['a', 'a'] })).messages).toContain(
       'Un même tag ne peut pas être ajouté deux fois',
     );
-    expect((await verifier({ tags: onze })).messages).toContain(
+    expect((await check({ tags: eleven })).messages).toContain(
       'Un fichier peut avoir au plus 10 tags',
     );
   });

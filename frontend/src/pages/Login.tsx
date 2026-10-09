@@ -1,5 +1,5 @@
 // ================================================================================================
-// Fichier : Connexion.tsx
+// Fichier : Login.tsx
 // Rôle : Page de connexion (adresse « /connexion », US04), conforme à la maquette « Connexion ».
 //   1. Validation côté client (email au bon format, mot de passe renseigné) : message sous chaque champ.
 //   2. Envoi à l'API via le contexte (connexion) ; le bouton est désactivé pendant l'envoi.
@@ -9,99 +9,99 @@
 // Utilise :
 //   - context/useAuth.ts (connexion, utilisateur)
 //   - services/api.ts (ApiError)
-//   - components/Champ.tsx, components/Bandeau.tsx
+//   - components/Field.tsx, components/Banner.tsx
 //   - react-router (Link, Navigate, useLocation, useNavigate)
 // Utilisé par :
-//   - App.tsx (route « /connexion »), Header.tsx et Accueil.tsx (liens)
+//   - App.tsx (route « /connexion »), Header.tsx et Home.tsx (liens)
 // ================================================================================================
 import { useState, type SubmitEvent } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router';
-import { Bandeau } from '../components/Bandeau.tsx';
-import { Champ } from '../components/Champ.tsx';
+import { Banner } from '../components/Banner.tsx';
+import { Field } from '../components/Field.tsx';
 import { useAuth } from '../context/useAuth.ts';
 import { ApiError } from '../services/api.ts';
 
 // Vérification simple du format « quelque-chose@domaine.extension » (le serveur revérifie de toute façon)
-const FORMAT_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-interface ErreursConnexion {
+interface LoginErrors {
   email?: string;
   password?: string;
 }
 
-export function Connexion() {
-  const { connexion, utilisateur } = useAuth();
-  const naviguer = useNavigate();
+export function Login() {
+  const { login, user } = useAuth();
+  const navigate = useNavigate();
   // location.state : informations transmises par la page précédente (ici : « compte créé »)
   const location = useLocation();
-  const compteCree = (location.state as { compteCree?: boolean } | null)
-    ?.compteCree;
+  const accountCreated = (location.state as { accountCreated?: boolean } | null)
+    ?.accountCreated;
 
   // Mémoire du formulaire
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [erreurs, setErreurs] = useState<ErreursConnexion>({});
-  const [erreurServeur, setErreurServeur] = useState<string | null>(null);
-  const [envoiEnCours, setEnvoiEnCours] = useState(false);
+  const [errors, setErrors] = useState<LoginErrors>({});
+  const [serverError, setServerError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   // Déjà connecté : inutile d'afficher le formulaire
-  if (utilisateur) {
+  if (user) {
     return <Navigate to="/" replace />;
   }
 
   // Validation côté client : confort de l'utilisateur (le serveur reste l'arbitre final)
-  function valider(): ErreursConnexion {
-    const resultat: ErreursConnexion = {};
-    if (!FORMAT_EMAIL.test(email.trim())) {
-      resultat.email = "L'adresse email n'est pas valide";
+  function validate(): LoginErrors {
+    const result: LoginErrors = {};
+    if (!EMAIL_PATTERN.test(email.trim())) {
+      result.email = "L'adresse email n'est pas valide";
     }
     if (!password) {
-      resultat.password = 'Le mot de passe est obligatoire';
+      result.password = 'Le mot de passe est obligatoire';
     }
-    return resultat;
+    return result;
   }
 
   // async : la soumission attend la réponse de l'API.
   // SubmitEvent : le type de l'événement « envoi du formulaire » (FormEvent est déclaré obsolète dans React 19).
-  async function soumettre(evenement: SubmitEvent<HTMLFormElement>) {
+  async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     // preventDefault : empêche le navigateur de recharger la page (comportement par défaut d'un formulaire)
-    evenement.preventDefault();
-    setErreurServeur(null);
-    const erreursTrouvees = valider();
-    setErreurs(erreursTrouvees);
-    if (Object.keys(erreursTrouvees).length > 0) return;
+    event.preventDefault();
+    setServerError(null);
+    const foundErrors = validate();
+    setErrors(foundErrors);
+    if (Object.keys(foundErrors).length > 0) return;
 
-    setEnvoiEnCours(true);
+    setSubmitting(true);
     try {
-      await connexion(email.trim(), password);
-      naviguer('/');
-    } catch (erreur) {
+      await login(email.trim(), password);
+      navigate('/');
+    } catch (error) {
       // ApiError : message prévu par l'API ou par le service ; autre erreur : message générique
-      setErreurServeur(
-        erreur instanceof ApiError
-          ? erreur.message
+      setServerError(
+        error instanceof ApiError
+          ? error.message
           : 'Une erreur inattendue est survenue.',
       );
     } finally {
       // finally : exécuté dans tous les cas, succès ou échec
-      setEnvoiEnCours(false);
+      setSubmitting(false);
     }
   }
 
   return (
-    <section className="carte">
-      <h1 className="carte__titre">Connexion</h1>
+    <section className="card">
+      <h1 className="card__title">Connexion</h1>
 
-      {compteCree && (
-        <Bandeau variante="info">
+      {accountCreated && (
+        <Banner variant="info">
           Ton compte est créé, tu peux te connecter.
-        </Bandeau>
+        </Banner>
       )}
-      {erreurServeur && <Bandeau variante="erreur">{erreurServeur}</Bandeau>}
+      {serverError && <Banner variant="error">{serverError}</Banner>}
 
       {/* noValidate : on désactive les bulles du navigateur pour afficher nos propres messages en français */}
-      <form className="formulaire" onSubmit={soumettre} noValidate>
-        <Champ
+      <form className="form" onSubmit={handleSubmit} noValidate>
+        <Field
           id="email"
           label="Email"
           type="email"
@@ -109,9 +109,9 @@ export function Connexion() {
           onChange={setEmail}
           placeholder="Saisissez votre email..."
           autoComplete="email"
-          erreur={erreurs.email}
+          error={errors.email}
         />
-        <Champ
+        <Field
           id="password"
           label="Mot de passe"
           type="password"
@@ -119,20 +119,16 @@ export function Connexion() {
           onChange={setPassword}
           placeholder="Saisissez votre mot de passe..."
           autoComplete="current-password"
-          erreur={erreurs.password}
+          error={errors.password}
         />
 
-        <Link to="/inscription" className="lien-accent">
+        <Link to="/inscription" className="link-accent">
           Créer un compte
         </Link>
 
         {/* disabled pendant l'envoi : évite les doubles clics (et donc les doubles requêtes) */}
-        <button
-          type="submit"
-          className="bouton-principal"
-          disabled={envoiEnCours}
-        >
-          {envoiEnCours ? 'Connexion…' : 'Connexion'}
+        <button type="submit" className="button-primary" disabled={submitting}>
+          {submitting ? 'Connexion…' : 'Connexion'}
         </button>
       </form>
     </section>

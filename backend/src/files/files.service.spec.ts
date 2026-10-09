@@ -27,30 +27,30 @@ describe('FilesService', () => {
     findOne: vi.fn(),
     delete: vi.fn(),
     // create : renvoie l'objet préparé tel quel ; save : simule l'INSERT (id et date ajoutés par la base)
-    create: vi.fn((donnees: object) => donnees),
-    save: vi.fn((donnees: object) =>
-      Promise.resolve({ ...donnees, id: 12, createdAt: new Date() }),
+    create: vi.fn((data: object) => data),
+    save: vi.fn((data: object) =>
+      Promise.resolve({ ...data, id: 12, createdAt: new Date() }),
     ),
   };
   const storage = { remove: vi.fn() };
 
   // Deux fichiers factices tels que la base les renverrait
-  const demain = new Date(Date.now() + 24 * 3600 * 1000);
-  const hier = new Date(Date.now() - 24 * 3600 * 1000);
-  const fichierActifProtege = {
+  const tomorrow = new Date(Date.now() + 24 * 3600 * 1000);
+  const yesterday = new Date(Date.now() - 24 * 3600 * 1000);
+  const activeProtectedFile = {
     id: 1,
     originalName: 'photo.jpg',
     size: 2726297,
     createdAt: new Date(),
-    expiresAt: demain,
+    expiresAt: tomorrow,
     token: 'jeton-1',
     passwordHash: '$2b$12$empreinte',
     tags: [{ id: 1, label: 'photos' }],
   };
-  const fichierExpire = {
-    ...fichierActifProtege,
+  const expiredFile = {
+    ...activeProtectedFile,
     id: 2,
-    expiresAt: hier,
+    expiresAt: yesterday,
     token: 'jeton-2',
     passwordHash: null,
     tags: [],
@@ -69,7 +69,7 @@ describe('FilesService', () => {
   });
 
   // Récupère les options passées à repository.find() lors du dernier appel
-  const optionsDeRecherche = () =>
+  const findOptions = () =>
     repository.find.mock.calls[0][0] as { where: Record<string, unknown> };
 
   it("filtre TOUJOURS sur l'utilisateur et, par défaut, sur les fichiers actifs", async () => {
@@ -77,7 +77,7 @@ describe('FilesService', () => {
 
     await service.findForUser(7, 'active');
 
-    const { where } = optionsDeRecherche();
+    const { where } = findOptions();
     expect(where.userId).toBe(7);
     expect(where.expiresAt).toEqual(MoreThan(expect.any(Date)));
   });
@@ -87,7 +87,7 @@ describe('FilesService', () => {
 
     await service.findForUser(7, 'expired');
 
-    expect(optionsDeRecherche().where.expiresAt).toEqual(
+    expect(findOptions().where.expiresAt).toEqual(
       LessThanOrEqual(expect.any(Date)),
     );
   });
@@ -97,31 +97,31 @@ describe('FilesService', () => {
 
     await service.findForUser(7, 'all');
 
-    const { where } = optionsDeRecherche();
+    const { where } = findOptions();
     expect(where).toEqual({ userId: 7 });
   });
 
   it('renvoie des lignes sans empreinte, avec isExpired, isProtected et les libellés des tags', async () => {
-    repository.find.mockResolvedValue([fichierActifProtege, fichierExpire]);
+    repository.find.mockResolvedValue([activeProtectedFile, expiredFile]);
 
-    const lignes = await service.findForUser(7, 'all');
+    const rows = await service.findForUser(7, 'all');
 
-    expect(lignes[0]).toMatchObject({
+    expect(rows[0]).toMatchObject({
       id: 1,
       isExpired: false,
       isProtected: true,
       tags: ['photos'],
       token: 'jeton-1',
     });
-    expect(lignes[1]).toMatchObject({
+    expect(rows[1]).toMatchObject({
       id: 2,
       isExpired: true,
       isProtected: false,
       tags: [],
     });
     // 🔒 L'empreinte du mot de passe ne sort jamais du service
-    for (const ligne of lignes) {
-      expect(ligne).not.toHaveProperty('passwordHash');
+    for (const row of rows) {
+      expect(row).not.toHaveProperty('passwordHash');
     }
   });
 
@@ -164,7 +164,7 @@ describe('FilesService', () => {
   // Téléversement (US01)
   describe('create', () => {
     // Fichier tel que multer le décrit après l'avoir écrit sur le disque
-    const fichier = {
+    const file = {
       originalname: 'photo.jpg',
       size: 2048,
       mimetype: 'image/jpeg',
@@ -172,7 +172,7 @@ describe('FilesService', () => {
     } as Express.Multer.File;
 
     // Options passées à repository.create() lors du dernier appel
-    const ligneCreee = () =>
+    const createdRow = () =>
       repository.create.mock.calls[0][0] as {
         token: string;
         passwordHash: string | null;
@@ -183,26 +183,26 @@ describe('FilesService', () => {
       };
 
     it("enregistre le fichier de l'utilisateur, sans mot de passe, expirant dans le nombre de jours demandé", async () => {
-      const avant = Date.now();
+      const before = Date.now();
 
-      const reponse = await service.create(7, fichier, {
+      const result = await service.create(7, file, {
         expiresInDays: 3,
         tags: [],
       });
 
-      const ligne = ligneCreee();
-      expect(ligne.userId).toBe(7);
-      expect(ligne.storageName).toBe(fichier.filename);
-      expect(ligne.passwordHash).toBeNull();
+      const row = createdRow();
+      expect(row.userId).toBe(7);
+      expect(row.storageName).toBe(file.filename);
+      expect(row.passwordHash).toBeNull();
       // 3 jours plus tard (à la milliseconde près, le temps du test)
-      const troisJours = 3 * 24 * 60 * 60 * 1000;
-      expect(ligne.expiresAt.getTime()).toBeGreaterThanOrEqual(
-        avant + troisJours,
+      const threeDays = 3 * 24 * 60 * 60 * 1000;
+      expect(row.expiresAt.getTime()).toBeGreaterThanOrEqual(
+        before + threeDays,
       );
-      expect(ligne.expiresAt.getTime()).toBeLessThanOrEqual(
-        Date.now() + troisJours,
+      expect(row.expiresAt.getTime()).toBeLessThanOrEqual(
+        Date.now() + threeDays,
       );
-      expect(reponse).toMatchObject({
+      expect(result).toMatchObject({
         id: 12,
         originalName: 'photo.jpg',
         isProtected: false,
@@ -211,51 +211,51 @@ describe('FilesService', () => {
     });
 
     it('génère un jeton aléatoire de 43 caractères, différent à chaque envoi', async () => {
-      await service.create(7, fichier, { expiresInDays: 7, tags: [] });
-      await service.create(7, fichier, { expiresInDays: 7, tags: [] });
+      await service.create(7, file, { expiresInDays: 7, tags: [] });
+      await service.create(7, file, { expiresInDays: 7, tags: [] });
 
-      const jeton1 = (repository.create.mock.calls[0][0] as { token: string })
+      const token1 = (repository.create.mock.calls[0][0] as { token: string })
         .token;
-      const jeton2 = (repository.create.mock.calls[1][0] as { token: string })
+      const token2 = (repository.create.mock.calls[1][0] as { token: string })
         .token;
       // base64url : lettres, chiffres, « - » et « _ » uniquement (sans risque dans une adresse)
-      expect(jeton1).toMatch(/^[A-Za-z0-9_-]{43}$/);
-      expect(jeton1).not.toBe(jeton2);
+      expect(token1).toMatch(/^[A-Za-z0-9_-]{43}$/);
+      expect(token1).not.toBe(token2);
     });
 
     it("stocke l'empreinte bcrypt du mot de passe, jamais le mot de passe, et ne la renvoie pas", async () => {
-      const reponse = await service.create(7, fichier, {
+      const result = await service.create(7, file, {
         expiresInDays: 7,
         password: 'secret1',
         tags: [],
       });
 
-      const { passwordHash } = ligneCreee();
+      const { passwordHash } = createdRow();
       expect(passwordHash).not.toBe('secret1');
       expect(await bcrypt.compare('secret1', passwordHash!)).toBe(true);
-      expect(reponse.isProtected).toBe(true);
-      expect(reponse).not.toHaveProperty('passwordHash');
-      expect(reponse).not.toHaveProperty('storageName');
+      expect(result.isProtected).toBe(true);
+      expect(result).not.toHaveProperty('passwordHash');
+      expect(result).not.toHaveProperty('storageName');
     });
 
     it('enregistre les tags avec le fichier', async () => {
-      const reponse = await service.create(7, fichier, {
+      const result = await service.create(7, file, {
         expiresInDays: 7,
         tags: ['vacances', 'photos'],
       });
 
-      expect(ligneCreee().tags).toEqual([
+      expect(createdRow().tags).toEqual([
         { label: 'vacances' },
         { label: 'photos' },
       ]);
-      expect(reponse.tags).toEqual(['vacances', 'photos']);
+      expect(result.tags).toEqual(['vacances', 'photos']);
     });
 
     it('refuse (400) un nom de fichier de plus de 255 caractères, sans rien enregistrer', async () => {
-      const nomTropLong = { ...fichier, originalname: 'a'.repeat(256) };
+      const tooLongName = { ...file, originalname: 'a'.repeat(256) };
 
       await expect(
-        service.create(7, nomTropLong, { expiresInDays: 7, tags: [] }),
+        service.create(7, tooLongName, { expiresInDays: 7, tags: [] }),
       ).rejects.toThrow(BadRequestException);
       expect(repository.save).not.toHaveBeenCalled();
     });

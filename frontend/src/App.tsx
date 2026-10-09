@@ -4,16 +4,16 @@
 //   Toutes les pages sont « enfants » du Layout : elles partagent l'en-tête et le pied de page.
 // Utilise :
 //   - react-router (Routes, Route)
-//   - components/Layout.tsx ; pages/Accueil, Connexion, Inscription, PageIntrouvable
+//   - components/Layout.tsx ; pages/Accueil, Connexion, Inscription, NotFound
 // Utilisé par :
 //   - main.tsx
 // ================================================================================================
 import { Route, Routes } from 'react-router';
 import { Layout } from './components/Layout.tsx';
-import { Accueil } from './pages/Accueil.tsx';
-import { Connexion } from './pages/Connexion.tsx';
-import { Inscription } from './pages/Inscription.tsx';
-import { PageIntrouvable } from './pages/PageIntrouvable.tsx';
+import { Home } from './pages/Home.tsx';
+import { Login } from './pages/Login.tsx';
+import { Register } from './pages/Register.tsx';
+import { NotFound } from './pages/NotFound.tsx';
 
 function App() {
   return (
@@ -21,13 +21,13 @@ function App() {
     <Routes>
       {/* Route parente sans adresse : le Layout entoure toutes les pages (affichées dans son <Outlet />) */}
       <Route element={<Layout />}>
-        <Route path="/" element={<Accueil />} />
+        <Route path="/" element={<Home />} />
         {/* /connexion → page de connexion (US04) */}
-        <Route path="/connexion" element={<Connexion />} />
+        <Route path="/connexion" element={<Login />} />
         {/* /inscription → page de création de compte (US03) */}
-        <Route path="/inscription" element={<Inscription />} />
+        <Route path="/inscription" element={<Register />} />
         {/* path="*" : toute autre adresse → page introuvable (doit rester en dernier) */}
-        <Route path="*" element={<PageIntrouvable />} />
+        <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>
   );

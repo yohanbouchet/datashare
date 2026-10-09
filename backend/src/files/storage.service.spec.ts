@@ -14,99 +14,99 @@ import { ConfigService } from '@nestjs/config';
 import { access, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { StorageService, TAILLE_MAX_FICHIER } from './storage.service.js';
+import { StorageService, MAX_FILE_SIZE } from './storage.service.js';
 
 // Signature simplifiée des fonctions de rappel de multer (filename, fileFilter)
-type Rappel = (erreur: Error | null, valeur?: unknown) => void;
-interface OptionsMulterTestees {
+type Callback = (error: Error | null, value?: unknown) => void;
+interface TestedMulterOptions {
   storage: {
-    getFilename: (requete: unknown, fichier: unknown, rappel: Rappel) => void;
+    getFilename: (request: unknown, file: unknown, callback: Callback) => void;
   };
   limits: { fileSize: number; files: number };
-  fileFilter: (requete: unknown, fichier: unknown, rappel: Rappel) => void;
+  fileFilter: (request: unknown, file: unknown, callback: Callback) => void;
 }
 
 describe('StorageService', () => {
-  let dossier: string;
+  let directory: string;
   let service: StorageService;
-  let options: OptionsMulterTestees;
+  let options: TestedMulterOptions;
 
   beforeEach(async () => {
     // Dossier temporaire unique (ex. /tmp/datashare-test-AbC123)
-    dossier = await mkdtemp(join(tmpdir(), 'datashare-test-'));
+    directory = await mkdtemp(join(tmpdir(), 'datashare-test-'));
     const variables: Record<string, string> = {
-      UPLOAD_DIR: dossier,
+      UPLOAD_DIR: directory,
       FORBIDDEN_EXTENSIONS: '.exe, .SH,.js',
     };
     const config = {
-      getOrThrow: (cle: string) => variables[cle],
+      getOrThrow: (key: string) => variables[key],
     } as unknown as ConfigService;
     service = new StorageService(config);
-    options = service.createMulterOptions() as unknown as OptionsMulterTestees;
+    options = service.createMulterOptions() as unknown as TestedMulterOptions;
   });
 
   afterEach(async () => {
-    await rm(dossier, { recursive: true, force: true });
+    await rm(directory, { recursive: true, force: true });
   });
 
   // Appelle le fileFilter de multer pour un nom de fichier et renvoie [erreur, accepté]
-  const filtrer = (nom: string) =>
-    new Promise<[Error | null, unknown]>((fin) =>
-      options.fileFilter({}, { originalname: nom }, (erreur, accepte) =>
-        fin([erreur, accepte]),
+  const runFilter = (name: string) =>
+    new Promise<[Error | null, unknown]>((done) =>
+      options.fileFilter({}, { originalname: name }, (error, accepted) =>
+        done([error, accepted]),
       ),
     );
 
   it('limite la réception à un seul fichier de 1 Go', () => {
     expect(options.limits.fileSize).toBe(1024 * 1024 * 1024);
-    expect(TAILLE_MAX_FICHIER).toBe(1073741824);
+    expect(MAX_FILE_SIZE).toBe(1073741824);
     expect(options.limits.files).toBe(1);
   });
 
   it('génère un nom de stockage aléatoire de 64 caractères hexadécimaux, jamais le nom d’origine', async () => {
-    const nommer = () =>
-      new Promise<unknown>((fin) =>
+    const generateName = () =>
+      new Promise<unknown>((done) =>
         options.storage.getFilename(
           {},
           { originalname: 'photo.jpg' },
-          (_erreur, nom) => fin(nom),
+          (_error, name) => done(name),
         ),
       );
 
-    const nom1 = await nommer();
-    const nom2 = await nommer();
+    const name1 = await generateName();
+    const name2 = await generateName();
 
-    expect(nom1).toMatch(/^[0-9a-f]{64}$/);
-    expect(nom1).not.toBe(nom2);
+    expect(name1).toMatch(/^[0-9a-f]{64}$/);
+    expect(name1).not.toBe(name2);
   });
 
   it('refuse les extensions interdites, quelle que soit la casse (400)', async () => {
-    for (const nom of ['virus.exe', 'script.sh', 'SCRIPT.SH', 'app.Js']) {
-      const [erreur, accepte] = await filtrer(nom);
-      expect(erreur).toBeInstanceOf(BadRequestException);
-      expect(accepte).toBe(false);
+    for (const name of ['virus.exe', 'script.sh', 'SCRIPT.SH', 'app.Js']) {
+      const [error, accepted] = await runFilter(name);
+      expect(error).toBeInstanceOf(BadRequestException);
+      expect(accepted).toBe(false);
     }
   });
 
   it('accepte les autres fichiers', async () => {
-    for (const nom of [
+    for (const name of [
       'photo.jpg',
       'rapport.pdf',
       'archive.tar.gz',
       'sans-extension',
     ]) {
-      const [erreur, accepte] = await filtrer(nom);
-      expect(erreur).toBeNull();
-      expect(accepte).toBe(true);
+      const [error, accepted] = await runFilter(name);
+      expect(error).toBeNull();
+      expect(accepted).toBe(true);
     }
   });
 
   it('supprime un fichier du dossier de stockage', async () => {
-    await writeFile(join(dossier, 'abc123'), 'contenu');
+    await writeFile(join(directory, 'abc123'), 'contenu');
 
     await service.remove('abc123');
 
-    await expect(access(join(dossier, 'abc123'))).rejects.toThrow();
+    await expect(access(join(directory, 'abc123'))).rejects.toThrow();
   });
 
   it('ne signale pas d’erreur si le fichier est déjà absent (ENOENT)', async () => {

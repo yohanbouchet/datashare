@@ -47,3 +47,4 @@
 | Analyse statique | Oxlint | ESLint | Installé par les deux générateurs ; même outil des deux côtés, très rapide |
 | Mise en forme | Prettier | — | Présentation homogène du code, appliquée automatiquement |
 | Éditeur | VS Code (Remote SSH) | IntelliJ / WebStorm | Gratuit, adapté à TypeScript, travail à distance sur la machine Ubuntu |
+| Langue | Code en anglais (fichiers, classes, fonctions, variables, classes CSS, messages de commit) ; commentaires, documentation et messages affichés en français | Tout en français, mélange | Les frameworks (`@Controller`, `useState`…) et les champs de l'API sont en anglais : un code entièrement anglais est homogène ; les explications et l'interface s'adressent à un public francophone |

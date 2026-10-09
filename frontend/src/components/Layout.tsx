@@ -5,7 +5,7 @@
 // Utilise :
 //   - components/Header.tsx (Header)
 //   - react-router (Outlet) : emplacement de la page courante
-//   - index.css : classes mise-en-page, contenu, pied-de-page, lien-evitement
+//   - index.css : classes layout, content, footer, skip-link
 // Utilisé par :
 //   - App.tsx (route parente de toutes les pages)
 // ================================================================================================
@@ -14,18 +14,18 @@ import { Header } from './Header.tsx';
 
 export function Layout() {
   return (
-    <div className="mise-en-page">
+    <div className="layout">
       {/* Accessibilité : au clavier, le premier Tab propose de sauter directement au contenu */}
-      <a href="#contenu" className="lien-evitement">
+      <a href="#content" className="skip-link">
         Aller au contenu
       </a>
       <Header />
       {/* <main> : le contenu principal (une seule fois par page, repère pour les lecteurs d'écran) */}
-      <main id="contenu" className="contenu">
+      <main id="content" className="content">
         {/* Outlet : « ici s'affiche la page de l'adresse en cours » (Accueil, Connexion…) */}
         <Outlet />
       </main>
-      <footer className="pied-de-page">Copyright DataShare© 2025</footer>
+      <footer className="footer">Copyright DataShare© 2025</footer>
     </div>
   );
 }

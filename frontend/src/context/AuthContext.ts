@@ -10,16 +10,16 @@
 //   - context/AuthProvider.tsx (remplit le contexte), context/useAuth.ts (le lit)
 // ================================================================================================
 import { createContext } from 'react';
-import type { Utilisateur } from '../services/api.ts';
+import type { User } from '../services/api.ts';
 
 // Ce que le contexte met à disposition des composants
-export interface ValeurAuth {
-  utilisateur: Utilisateur | null;
+export interface AuthValue {
+  user: User | null;
   // true tant que la session conservée n'a pas été vérifiée (évite d'afficher « Se connecter » une fraction de seconde)
-  chargement: boolean;
-  connexion: (email: string, password: string) => Promise<void>;
-  deconnexion: () => void;
+  loading: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => void;
 }
 
 // createContext : crée le « tableau d'affichage » partagé ; null tant qu'aucun AuthProvider ne l'a rempli
-export const AuthContext = createContext<ValeurAuth | null>(null);
+export const AuthContext = createContext<AuthValue | null>(null);

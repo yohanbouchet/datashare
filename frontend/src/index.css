@@ -13,41 +13,41 @@
 /* ---- Variables : couleurs relevées dans Figma (panneau « Couleurs » des maquettes) ---- */
 :root {
   /* Textes */
-  --couleur-texte: #1e1e1e;
-  --couleur-texte-doux: #b3b3b3; /* textes d'aide dans les champs (placeholder) */
-  --couleur-bordure: #d9d9d9; /* bordure des champs */
+  --color-text: #1e1e1e;
+  --color-text-muted: #b3b3b3; /* textes d'aide dans les champs (placeholder) */
+  --color-border: #d9d9d9; /* bordure des champs */
   /* Boutons et liens */
-  --couleur-sombre: #2c2c2c; /* boutons noirs de l'en-tête */
-  --couleur-bouton-rond: #100218; /* bouton rond de l'accueil */
-  --couleur-anneau: rgba(
+  --color-dark: #2c2c2c; /* boutons noirs de l'en-tête */
+  --color-round-button: #100218; /* bouton rond de l'accueil */
+  --color-ring: rgba(
     47,
     25,
     13,
     0.15
   ); /* anneau autour du bouton rond (#2F190D à 15 %) */
-  --couleur-accent: #e27f29; /* liens orange (« Créer un compte ») */
-  --couleur-accent-texte: #ba681f; /* texte des boutons orange */
-  --couleur-accent-fond: #ffeeec; /* fond des boutons orange */
-  --couleur-accent-bord: #ffa569; /* bordure des boutons orange */
-  --couleur-erreur: #f14343; /* messages d'erreur sous les champs */
+  --color-accent: #e27f29; /* liens orange (« Créer un compte ») */
+  --color-accent-text: #ba681f; /* texte des boutons orange */
+  --color-accent-bg: #ffeeec; /* fond des boutons orange */
+  --color-accent-border: #ffa569; /* bordure des boutons orange */
+  --color-error: #f14343; /* messages d'erreur sous les champs */
   /* Bandeaux (« Callout Component ») : information, alerte, erreur */
-  --info-fond: #e2ecff;
-  --info-bord: #b1c9f5;
-  --info-texte: #2a3f72;
-  --alerte-fond: #fff5ed;
-  --alerte-bord: #e6cbb5;
-  --alerte-texte: #aa642b;
-  --erreur-fond: #ffe2e2;
-  --erreur-bord: #e8a6a6;
-  --erreur-texte: #9c3333;
+  --info-bg: #e2ecff;
+  --info-border: #b1c9f5;
+  --info-text: #2a3f72;
+  --warning-bg: #fff5ed;
+  --warning-border: #e6cbb5;
+  --warning-text: #aa642b;
+  --error-bg: #ffe2e2;
+  --error-border: #e8a6a6;
+  --error-text: #9c3333;
   /* Fond et cartes */
-  --couleur-carte: #ffffff;
+  --color-card: #ffffff;
   /* Dégradé linéaire de la maquette : #FFB88C (haut) → #DE6262 (bas) */
-  --degrade-fond: linear-gradient(170deg, #ffb88c 0%, #de6262 100%);
-  --rayon: 12px;
-  --ombre-carte: 0 8px 24px rgba(0, 0, 0, 0.15);
+  --gradient-bg: linear-gradient(170deg, #ffb88c 0%, #de6262 100%);
+  --radius: 12px;
+  --shadow-card: 0 8px 24px rgba(0, 0, 0, 0.15);
   font-family: 'DM Sans', system-ui, sans-serif;
-  color: var(--couleur-texte);
+  color: var(--color-text);
 }
 
 /* box-sizing : la largeur d'un bloc inclut ses marges intérieures (calculs plus simples) */
@@ -60,7 +60,7 @@
 body {
   margin: 0;
   min-height: 100vh;
-  background: var(--degrade-fond);
+  background: var(--gradient-bg);
   background-attachment: fixed;
 }
 
@@ -70,16 +70,16 @@ a {
 
 /* Accessibilité : contour bien visible sur l'élément sélectionné au clavier (touche Tab) */
 :focus-visible {
-  outline: 3px solid var(--couleur-sombre);
+  outline: 3px solid var(--color-dark);
   outline-offset: 2px;
 }
 
 /* Accessibilité : lien « Aller au contenu », caché hors écran, il apparaît quand on le sélectionne au clavier */
-.lien-evitement {
+.skip-link {
   position: absolute;
   left: -9999px;
 }
-.lien-evitement:focus {
+.skip-link:focus {
   left: 1rem;
   top: 1rem;
   z-index: 10;
@@ -89,13 +89,13 @@ a {
 }
 
 /* ---- Mise en page commune (Layout) : en-tête / contenu / pied de page ---- */
-.mise-en-page {
+.layout {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
-.en-tete {
+.header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -105,23 +105,23 @@ a {
 
 /* Très petits écrans (moins de 360 px) : logo un peu réduit pour laisser la place au bouton */
 @media (max-width: 359px) {
-  .en-tete {
+  .header {
     padding: 1rem;
   }
-  .en-tete__logo {
+  .header__logo {
     font-size: 1.4rem;
   }
 }
 
-.en-tete__logo {
+.header__logo {
   font-size: 1.8rem;
   font-weight: 700;
   text-decoration: none;
-  color: var(--couleur-texte);
+  color: var(--color-text);
 }
 
-.bouton-sombre {
-  background: var(--couleur-sombre);
+.button-dark {
+  background: var(--color-dark);
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -133,7 +133,7 @@ a {
 }
 
 /* flex: 1 : le contenu prend toute la hauteur disponible et centre la carte */
-.contenu {
+.content {
   flex: 1;
   display: flex;
   align-items: center;
@@ -142,7 +142,7 @@ a {
 }
 
 /* Pied de page masqué sur mobile, comme dans les maquettes */
-.pied-de-page {
+.footer {
   display: none;
   color: #fff;
   padding: 1rem 1.5rem;
@@ -150,58 +150,58 @@ a {
 }
 
 /* ---- Carte blanche centrale (Connexion, Créer un compte, Télécharger…) ---- */
-.carte {
-  background: var(--couleur-carte);
-  border-radius: var(--rayon);
-  box-shadow: var(--ombre-carte);
+.card {
+  background: var(--color-card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
   padding: 1.5rem 2rem;
   width: 100%;
   max-width: 36rem;
 }
 
-.carte__titre {
+.card__title {
   margin: 0 0 1.5rem;
   text-align: center;
   font-size: 1.6rem;
 }
 
 /* ---- Page d'accueil ---- */
-.accueil {
+.home {
   text-align: center;
 }
 
-.accueil__titre {
+.home__title {
   font-weight: 400;
   font-size: 1.8rem;
   margin: 0 0 1.5rem;
 }
 
 /* Bouton rond sombre ; box-shadow dessine l'anneau clair autour */
-.accueil__bouton {
+.home__button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 5.5rem;
   height: 5.5rem;
   border-radius: 50%;
-  background: var(--couleur-bouton-rond);
+  background: var(--color-round-button);
   color: #fff;
-  box-shadow: 0 0 0 1.4rem var(--couleur-anneau);
+  box-shadow: 0 0 0 1.4rem var(--color-ring);
 }
 
 /* ---- Écrans d'ordinateur (768 px de large et plus) ---- */
 @media (min-width: 768px) {
-  .en-tete {
+  .header {
     padding: 1rem 5.5rem;
   }
-  .en-tete__logo {
+  .header__logo {
     font-size: 1.6rem;
   }
-  .pied-de-page {
+  .footer {
     display: block;
     padding: 1rem 5.5rem;
   }
-  .accueil__titre {
+  .home__title {
     font-size: 1.6rem;
   }
 }
@@ -209,83 +209,83 @@ a {
 /* ================================================================================================
    Formulaires (Connexion, Créer un compte…)
    ================================================================================================ */
-.formulaire {
+.form {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
 
 /* ---- Champ (« Input Component ») ---- */
-.champ {
+.field {
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
 }
 
-.champ__label {
+.field__label {
   font-size: 1rem;
 }
 
-.champ__saisie {
+.field__input {
   font: inherit;
   padding: 0.65rem 1rem;
-  border: 1px solid var(--couleur-bordure);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   background: #fff;
 }
 
-.champ__saisie::placeholder {
-  color: var(--couleur-texte-doux);
+.field__input::placeholder {
+  color: var(--color-text-muted);
 }
 
 /* Champ en erreur : bordure rouge (repérée par aria-invalid, donc cohérente avec l'accessibilité) */
-.champ__saisie[aria-invalid='true'] {
-  border-color: var(--couleur-erreur);
+.field__input[aria-invalid='true'] {
+  border-color: var(--color-error);
 }
 
-.champ__erreur {
+.field__error {
   margin: 0;
-  color: var(--couleur-erreur);
+  color: var(--color-error);
   font-size: 0.9rem;
 }
 
 /* ---- Lien orange (« Créer un compte », « J'ai déjà un compte ») ---- */
-.lien-accent {
+.link-accent {
   align-self: center;
-  color: var(--couleur-accent);
+  color: var(--color-accent);
   text-decoration: none;
   margin-top: 0.5rem;
 }
 
-.lien-accent:hover {
+.link-accent:hover {
   text-decoration: underline;
 }
 
 /* ---- Bouton orange pleine largeur (« Button Component ») ---- */
-.bouton-principal {
+.button-primary {
   font: inherit;
   padding: 0.65rem 1rem;
   border-radius: 8px;
-  border: 1px solid var(--couleur-accent-bord);
-  background: var(--couleur-accent-fond);
-  color: var(--couleur-accent-texte);
+  border: 1px solid var(--color-accent-border);
+  background: var(--color-accent-bg);
+  color: var(--color-accent-text);
   cursor: pointer;
 }
 
-.bouton-principal:hover:not(:disabled) {
+.button-primary:hover:not(:disabled) {
   filter: brightness(0.97);
 }
 
 /* Bouton désactivé : gris, comme dans la maquette */
-.bouton-principal:disabled {
+.button-primary:disabled {
   background: #f3eeea;
-  border-color: var(--couleur-bordure);
-  color: var(--couleur-texte-doux);
+  border-color: var(--color-border);
+  color: var(--color-text-muted);
   cursor: not-allowed;
 }
 
 /* ---- Bandeau (« Callout Component ») ---- */
-.bandeau {
+.banner {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -296,24 +296,24 @@ a {
   font-size: 0.95rem;
 }
 
-.bandeau svg {
+.banner svg {
   flex-shrink: 0;
 }
 
-.bandeau--info {
-  background: var(--info-fond);
-  border-color: var(--info-bord);
-  color: var(--info-texte);
+.banner--info {
+  background: var(--info-bg);
+  border-color: var(--info-border);
+  color: var(--info-text);
 }
 
-.bandeau--alerte {
-  background: var(--alerte-fond);
-  border-color: var(--alerte-bord);
-  color: var(--alerte-texte);
+.banner--warning {
+  background: var(--warning-bg);
+  border-color: var(--warning-border);
+  color: var(--warning-text);
 }
 
-.bandeau--erreur {
-  background: var(--erreur-fond);
-  border-color: var(--erreur-bord);
-  color: var(--erreur-texte);
+.banner--error {
+  background: var(--error-bg);
+  border-color: var(--error-border);
+  color: var(--error-text);
 }

@@ -1,25 +1,25 @@
 // ================================================================================================
-// Fichier : Bandeau.tsx
+// Fichier : Banner.tsx
 // Rôle : Composant réutilisable « Callout Component » des maquettes : bandeau coloré avec icône.
-//   3 variantes : info (bleu), alerte (orange), erreur (rouge).
+//   3 variantes (variant) : info (bleu), warning (orange, alerte), error (rouge, erreur).
 //   Accessible : une erreur est annoncée immédiatement (role="alert"), une information poliment (role="status").
 // Utilise :
-//   - index.css : classes bandeau, bandeau--info, bandeau--alerte, bandeau--erreur
+//   - index.css : classes banner, banner--info, banner--warning, banner--error
 // Utilisé par :
-//   - pages/Connexion.tsx, pages/Inscription.tsx (et plus tard la page de téléchargement)
+//   - pages/Login.tsx, pages/Register.tsx (et plus tard la page de téléchargement)
 // ================================================================================================
 import type { ReactNode } from 'react';
 
-interface ProprietesBandeau {
-  variante: 'info' | 'alerte' | 'erreur';
+interface BannerProps {
+  variant: 'info' | 'warning' | 'error';
   children: ReactNode;
 }
 
-export function Bandeau({ variante, children }: ProprietesBandeau) {
+export function Banner({ variant, children }: BannerProps) {
   return (
     <div
-      className={`bandeau bandeau--${variante}`}
-      role={variante === 'erreur' ? 'alert' : 'status'}
+      className={`banner banner--${variant}`}
+      role={variant === 'error' ? 'alert' : 'status'}
     >
       {/* Icône décorative (cercle avec « i » ou « ! ») : ignorée par les lecteurs d'écran */}
       <svg
@@ -33,7 +33,7 @@ export function Bandeau({ variante, children }: ProprietesBandeau) {
         aria-hidden="true"
       >
         <circle cx="12" cy="12" r="10" />
-        {variante === 'info' ? (
+        {variant === 'info' ? (
           <path d="M12 16v-4M12 8h.01" />
         ) : (
           <path d="M12 8v4M12 16h.01" />
