@@ -1,6 +1,6 @@
 // ================================================================================================
 // Fichier : files.service.spec.ts
-// Rôle : Tests unitaires de FilesService – historique (US05) et suppression (US06) (Vitest : npm test).
+// Rôle : Tests unitaires de FilesService – téléversement (US01), historique (US05) et suppression (US06) (Vitest : npm test).
 //   Le Repository TypeORM est remplacé par une doublure : on vérifie la REQUÊTE construite
 //   (filtre utilisateur + filtre de date) et la RÉPONSE (sans empreinte, isExpired / isProtected calculés).
 //   StorageService est aussi remplacé : on vérifie la suppression (propriétaire, 404, ordre base puis disque).
@@ -11,8 +11,9 @@
 // Utilisé par :
 //   - Vitest (vitest.config.ts)
 // ================================================================================================
-import { NotFoundException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+import bcrypt from 'bcrypt';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { LessThanOrEqual, MoreThan } from 'typeorm';
 import { FileEntity } from './file.entity.js';
@@ -21,7 +22,16 @@ import { StorageService } from './storage.service.js';
 
 describe('FilesService', () => {
   let service: FilesService;
-  const repository = { find: vi.fn(), findOne: vi.fn(), delete: vi.fn() };
+  const repository = {
+    find: vi.fn(),
+    findOne: vi.fn(),
+    delete: vi.fn(),
+    // create : renvoie l'objet préparé tel quel ; save : simule l'INSERT (id et date ajoutés par la base)
+    create: vi.fn((donnees: object) => donnees),
+    save: vi.fn((donnees: object) =>
+      Promise.resolve({ ...donnees, id: 12, createdAt: new Date() }),
+    ),
+  };
   const storage = { remove: vi.fn() };
 
   // Deux fichiers factices tels que la base les renverrait
@@ -148,6 +158,106 @@ describe('FilesService', () => {
       );
 
       expect(repository.findOne).not.toHaveBeenCalled();
+    });
+  });
+
+  // Téléversement (US01)
+  describe('create', () => {
+    // Fichier tel que multer le décrit après l'avoir écrit sur le disque
+    const fichier = {
+      originalname: 'photo.jpg',
+      size: 2048,
+      mimetype: 'image/jpeg',
+      filename: 'a'.repeat(64),
+    } as Express.Multer.File;
+
+    // Options passées à repository.create() lors du dernier appel
+    const ligneCreee = () =>
+      repository.create.mock.calls[0][0] as {
+        token: string;
+        passwordHash: string | null;
+        expiresAt: Date;
+        userId: number;
+        storageName: string;
+        tags: { label: string }[];
+      };
+
+    it("enregistre le fichier de l'utilisateur, sans mot de passe, expirant dans le nombre de jours demandé", async () => {
+      const avant = Date.now();
+
+      const reponse = await service.create(7, fichier, {
+        expiresInDays: 3,
+        tags: [],
+      });
+
+      const ligne = ligneCreee();
+      expect(ligne.userId).toBe(7);
+      expect(ligne.storageName).toBe(fichier.filename);
+      expect(ligne.passwordHash).toBeNull();
+      // 3 jours plus tard (à la milliseconde près, le temps du test)
+      const troisJours = 3 * 24 * 60 * 60 * 1000;
+      expect(ligne.expiresAt.getTime()).toBeGreaterThanOrEqual(
+        avant + troisJours,
+      );
+      expect(ligne.expiresAt.getTime()).toBeLessThanOrEqual(
+        Date.now() + troisJours,
+      );
+      expect(reponse).toMatchObject({
+        id: 12,
+        originalName: 'photo.jpg',
+        isProtected: false,
+        isExpired: false,
+      });
+    });
+
+    it('génère un jeton aléatoire de 43 caractères, différent à chaque envoi', async () => {
+      await service.create(7, fichier, { expiresInDays: 7, tags: [] });
+      await service.create(7, fichier, { expiresInDays: 7, tags: [] });
+
+      const jeton1 = (repository.create.mock.calls[0][0] as { token: string })
+        .token;
+      const jeton2 = (repository.create.mock.calls[1][0] as { token: string })
+        .token;
+      // base64url : lettres, chiffres, « - » et « _ » uniquement (sans risque dans une adresse)
+      expect(jeton1).toMatch(/^[A-Za-z0-9_-]{43}$/);
+      expect(jeton1).not.toBe(jeton2);
+    });
+
+    it("stocke l'empreinte bcrypt du mot de passe, jamais le mot de passe, et ne la renvoie pas", async () => {
+      const reponse = await service.create(7, fichier, {
+        expiresInDays: 7,
+        password: 'secret1',
+        tags: [],
+      });
+
+      const { passwordHash } = ligneCreee();
+      expect(passwordHash).not.toBe('secret1');
+      expect(await bcrypt.compare('secret1', passwordHash!)).toBe(true);
+      expect(reponse.isProtected).toBe(true);
+      expect(reponse).not.toHaveProperty('passwordHash');
+      expect(reponse).not.toHaveProperty('storageName');
+    });
+
+    it('enregistre les tags avec le fichier', async () => {
+      const reponse = await service.create(7, fichier, {
+        expiresInDays: 7,
+        tags: ['vacances', 'photos'],
+      });
+
+      expect(ligneCreee().tags).toEqual([
+        { label: 'vacances' },
+        { label: 'photos' },
+      ]);
+      expect(reponse.tags).toEqual(['vacances', 'photos']);
+    });
+
+    it('refuse (400) un nom de fichier de plus de 255 caractères, sans rien enregistrer', async () => {
+      const nomTropLong = { ...fichier, originalname: 'a'.repeat(256) };
+
+      await expect(
+        service.create(7, nomTropLong, { expiresInDays: 7, tags: [] }),
+      ).rejects.toThrow(BadRequestException);
+      expect(repository.save).not.toHaveBeenCalled();
     });
   });
 });
