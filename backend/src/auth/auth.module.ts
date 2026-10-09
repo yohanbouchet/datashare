@@ -9,6 +9,7 @@
 //   - .env (JWT_SECRET, JWT_EXPIRES_IN)
 // Utilisé par :
 //   - app.module.ts (imports)
+//   - files/files.module.ts (imports : pour la garde JWT, grâce à exports: [JwtModule])
 // ================================================================================================
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -35,5 +36,8 @@ import { AuthService } from './auth.service.js';
   ],
   controllers: [AuthController],
   providers: [AuthService],
+  // exports : partage JwtModule avec les modules qui importent AuthModule (ex. FilesModule),
+  // pour qu'ils puissent utiliser la garde JWT (qui a besoin de JwtService).
+  exports: [JwtModule],
 })
 export class AuthModule {}

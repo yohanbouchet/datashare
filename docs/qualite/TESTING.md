@@ -21,7 +21,7 @@
 | Route protégée | US04 | Avec JWT valide ; sans JWT ; mauvais format ; JWT invalide ou expiré | Unitaire + e2e | 200 ; 401 ; 401 ; 401 | ✅ unitaire (garde : 4 tests) · 🔜 e2e |
 | Téléversement | US01 | Fichier valide ; > 1 Go ; extension interdite ; durée hors 1–7 ; sans connexion | Unitaire + e2e | 201 + jeton ; 413 ; 400 ; 400 ; 401 | 🔜 |
 | Téléchargement | US02 | Lien valide ; lien inconnu ; lien expiré ; mot de passe juste / faux | Unitaire + e2e | 200 ; 404 ; 410 ; 200 / 401 | 🔜 |
-| Historique | US05 | Fichiers de l'utilisateur seulement ; filtre actifs / expirés | Unitaire + e2e | Aucun fichier d'un autre compte | 🔜 |
+| Historique | US05 | Fichiers de l'utilisateur seulement ; filtre actifs (par défaut) / expirés / tous ; filtre invalide ; sans connexion | Unitaire + e2e | Aucun fichier d'un autre compte ; aucune empreinte dans la réponse ; 400 ; 401 | ✅ unitaire (5 tests) · 🔜 e2e |
 | Suppression | US06 | Son propre fichier ; fichier d'un autre | Unitaire + e2e | 204 et fichier effacé du disque ; 404 | 🔜 |
 | Parcours complet | — | Inscription → connexion → téléversement → téléchargement | Cypress | Parcours sans erreur | 🔜 étape 5 |
 
@@ -38,6 +38,8 @@
 | 08/10/2026 | backend | Garde JWT et `GET /api/auth/me` : tests unitaires (4 cas de la garde, routes login et me du contrôleur) + test manuel `curl` (jeton valide 200, sans jeton 401, jeton modifié d'un caractère 401) | ✅ 18/18 (total) · ✅ 3/3 manuel | — |
 | 08/10/2026 | frontend | Session au rechargement (F5), test manuel navigateur : jeton valide → en-tête « Mon espace » ; jeton modifié → `GET /api/auth/me` 401, jeton effacé, en-tête « Se connecter » | ✅ 2/2 | — |
 | 08/10/2026 | frontend | Page Créer un compte, test manuel navigateur : champs vides (messages email et mot de passe), mot de passe de 5 caractères, vérification différente, email déjà utilisé (bandeau « Cet email est déjà utilisé » renvoyé par l'API), nouveau compte → page Connexion avec bandeau « Ton compte est créé » | ✅ 5/5 | — |
+| 09/10/2026 | backend | Historique `GET /api/files` : tests unitaires (filtre utilisateur toujours présent, filtres actifs / expirés / tous, réponse sans empreinte avec `isExpired`, `isProtected` et tags, délégation du contrôleur) | ✅ 23/23 (total) | — |
+| 09/10/2026 | backend | Historique, test manuel `curl` avec des données de test : par défaut 2 fichiers actifs, `status=expired` 1 fichier, `status=all` 3 fichiers, jamais le fichier d'un autre compte ni d'empreinte ; filtre invalide (400, message en français) ; paramètre `userId` ajouté (400) ; sans jeton (401) | ✅ 6/6 | — |
 
 🔜 Rapport de couverture et capture d'écran (étape 5).
 
@@ -62,3 +64,4 @@ ou les vérifications avant commit.
 | 08/10/2026 | Message d'erreur d'un champ resté affiché après correction de la saisie | Test manuel (navigateur) | La validation n'est recalculée qu'à l'envoi du formulaire | 🔜 Amélioration d'ergonomie prévue (étape 5) : effacer l'erreur d'un champ dès qu'il est modifié |
 | 08/10/2026 | « Cannot access 'FileEntity' before initialization » à la génération de la migration | Vérification avant livraison (génération de migration sur une copie) | Import mutuel entre `FileEntity` et `Tag` en modules ESM : la classe est lue avant d'être définie | Type `Relation<…>` de TypeORM sur les propriétés de relation |
 | 09/10/2026 | Compilation impossible : `FileEntity` et `Tag` importés depuis le mauvais fichier | Compilation TypeScript | Chaque classe doit être importée depuis le fichier où elle est écrite | Une ligne d'import par fichier (`user.entity`, `file.entity`, `tag.entity`) |
+| 09/10/2026 | Paramètre inattendu (`?userId=2`) refusé avec un message en anglais (« property userId should not exist ») | Test manuel (`curl`) | Message par défaut de `forbidNonWhitelisted` (le refus 400 est correct, seule la langue diffère) | 🔜 Message en français prévu à l'étape 5 (option `exceptionFactory` du `ValidationPipe`) |

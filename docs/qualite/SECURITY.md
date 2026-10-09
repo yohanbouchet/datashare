@@ -49,7 +49,9 @@ Légende : ✅ en place · 🔜 prévu (étape indiquée)
 | Email normalisé | ✅ | Espaces retirés et minuscules avant contrôle : une seule adresse = un seul compte |
 | Longueur du mot de passe bornée | ✅ | 8 caractères minimum (US03), 72 maximum (limite de bcrypt, au-delà les caractères seraient ignorés) |
 | En-têtes de sécurité HTTP (`helmet`) | ✅ | Appliqués à toutes les réponses : `X-Powered-By` supprimé (technologie du serveur masquée), `X-Content-Type-Options: nosniff`, `X-Frame-Options` et `frame-ancestors` (anti-clickjacking), `Strict-Transport-Security` (HTTPS imposé en production), `Referrer-Policy: no-referrer` (les liens de partage ne fuient pas vers d'autres sites), `Content-Security-Policy` |
-| Accès limité à ses propres fichiers | 🔜 étape 4 | L'identité vient du JWT, jamais d'un paramètre ; réponse 404 pour le fichier d'un autre |
+| Accès limité à ses propres fichiers | ✅ historique · 🔜 suppression | US05 : la liste est toujours filtrée sur l'identifiant du JWT, jamais sur un paramètre (un paramètre `userId` ajouté à l'adresse est refusé, 400) ; US06 : réponse 404 pour le fichier d'un autre |
+| Historique sans donnée sensible | ✅ | US05 : la réponse est construite champ par champ ; l'empreinte du mot de passe de fichier devient un simple booléen `isProtected` |
+| Paramètre de filtre contrôlé | ✅ | US05 : `status` limité à `active`, `expired` ou `all` (DTO), sinon 400 |
 | Lien de partage non prédictible | 🔜 étape 4 | Jeton aléatoire long, distinct de l'identifiant interne |
 | Contrôle de la taille et des extensions | 🔜 étape 4 | 1 Go maximum (contrôle dans le navigateur, à l'arrivée et pendant la réception) ; extensions exécutables refusées |
 | Fichiers stockés sous un nom généré | 🔜 étape 4 | Jamais le nom d'origine : évite les doublons et les attaques par chemin (`../`) |
