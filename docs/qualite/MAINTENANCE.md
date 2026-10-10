@@ -66,14 +66,24 @@ Repères déjà fixés :
 
 ## 4. Nettoyage des fichiers expirés
 
-🔜 Étape 4 : tâche planifiée qui supprime les fichiers expirés (disque et base), au moins une fois par jour,
-avec une fréquence configurable par variable d'environnement.
+✅ US10 : `backend/src/files/purge.service.ts`.
+
+| Élément | Fonctionnement |
+|---|---|
+| Fréquence | `PURGE_INTERVAL_MINUTES` dans `.env` (60 par défaut) ; une valeur invalide (0, négative, non entière) empêche l'API de démarrer |
+| Démarrage | Une purge est lancée dès le démarrage de l'API (rattrapage après un arrêt), puis à chaque intervalle |
+| Traitement | Fichiers dont `expires_at` est dépassée (recherche rapide grâce à l'index) : ligne en base (tags en cascade), puis fichier sur le disque |
+| Robustesse | Un échec sur un fichier est consigné dans le journal et n'interrompt pas la purge des suivants |
+| Suivi | Journal de l'API : `[PurgeService] Purge : N fichier(s) expiré(s) supprimé(s)` |
+| Plusieurs serveurs | À prévoir si l'API est répartie sur plusieurs instances : une seule doit purger (verrou en base ou tâche planifiée externe) |
 
 ## 5. Évolutions envisagées
 
 | Évolution | Pourquoi | Mise en œuvre envisagée |
 |---|---|---|
 | Analyse antivirus des fichiers reçus | La liste d'extensions interdites se contourne (renommage, archive `.zip`) et ne détecte pas les documents piégés | Conteneur **ClamAV** ajouté à Docker Compose ; l'API lui transmet chaque fichier reçu avant de l'enregistrer ; mise à jour quotidienne des signatures (`freshclam`) à surveiller comme une dépendance |
+| Quota par utilisateur | Empêche un seul compte de remplir le disque du serveur ; base d'une offre commerciale | Colonne `quota` dans `users` ; au téléversement, somme des tailles des fichiers actifs (`SUM(size)`), refus au-delà avec un message clair |
+| Offre payante (*freemium*) | Modèle des services de transfert (gratuit limité, payant pour plus) | Quota, taille maximale et durée d'expiration plus élevés pour les comptes payants ; paiement confié à un prestataire (ex. Stripe) : aucune donnée bancaire stockée par DataShare (norme PCI-DSS) |
 | Stockage sur AWS S3 | Disque local limité à un serveur (pas de répartition de charge, sauvegardes à gérer) ; S3 offre une capacité illimitée, une durabilité très élevée et des sauvegardes intégrées | Voir ci-dessous : seul `StorageService` change |
 
 ### Passer du disque local à AWS S3

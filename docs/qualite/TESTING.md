@@ -23,6 +23,7 @@
 | Téléchargement | US02 | Lien valide ; lien inconnu ; lien expiré ; mot de passe juste / faux / absent ; fichier absent du disque ; nom accentué ou non latin | Unitaire + e2e | 200 ; 404 ; 410 ; 200 / 401 / 401 ; 404 ; nom exact (UTF-8) | ✅ unitaire (14 tests) · 🔜 e2e |
 | Historique | US05 | Fichiers de l'utilisateur seulement ; filtre actifs (par défaut) / expirés / tous ; filtre invalide ; sans connexion | Unitaire + e2e | Aucun fichier d'un autre compte ; aucune empreinte dans la réponse ; 400 ; 401 | ✅ unitaire (5 tests) · 🔜 e2e |
 | Suppression | US06 | Son propre fichier ; fichier d'un autre ; id invalide ou hors limites ; sans connexion | Unitaire + e2e | 204, ligne, tags et fichier effacés (base puis disque) ; 404 sans rien supprimer ; 404 ; 401 | ✅ unitaire (3 tests) · 🔜 e2e |
+| Purge planifiée | US10 | Fichiers expirés supprimés (base, tags, disque) ; ordre base puis disque ; poursuite après une erreur ; purge au démarrage et à chaque intervalle ; fréquence invalide | Unitaire + manuel | Aucun fichier expiré restant ; démarrage refusé si `PURGE_INTERVAL_MINUTES` est invalide | ✅ unitaire (5 tests) · ✅ manuel |
 | Parcours complet | — | Inscription → connexion → téléversement → téléchargement | Cypress | Parcours sans erreur | 🔜 étape 5 |
 
 ## 3. Résultats
@@ -46,6 +47,8 @@
 | 09/10/2026 | backend | Tests unitaires du téléversement : service (enregistrement, durée, jeton aléatoire, empreinte, tags, nom trop long), stockage (réglages multer, nom aléatoire, extensions, suppression sur un dossier temporaire, traversée de chemin), garde de taille, filtre d'exceptions (fichier effacé, 400, 413, 500), DTO (défauts, conversions, règles) ; contrôleur (upload, remove) | ✅ 53/53 (total) | — |
 | 10/10/2026 | backend | Téléchargement, test manuel `curl` : informations d'un fichier libre et d'un fichier protégé (200, sans donnée sensible), jeton inconnu (404), `verify` bon / mauvais mot de passe (204 / 401) et absent (400), téléchargement libre et protégé avec le bon mot de passe (200, fichier identique à l'original octet pour octet), protégé sans mot de passe ou avec un faux (401), champ inattendu (400), fichier absent du disque (404), lien expiré (410 pour les informations et le téléchargement), nom « 報告書 été.pdf » (en-tête `filename*` UTF-8) | ✅ 15/15 | — |
 | 10/10/2026 | backend | Tests unitaires du téléchargement : informations sans donnée sensible, 404, 410, mot de passe bon / faux, revérification au téléchargement (fichier jamais ouvert sans mot de passe), fichier absent du disque ; contrôleur (délégation, en-têtes `Content-Type` et `Content-Disposition` UTF-8) ; stockage (lecture en flux, fichier absent) | ✅ 67/67 (total) | — |
+| 10/10/2026 | backend | Purge planifiée, test manuel : fichier téléversé avec un tag puis rendu expiré ; au redémarrage de l'API, journal « Purge : 1 fichier(s) expiré(s) supprimé(s) », ligne, tag et fichier sur le disque supprimés ; les fichiers actifs sont conservés | ✅ 1/1 | — |
+| 10/10/2026 | backend | Tests unitaires de la purge : recherche des fichiers expirés, base puis disque, poursuite après une erreur, aucun fichier expiré, purge au démarrage puis après l'intervalle (horloge factice), fréquence invalide refusée | ✅ 72/72 (total) | — |
 
 🔜 Rapport de couverture et capture d'écran (étape 5).
 

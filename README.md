@@ -126,7 +126,7 @@ chacune remplace une commande plus longue.
 
 | Fichier | Lu par | Variables |
 |---|---|---|
-| `.env` (racine) | Docker Compose, API | `POSTGRES_*`, `FRONTEND_URL`, `JWT_SECRET`, `JWT_EXPIRES_IN`, `UPLOAD_DIR`, `FORBIDDEN_EXTENSIONS` |
+| `.env` (racine) | Docker Compose, API | `POSTGRES_*`, `FRONTEND_URL`, `JWT_SECRET`, `JWT_EXPIRES_IN`, `UPLOAD_DIR`, `FORBIDDEN_EXTENSIONS`, `PURGE_INTERVAL_MINUTES` |
 | `frontend/.env` | Vite | `VITE_API_URL` |
 
 Les fichiers `.env` contiennent des secrets : ils sont exclus de Git. Seuls les modèles `.env.example` sont publiés.
@@ -151,7 +151,7 @@ Conception :
 
 - [x] Étape 1 – Conception (MCD, architecture, contrat d'interface)
 - [x] Étape 2 – Initialisation (dépôt, PostgreSQL, API, front)
-- [ ] Étape 3 – Inscription (US03) et connexion (US04) — *en cours*
-- [ ] Étape 4 – Téléversement, téléchargement, historique, suppression (US01, US02, US05, US06)
+- [x] Étape 3 – Inscription (US03) et connexion (US04)
+- [ ] Étape 4 – Téléversement, téléchargement, historique, suppression, purge (US01, US02, US05, US06, US10) — *API terminée, écrans en cours*
 - [ ] Étape 5 – Tests, sécurité, performance
 - [ ] Étape 6 – Documentation finale
