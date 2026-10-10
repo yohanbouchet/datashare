@@ -7,17 +7,18 @@
 //     dossier, nom généré, taille maximale, extensions interdites
 //     (createMulterOptions).
 //   - US06 : supprime un fichier du disque (remove).
-//   La lecture (US02) viendra s'ajouter ici.
+//   - US02 : ouvre un fichier en flux de lecture pour le téléchargement
+//     (openStream).
 // Utilise :
 //   - .env (UPLOAD_DIR, FORBIDDEN_EXTENSIONS) via ConfigService
 //   - multer (diskStorage : écriture du fichier sur le disque au fil de la
 //     réception)
 //   - node:crypto (randomBytes : nom de stockage aléatoire), node:fs/promises
-//     (unlink), node:path (chemins)
+//     (unlink, access), node:fs (createReadStream), node:path (chemins)
 // Utilisé par :
 //   - files.module.ts (providers + MulterModule.registerAsync),
 //     files.service.ts (remove), upload-exception.filter.ts (remove),
-//     request-size.guard.ts (MAX_FILE_SIZE)
+//     request-size.guard.ts (MAX_FILE_SIZE), download.service.ts (openStream)
 // =============================================================================
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -27,7 +28,8 @@ import type {
 } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { randomBytes } from 'node:crypto';
-import { unlink } from 'node:fs/promises';
+import { createReadStream, type ReadStream } from 'node:fs';
+import { access, unlink } from 'node:fs/promises';
 import { basename, extname, join, resolve } from 'node:path';
 
 // Taille maximale d'un fichier (US01) : 1 Go = 1024 × 1024 × 1024 octets
@@ -123,5 +125,17 @@ export class StorageService implements MulterOptionsFactory {
         throw error;
       }
     }
+  }
+  // Ouvre un fichier stocké en lecture, en flux (US02) : il sera envoyé au
+  // navigateur morceau par morceau, jamais chargé entièrement en mémoire.
+  // Fichier absent du disque → null (le service répondra 404).
+  async openStream(storageName: string): Promise<ReadStream | null> {
+    const path = this.pathOf(storageName);
+    try {
+      await access(path);
+    } catch {
+      return null;
+    }
+    return createReadStream(path);
   }
 }
