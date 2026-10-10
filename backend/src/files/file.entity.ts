@@ -80,6 +80,12 @@ export class FileEntity {
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt!: Date;
 
+  // Date à laquelle la purge a effacé le fichier du disque (US10) ; null tant
+  // qu'il y est encore. La ligne reste dans l'historique (« Ce fichier a
+  // expiré ») pendant HISTORY_RETENTION_DAYS jours, puis elle est supprimée.
+  @Column({ name: 'purged_at', type: 'timestamptz', nullable: true })
+  purgedAt!: Date | null;
+
   // ⚙️ Index : la purge planifiée retrouve vite les fichiers expirés, même s'il
   // y en a beaucoup.
   // Le statut « expiré » n'est pas stocké : il se calcule en comparant
