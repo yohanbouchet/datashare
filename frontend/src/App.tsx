@@ -13,6 +13,7 @@ import { Route, Routes } from 'react-router';
 import { Layout } from './components/Layout.tsx';
 import { RequireAuth } from './components/RequireAuth.tsx';
 import { SpaceLayout } from './components/SpaceLayout.tsx';
+import { Download } from './pages/Download.tsx';
 import { Home } from './pages/Home.tsx';
 import { Login } from './pages/Login.tsx';
 import { Register } from './pages/Register.tsx';
@@ -32,6 +33,9 @@ function App() {
         <Route path="/connexion" element={<Login />} />
         {/* /inscription → page de création de compte (US03) */}
         <Route path="/inscription" element={<Register />} />
+        {/* /d/<jeton> → page publique de téléchargement (US02) : le lien
+           partagé, sans compte */}
+        <Route path="/d/:token" element={<Download />} />
         {/* path="*" : toute autre adresse → page introuvable (doit rester en
            dernier) */}
         <Route path="*" element={<NotFound />} />
