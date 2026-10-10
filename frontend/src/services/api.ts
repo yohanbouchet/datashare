@@ -155,3 +155,64 @@ export const authApi = {
   // expiré)
   me: () => request<User>('/auth/me'),
 };
+
+// ---- Fichiers de l'utilisateur (US05, US06) ---------------------------------
+// Filtre de l'historique (paramètre ?status= de GET /api/files)
+export type FileStatus = 'active' | 'expired' | 'all';
+
+// Une ligne de l'historique (contrat d'interface, § 4.2). Les dates arrivent
+// en texte (format ISO, ex. "2026-10-12T09:00:00Z") : le JSON n'a pas de type
+// « date ».
+export interface FileHistoryItem {
+  id: number;
+  originalName: string;
+  size: number;
+  createdAt: string;
+  expiresAt: string;
+  isExpired: boolean;
+  isProtected: boolean;
+  tags: string[];
+  token: string;
+}
+
+export const filesApi = {
+  // GET /api/files?status=… → 200 (liste) ou 401
+  list: (status: FileStatus) =>
+    request<FileHistoryItem[]>(`/files?status=${status}`),
+
+  // DELETE /api/files/:id → 204 (rien) ou 401 / 404
+  remove: (id: number) => request<void>(`/files/${id}`, { method: 'DELETE' }),
+};
+
+// ---- Téléchargement public (US02) -------------------------------------------
+// Informations affichées avant le téléchargement (contrat, § 5.1)
+export interface DownloadInfo {
+  originalName: string;
+  size: number;
+  mimeType: string;
+  expiresAt: string;
+  isProtected: boolean;
+}
+
+// encodeURIComponent : protège l'adresse si le jeton contenait un caractère
+// spécial (un jeton modifié à la main, par exemple)
+export const downloadApi = {
+  // GET /api/download/:token → 200 (informations) ou 404 / 410
+  info: (token: string) =>
+    request<DownloadInfo>(`/download/${encodeURIComponent(token)}`),
+
+  // POST /api/download/:token/verify → 204 si le mot de passe est correct,
+  // 401 sinon
+  verify: (token: string, password: string) =>
+    request<void>(`/download/${encodeURIComponent(token)}/verify`, {
+      method: 'POST',
+      body: JSON.stringify({ password }),
+    }),
+
+  // Adresse du téléchargement lui-même : elle n'est pas appelée par fetch,
+  // mais par un formulaire envoyé par le NAVIGATEUR, qui enregistre alors le
+  // fichier directement sur le disque, sans le charger en mémoire (contrat,
+  // § 5.3)
+  fileUrl: (token: string) =>
+    `${API_URL}/download/${encodeURIComponent(token)}`,
+};

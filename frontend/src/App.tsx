@@ -11,10 +11,13 @@
 // =============================================================================
 import { Route, Routes } from 'react-router';
 import { Layout } from './components/Layout.tsx';
+import { RequireAuth } from './components/RequireAuth.tsx';
+import { SpaceLayout } from './components/SpaceLayout.tsx';
 import { Home } from './pages/Home.tsx';
 import { Login } from './pages/Login.tsx';
 import { Register } from './pages/Register.tsx';
 import { NotFound } from './pages/NotFound.tsx';
+import { MySpace } from './pages/MySpace.tsx';
 
 function App() {
   return (
@@ -32,6 +35,16 @@ function App() {
         {/* path="*" : toute autre adresse → page introuvable (doit rester en
            dernier) */}
         <Route path="*" element={<NotFound />} />
+      </Route>
+
+      {/* Pages réservées aux utilisateurs connectés : RequireAuth vérifie la
+         session, puis SpaceLayout affiche la barre latérale et la barre du
+         haut autour de la page */}
+      <Route element={<RequireAuth />}>
+        <Route element={<SpaceLayout />}>
+          {/* /mon-espace → historique et suppression (US05, US06) */}
+          <Route path="/mon-espace" element={<MySpace />} />
+        </Route>
       </Route>
     </Routes>
   );
