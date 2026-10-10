@@ -51,6 +51,8 @@
 | 10/10/2026 | backend | Tests unitaires de la purge : recherche des fichiers expirés, base puis disque, poursuite après une erreur, aucun fichier expiré, purge au démarrage puis après l'intervalle (horloge factice), fréquence invalide refusée | ✅ 72/72 (total) | — |
 | 10/10/2026 | backend + frontend | Purge en deux temps, test manuel : fichier « vacances_ardeche.mp4 » (avec un tag) rendu expiré ; au redémarrage de l'API, fichier effacé du disque, ligne et tag conservés avec `purged_at` renseigné ; dans Mon espace, ligne « Expiré » avec « Ce fichier a expiré, il n'est plus stocké chez nous » (conforme à la maquette) ; lien → 410 | ✅ 4/4 | — |
 | 10/10/2026 | backend | Tests unitaires de la purge en deux temps : effacement du disque puis marquage, une seule fois ; suppression des lignes après la durée de conservation (date limite exacte) ; poursuite après une erreur ; rien à purger ; démarrage et intervalle (horloge factice) ; réglages invalides | ✅ 73/73 (total) | — |
+| 10/10/2026 | frontend | Écran Mon espace, test dans Chrome piloté par script (bureau 1280 px et mobile 393 px) : liste des fichiers conforme à la maquette, filtres Tous / Actifs / Expiré, cadenas, menu ⋮ et tiroir ☰ sur mobile | ✅ 5/5 | — |
+| 10/10/2026 | frontend | Téléversement (US01), test dans Chrome piloté par script : accueil connecté → choix du fichier → carte « Ajouter un fichier » ; mot de passe de 3 caractères refusé (message sous le champ) ; envoi avec mot de passe, 7 jours et 2 tags → carte de succès avec le lien `/d/<jeton>` (vérifié par l'API : protégé, tags, expiration) ; mobile : fichier de 1,1 Go → taille en rouge, message « limitée à 1 Go », bouton désactivé | ✅ 4/4 | — |
 
 🔜 Rapport de couverture et capture d'écran (étape 5).
 

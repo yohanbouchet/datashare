@@ -686,3 +686,166 @@ a {
     transition: none;
   }
 }
+
+/* =============================================================================
+   Téléversement (US01) : carte « Ajouter un fichier » (maquette Figma)
+   ============================================================================= */
+/* Le bouton rond de l'accueil peut être un <button> (connecté) : on retire
+   la bordure et le fond par défaut du navigateur */
+button.home__button {
+  border: none;
+  cursor: pointer;
+  font: inherit;
+}
+
+.upload-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 30rem;
+  border-radius: 16px;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.25);
+}
+
+.upload-card .card__title {
+  margin: 0;
+  font-size: 1.75rem;
+  line-height: 2.5rem;
+}
+
+.upload-card__file {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.upload-card__file + .field__error {
+  margin-top: -1rem;
+}
+
+.file-summary {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem;
+}
+
+.file-summary svg {
+  flex-shrink: 0;
+}
+
+.file-summary__text {
+  min-width: 0;
+}
+
+.file-summary__name {
+  margin: 0;
+  overflow: hidden;
+  line-height: 1.5rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-summary__size {
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.file-summary__size--error {
+  color: var(--color-error);
+}
+
+/* Bouton « Changer » : contour orange, taille du texte courant */
+.button-outline--large {
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  color: var(--color-accent);
+  font-size: 1rem;
+}
+
+/* Liste « Expiration » : flèche dessinée en SVG, sans le style du système */
+.field__select {
+  appearance: none;
+  padding-right: 2.5rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%231e1e1e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  cursor: pointer;
+}
+
+/* ---- Bouton orange translucide (« Button Component » : Téléverser,
+   Copier le lien, Télécharger) ---- */
+.button-soft {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border: 1px solid rgba(205, 94, 20, 0.5);
+  border-radius: 8px;
+  background: rgba(255, 129, 45, 0.13);
+  color: var(--color-accent-text);
+  font: inherit;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.button-soft:hover:not(:disabled) {
+  filter: brightness(0.97);
+}
+
+.button-soft:disabled {
+  border-color: var(--color-border);
+  background: #f3eeea;
+  color: var(--color-text-muted);
+  cursor: not-allowed;
+}
+
+.upload-card__progress {
+  width: 100%;
+  accent-color: var(--color-accent);
+}
+
+.upload-card__success {
+  margin: 0;
+}
+
+/* Lien de partage. Couleur légèrement plus foncée que la maquette
+   (#d8640b) : contraste ≥ 4,5:1 exigé pour un texte (accessibilité WCAG) */
+.upload-card__link {
+  display: block;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  background: rgba(164, 153, 147, 0.1);
+  color: #b0530a;
+  overflow-wrap: anywhere;
+}
+
+.upload-card__copy-status {
+  margin: 0;
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+/* Mobile : la carte est collée en bas de l'écran (maquette) */
+@media (max-width: 767px) {
+  .upload-card {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 5;
+    max-width: none;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 1.5rem;
+    border-radius: 16px 16px 0 0;
+  }
+
+  .upload-card .button-soft {
+    align-self: stretch;
+  }
+}

@@ -9,11 +9,12 @@
 //   fermeture de l'onglet).
 // Utilise :
 //   - frontend/.env (VITE_API_URL) : adresse de l'API
-//   - l'API NestJS : routes /api/auth/register, /api/auth/login, /api/auth/me
+//   - l'API NestJS : routes /api/auth/*, /api/files, /api/download/*
 //     (contrat d'interface)
 // Utilisé par :
 //   - context/AuthProvider.tsx (connexion, déconnexion, vérification de session)
-//   - pages/Login.tsx, pages/Register.tsx (brique 3)
+//   - pages/Login.tsx, pages/Register.tsx, pages/MySpace.tsx,
+//     components/UploadCard.tsx (téléversement), page Téléchargement
 // =============================================================================
 
 // Adresse de base de l'API (ex. http://localhost:3000/api), lue dans
@@ -83,6 +84,18 @@ export interface RegisterResponse extends User {
   createdAt: string;
 }
 
+// Texte d'erreur à afficher, tiré de la réponse de l'API : { statusCode,
+// message, error } ; message peut être une liste (erreurs de validation)
+function errorText(body: unknown): string {
+  const message = (body as { message?: string | string[] } | null)?.message;
+  return Array.isArray(message)
+    ? message.join(' ')
+    : (message ?? 'Une erreur est survenue. Réessaie plus tard.');
+}
+
+const UNREACHABLE =
+  'Impossible de joindre le serveur. Réessaie dans quelques instants.';
+
 // ---- Fonction d'appel commune -----------------------------------------------
 // <T> : le type de la réponse attendue, précisé à chaque appel (ex.
 // request<User>(...)).
@@ -108,10 +121,7 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   } catch {
     // fetch échoue seulement si l'API est injoignable (serveur arrêté, réseau,
     // CORS)
-    throw new ApiError(
-      0,
-      'Impossible de joindre le serveur. Réessaie dans quelques instants.',
-    );
+    throw new ApiError(0, UNREACHABLE);
   }
 
   // 204 No Content : succès sans contenu (ex. suppression d'un fichier)
@@ -123,13 +133,7 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const body: unknown = await response.json().catch(() => null);
 
   if (!response.ok) {
-    // Format d'erreur de l'API : { statusCode, message, error } ; message peut
-    // être une liste (validation)
-    const message = (body as { message?: string | string[] } | null)?.message;
-    const text = Array.isArray(message)
-      ? message.join(' ')
-      : (message ?? 'Une erreur est survenue. Réessaie plus tard.');
-    throw new ApiError(response.status, text);
+    throw new ApiError(response.status, errorText(body));
   }
 
   return body as T;
@@ -175,7 +179,50 @@ export interface FileHistoryItem {
   token: string;
 }
 
+// Réponse du téléversement (contrat, § 4.1) : une ligne d'historique + le type
+export interface UploadedFile extends FileHistoryItem {
+  mimeType: string;
+}
+
 export const filesApi = {
+  // POST /api/files (US01) → 201 (fichier enregistré + jeton du lien) ou
+  // 400 / 401 / 413. Envoi multipart/form-data avec XMLHttpRequest plutôt
+  // que fetch : seul XMLHttpRequest donne la progression de l'ENVOI
+  // (onProgress reçoit un pourcentage, pour la barre de progression).
+  upload: (data: FormData, onProgress?: (percent: number) => void) =>
+    new Promise<UploadedFile>((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', `${API_URL}/files`);
+      // 🔒 Même règle que request : le JWT dans l'en-tête, jamais l'adresse.
+      // Pas de Content-Type : le navigateur l'écrit lui-même, avec la
+      // « ficelle » (boundary) qui sépare les compartiments du colis.
+      const token = readToken();
+      if (token) {
+        xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+      }
+      xhr.upload.onprogress = (event) => {
+        if (event.lengthComputable && onProgress) {
+          onProgress(Math.round((event.loaded / event.total) * 100));
+        }
+      };
+      xhr.onload = () => {
+        let body: unknown = null;
+        try {
+          body = JSON.parse(xhr.responseText);
+        } catch {
+          // Réponse vide ou non JSON : message générique ci-dessous
+        }
+        if (xhr.status >= 200 && xhr.status < 300) {
+          resolve(body as UploadedFile);
+        } else {
+          reject(new ApiError(xhr.status, errorText(body)));
+        }
+      };
+      // Réseau coupé, serveur arrêté, ou connexion fermée par le serveur
+      xhr.onerror = () => reject(new ApiError(0, UNREACHABLE));
+      xhr.send(data);
+    }),
+
   // GET /api/files?status=… → 200 (liste) ou 401
   list: (status: FileStatus) =>
     request<FileHistoryItem[]>(`/files?status=${status}`),
