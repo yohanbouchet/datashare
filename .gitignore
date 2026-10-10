@@ -24,6 +24,7 @@ uploads/
 
 # Rapports générés par les tests
 coverage/
+coverage-e2e/
 
 # Journaux (dont ceux de npm, yarn, pnpm en cas d'erreur)
 logs/

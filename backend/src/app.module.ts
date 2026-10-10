@@ -9,7 +9,6 @@
 //   - users/users.module.ts (UsersModule), auth/auth.module.ts (AuthModule),
 //     files/files.module.ts (FilesModule)
 //   - @nestjs/schedule (ScheduleModule) : tâches planifiées (purge, US10)
-//   - app.controller.ts, app.service.ts : exemple provisoire (GET /api)
 // Utilisé par :
 //   - main.ts (NestFactory.create(AppModule))
 // =============================================================================
@@ -20,8 +19,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 // En ESM, nos propres fichiers s'importent avec l'extension .js (celle du
 // fichier compilé), alors que les paquets npm (@nestjs/...) s'importent par
 // leur nom seul.
-import { AppController } from './app.controller.js';
-import { AppService } from './app.service.js';
 import { UsersModule } from './users/users.module.js';
 import { AuthModule } from './auth/auth.module.js';
 import { FilesModule } from './files/files.module.js';
@@ -84,7 +81,5 @@ import { FilesModule } from './files/files.module.js';
 
     FilesModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}
