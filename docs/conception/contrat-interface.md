@@ -237,9 +237,9 @@ Utilisée uniquement pour un fichier protégé, avant de lancer le téléchargem
 **Corps de la requête** (formulaire envoyé par le navigateur) : `password`, uniquement si le fichier est protégé.
 
 **Réponse 200** : le contenu du fichier, envoyé en flux, avec les en-têtes :
-- `Content-Type` : type MIME du fichier
+- `Content-Type` : type déduit de l'extension du nom par le serveur (le type déclaré à l'envoi n'est pas réutilisé tel quel)
 - `Content-Length` : taille en octets
-- `Content-Disposition: attachment; filename="IMG_9210.jpg"`
+- `Content-Disposition: attachment; filename="IMG_9210.jpg"` ; pour un nom accentué ou non latin, une version sans accents plus le nom exact en UTF-8 : `filename="compte-rendu ete.txt"; filename*=UTF-8''compte-rendu%20%C3%A9t%C3%A9.txt`
 
 **Erreurs** : 401 « Mot de passe incorrect » · 404 · 410
 

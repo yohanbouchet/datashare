@@ -63,7 +63,12 @@ Légende : ✅ en place · 🔜 prévu (étape indiquée)
 | Mot de passe de fichier haché | ✅ | US01 : bcrypt coût 12 (comme les comptes), 6 à 72 caractères ; seule l'empreinte est stockée, la réponse indique seulement `isProtected` |
 | Fichiers stockés sous un nom généré | ✅ | US01 : nom aléatoire de 64 caractères hexadécimaux, jamais le nom d'origine (pas de doublon, pas d'attaque par chemin `../`, nom non devinable) ; le service de stockage refuse en plus tout nom contenant un chemin (défense en profondeur) |
 | Accès au disque centralisé | ✅ | Un seul service (`StorageService`) lit et écrit les fichiers, dans le dossier `UPLOAD_DIR` (hors de Git) |
-| Mot de passe de fichier hors de l'URL | 🔜 étape 4 | Envoyé dans le corps d'une requête POST, jamais dans l'adresse |
+| Mot de passe de fichier hors de l'URL | ✅ | US02 : envoyé dans le corps d'une requête POST, jamais dans l'adresse (historique, journaux, favoris) |
+| Mot de passe de fichier toujours revérifié | ✅ | US02 : la route de téléchargement revérifie le mot de passe (bcrypt), même après la route `verify`, qui ne sert qu'au confort du front ; sans mot de passe valide, le fichier n'est jamais ouvert |
+| Page de téléchargement sans donnée sensible | ✅ | US02 : nom, taille, type, date d'expiration et `isProtected` seulement ; jamais l'empreinte, le nom de stockage ni le propriétaire |
+| Lien expiré ou invalide | ✅ | US02 : jeton inconnu → 404, date dépassée → 410 ; le statut est calculé à chaque demande, même si la purge n'est pas encore passée |
+| Fichier enregistré, jamais ouvert dans la page | ✅ | US02 : `Content-Disposition: attachment` ; type (`Content-Type`) déduit de l'extension par le serveur, sans se fier au type déclaré à l'envoi ; avec `X-Content-Type-Options: nosniff` (helmet), un fichier HTML ou SVG piégé ne peut pas s'exécuter sur le domaine de l'API |
+| Envoi en flux | ✅ | US02 : le fichier est lu sur le disque et envoyé morceau par morceau (jamais entièrement en mémoire) ; fichier absent du disque → 404 avant tout envoi |
 | Limitation des tentatives | 🔜 étape 5 | `@nestjs/throttler` sur la connexion et la vérification de mot de passe de fichier |
 
 ### Front-end
@@ -81,6 +86,17 @@ Légende : ✅ en place · 🔜 prévu (étape indiquée)
 | Injection SQL | Requêtes paramétrées (TypeORM) |
 | XSS (injection de code dans les pages) | React échappe automatiquement le texte affiché ; pas d'insertion de HTML brut |
 | CSRF (requête forcée depuis un autre site) | Le JWT est envoyé dans l'en-tête `Authorization`, pas dans un cookie : un site tiers ne peut pas l'ajouter à la place de l'utilisateur |
+
+### Conformité : RGPD et contenus illicites
+
+| Sujet | Dans le MVP | Pour une mise en production |
+|---|---|---|
+| Minimisation des données (RGPD) | Seuls l'email et l'empreinte du mot de passe sont conservés pour un compte | — |
+| Durée de conservation limitée | Fichiers expirés après 1 à 7 jours, puis purgés (disque et base) | Durée de conservation des comptes inactifs à définir |
+| Sécurité des données | Hachage bcrypt, JWT à durée limitée, secrets hors du code ; HTTPS en production | Chiffrement du stockage (ex. *bucket* S3 chiffré) |
+| Droits des personnes | — | Suppression de son compte et de ses fichiers (droit à l'effacement), export de ses données ; page de confidentialité et mentions légales |
+| Localisation | Serveur de développement local | Hébergement dans l'Union européenne (ex. région AWS `eu-west-3`, Paris) |
+| Contenus illicites | Compte obligatoire pour déposer (traçabilité), expiration de 7 jours au plus, purge automatique | Statut d'**hébergeur** (LCEN, *Digital Services Act*) : pas d'obligation de tout surveiller, mais obligation d'agir promptement sur signalement → bouton « signaler ce fichier », procédure de retrait, conservation des journaux de dépôt ; une détection automatique (comparaison d'empreintes de contenus illicites connus) est hors de portée du MVP |
 
 ## 2. Scans de sécurité des dépendances
 
