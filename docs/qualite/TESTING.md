@@ -7,22 +7,22 @@
 | Type | Rôle | Outil | Commande |
 |---|---|---|---|
 | Unitaire (back) | Tester une pièce isolée (service, contrôleur), sans base ni réseau | Vitest | `npm test` (dans `backend/`) |
-| Intégration / e2e API (back) | Tester l'API complète avec de vraies requêtes HTTP et la base | Vitest + supertest | `npm run test:e2e` |
+| Intégration / e2e API (back) | Tester l'API complète avec de vraies requêtes HTTP, sur une **base de test séparée** (`datashare_test`, recréée et migrée à chaque lancement) et un dossier de stockage temporaire | Vitest + supertest | `npm run test:e2e` (base Docker démarrée) |
 | Unitaire (front) | Tester un composant React | Vitest | 🔜 |
 | End-to-end (navigateur) | Rejouer un parcours utilisateur complet | Cypress | 🔜 étape 5 |
-| Couverture | Mesurer la part du code exécutée par les tests (objectif ≥ 70 %) | Vitest coverage | `npm run test:cov` |
+| Couverture | Mesurer la part du code exécutée par les tests (objectif ≥ 70 %, seuil bloquant pour les tests unitaires). **Tout** le code source est compté, pas seulement les fichiers chargés par les tests | Vitest coverage (v8) | `npm run test:cov` (unitaires), `npm run test:e2e:cov` (e2e) ; rapports HTML dans `coverage/` et `coverage-e2e/` |
 
 ## 2. Plan de tests des fonctionnalités critiques
 
 | Fonctionnalité | US | Cas testés | Type | Critère d'acceptation | État |
 |---|---|---|---|---|---|
-| Inscription | US03 | Compte créé ; email déjà utilisé ; email invalide ; mot de passe < 8 caractères ; mot de passe non renvoyé | Unitaire + e2e | 201 ; 409 ; 400 ; 400 ; aucune empreinte dans la réponse | ✅ unitaire (8 tests) · 🔜 e2e |
-| Connexion | US04 | Identifiants corrects ; mot de passe faux ; email inconnu (comparaison factice) | Unitaire + e2e | 200 + JWT ; 401 avec le même message dans les deux cas d'échec, sans jeton délivré | ✅ unitaire (3 tests) · 🔜 e2e |
-| Route protégée | US04 | Avec JWT valide ; sans JWT ; mauvais format ; JWT invalide ou expiré | Unitaire + e2e | 200 ; 401 ; 401 ; 401 | ✅ unitaire (garde : 4 tests) · 🔜 e2e |
-| Téléversement | US01 | Fichier valide (avec ou sans mot de passe et tags) ; > 1 Go annoncé ou réel ; extension interdite ; durée hors 1–7 ; mot de passe < 6 ; tag trop long, en double, > 10 ; sans fichier ; sans connexion ; fichier effacé en cas d'erreur | Unitaire + e2e | 201 + jeton ; 413 ; 400 ; 400 ; 400 ; 400 ; 400 ; 401 ; aucun fichier orphelin | ✅ unitaire (27 tests) · 🔜 e2e |
-| Téléchargement | US02 | Lien valide ; lien inconnu ; lien expiré ; mot de passe juste / faux / absent ; fichier absent du disque ; nom accentué ou non latin | Unitaire + e2e | 200 ; 404 ; 410 ; 200 / 401 / 401 ; 404 ; nom exact (UTF-8) | ✅ unitaire (14 tests) · 🔜 e2e |
-| Historique | US05 | Fichiers de l'utilisateur seulement ; filtre actifs (par défaut) / expirés / tous ; filtre invalide ; sans connexion | Unitaire + e2e | Aucun fichier d'un autre compte ; aucune empreinte dans la réponse ; 400 ; 401 | ✅ unitaire (5 tests) · 🔜 e2e |
-| Suppression | US06 | Son propre fichier ; fichier d'un autre ; id invalide ou hors limites ; sans connexion | Unitaire + e2e | 204, ligne, tags et fichier effacés (base puis disque) ; 404 sans rien supprimer ; 404 ; 401 | ✅ unitaire (3 tests) · 🔜 e2e |
+| Inscription | US03 | Compte créé ; email déjà utilisé ; email invalide ; mot de passe < 8 caractères ; mot de passe non renvoyé | Unitaire + e2e | 201 ; 409 ; 400 ; 400 ; aucune empreinte dans la réponse | ✅ unitaire (8 tests) · ✅ e2e |
+| Connexion | US04 | Identifiants corrects ; mot de passe faux ; email inconnu (comparaison factice) | Unitaire + e2e | 200 + JWT ; 401 avec le même message dans les deux cas d'échec, sans jeton délivré | ✅ unitaire (3 tests) · ✅ e2e |
+| Route protégée | US04 | Avec JWT valide ; sans JWT ; mauvais format ; JWT invalide ou expiré | Unitaire + e2e | 200 ; 401 ; 401 ; 401 | ✅ unitaire (garde : 4 tests) · ✅ e2e |
+| Téléversement | US01 | Fichier valide (avec ou sans mot de passe et tags) ; > 1 Go annoncé ou réel ; extension interdite ; durée hors 1–7 ; mot de passe < 6 ; tag trop long, en double, > 10 ; sans fichier ; sans connexion ; fichier effacé en cas d'erreur | Unitaire + e2e | 201 + jeton ; 413 ; 400 ; 400 ; 400 ; 400 ; 400 ; 401 ; aucun fichier orphelin | ✅ unitaire (27 tests) · ✅ e2e |
+| Téléchargement | US02 | Lien valide ; lien inconnu ; lien expiré ; mot de passe juste / faux / absent ; fichier absent du disque ; nom accentué ou non latin | Unitaire + e2e | 200 ; 404 ; 410 ; 200 / 401 / 401 ; 404 ; nom exact (UTF-8) | ✅ unitaire (14 tests) · ✅ e2e |
+| Historique | US05 | Fichiers de l'utilisateur seulement ; filtre actifs (par défaut) / expirés / tous ; filtre invalide ; sans connexion | Unitaire + e2e | Aucun fichier d'un autre compte ; aucune empreinte dans la réponse ; 400 ; 401 | ✅ unitaire (5 tests) · ✅ e2e |
+| Suppression | US06 | Son propre fichier ; fichier d'un autre ; id invalide ou hors limites ; sans connexion | Unitaire + e2e | 204, ligne, tags et fichier effacés (base puis disque) ; 404 sans rien supprimer ; 404 ; 401 | ✅ unitaire (3 tests) · ✅ e2e |
 | Purge planifiée | US10 | Étape 1 : fichiers expirés effacés du disque puis marqués (`purged_at`), une seule fois ; étape 2 : lignes supprimées après la durée de conservation ; poursuite après une erreur ; purge au démarrage et à chaque intervalle ; réglages invalides | Unitaire + manuel | Aucun fichier expiré sur le disque, historique conservé N jours ; démarrage refusé si un réglage est invalide | ✅ unitaire (6 tests) · ✅ manuel |
 | Parcours complet | — | Inscription → connexion → téléversement → téléchargement | Cypress | Parcours sans erreur | 🔜 étape 5 |
 
@@ -55,6 +55,8 @@
 | 10/10/2026 | frontend | Téléversement (US01), test dans Chrome piloté par script : accueil connecté → choix du fichier → carte « Ajouter un fichier » ; mot de passe de 3 caractères refusé (message sous le champ) ; envoi avec mot de passe, 7 jours et 2 tags → carte de succès avec le lien `/d/<jeton>` (vérifié par l'API : protégé, tags, expiration) ; mobile : fichier de 1,1 Go → taille en rouge, message « limitée à 1 Go », bouton désactivé | ✅ 4/4 | — |
 | 10/10/2026 | frontend | Téléchargement (US02), test dans Chrome piloté par script : fichier protégé (bandeau bleu « expirera dans 2 jours », bouton désactivé tant que le mot de passe est vide), mot de passe faux (« Mot de passe incorrect » sous le champ, aucun téléchargement), bon mot de passe (fichier `photo.jpg` enregistré par Chrome), fichier libre (`compte-rendu été.txt` enregistré avec son nom accentué), lien expiré (bandeau rouge 410), lien inconnu (bandeau rouge 404), mobile 393 px ; puis test manuel dans Firefox | ✅ 8/8 | — |
 | 10/10/2026 | backend | Messages de validation, test manuel `curl` : `verify` sans mot de passe → un seul message « Le mot de passe est obligatoire » ; `?userId=2` → « Le champ « userId » n'est pas autorisé » ; inscription avec email invalide, mot de passe court et champ `role` → un message par champ, en français ; tests unitaires de la fabrique d'erreurs | ✅ 3/3 · 76/76 (total) | — |
+| 10/10/2026 | backend | **Tests de bout en bout de l'API** (25 tests, base `datashare_test`) : inscription (201, email normalisé, 409, 400 un message par champ), connexion (200 JWT, 401 même message), `/me` (200, 401), en-têtes helmet ; téléversement (201 avec mot de passe, durée et tags, fichier écrit sur le disque ; extension interdite 400 sans écriture ; donnée invalide 400 sans fichier orphelin ; 413 ; 400 sans fichier ; 401), historique (fichiers de l'utilisateur seulement, filtre expirés, 400), suppression (404 fichier d'un autre, 204 base et disque, 404 id invalide) ; téléchargement (informations, `verify` 204 / 401 / 400, contenu identique octet pour octet, en-têtes `Content-Type` et `Content-Disposition` UTF-8, mot de passe exigé, formulaire du navigateur, 404, 410) | ✅ 25/25 | e2e : 87,8 % des lignes |
+| 10/10/2026 | backend | Couverture des tests unitaires, en comptant tout le code source (hors migrations et `main.ts`) | ✅ 75/75 | **89,7 % des lignes**, 88,5 % des instructions, 86 % des branches, 80 % des fonctions (seuil 70 %) |
 
 🔜 Rapport de couverture et capture d'écran (étape 5).
 

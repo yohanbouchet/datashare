@@ -97,8 +97,9 @@ chacune remplace une commande plus longue.
 | `npm run start:dev` | Démarre l'API en mode développement (redémarrage automatique) |
 | `npm run build` | Compile le TypeScript vers `dist/` |
 | `npm test` | Lance les tests unitaires |
-| `npm run test:e2e` | Lance les tests de bout en bout (base de données démarrée) |
-| `npm run test:cov` | Tests unitaires avec rapport de couverture |
+| `npm run test:e2e` | Lance les tests de bout en bout de l'API (base Docker démarrée) ; ils utilisent une base séparée, `datashare_test`, recréée à chaque lancement : les données de développement ne sont jamais touchées |
+| `npm run test:cov` | Tests unitaires avec rapport de couverture (`coverage/index.html`) ; échoue sous 70 % |
+| `npm run test:e2e:cov` | Tests de bout en bout avec rapport de couverture (`coverage-e2e/index.html`) |
 | `npm run lint` | Analyse statique du code (Oxlint) |
 | `npm run format` | Met en forme le code (Prettier) |
 | `npm run migration:generate -- src/database/migrations/<Nom>` | Génère une migration à partir des entités modifiées |
