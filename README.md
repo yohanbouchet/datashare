@@ -152,6 +152,6 @@ Conception :
 - [x] Étape 1 – Conception (MCD, architecture, contrat d'interface)
 - [x] Étape 2 – Initialisation (dépôt, PostgreSQL, API, front)
 - [x] Étape 3 – Inscription (US03) et connexion (US04)
-- [ ] Étape 4 – Téléversement, téléchargement, historique, suppression, purge (US01, US02, US05, US06, US10) — *API terminée, écrans en cours*
+- [x] Étape 4 – Téléversement, téléchargement, historique, suppression, purge (US01, US02, US05, US06, US10), tags et mot de passe de fichier (US08, US09)
 - [ ] Étape 5 – Tests, sécurité, performance
 - [ ] Étape 6 – Documentation finale
