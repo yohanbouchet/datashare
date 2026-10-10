@@ -26,6 +26,11 @@ uploads/
 coverage/
 coverage-e2e/
 
+# Produits par Cypress (fichiers téléchargés, captures en cas d'échec, vidéos)
+frontend/cypress/downloads/
+frontend/cypress/screenshots/
+frontend/cypress/videos/
+
 # Journaux (dont ceux de npm, yarn, pnpm en cas d'erreur)
 logs/
 *.log

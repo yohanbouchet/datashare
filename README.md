@@ -114,6 +114,10 @@ chacune remplace une commande plus longue.
 | `npm run build` | Produit la version optimisée pour la production |
 | `npm test` | Lance les tests unitaires du front (Vitest, faux navigateur jsdom) |
 | `npm run test:cov` | Tests unitaires avec rapport de couverture (`coverage/index.html`) ; échoue sous 70 % |
+| `npm run cy:run` | Scénarios Cypress dans un vrai navigateur, sans fenêtre (base, API et front démarrés) ; ils créent des comptes `cypress-…@mail.fr` dans la base de développement |
+| `npm run cy:open` | Ouvre Cypress pour voir les scénarios s'exécuter pas à pas |
+
+> Cypress : si son navigateur n'est pas téléchargé, lancer `npx cypress install`. Si Cypress refuse de démarrer (« bad option: --no-sandbox ») dans un terminal lancé par un outil basé sur Electron, la variable `ELECTRON_RUN_AS_NODE` est en cause : `env -u ELECTRON_RUN_AS_NODE npm run cy:run`.
 | `npm run lint` | Analyse statique du code (Oxlint) |
 
 ### Base de données (racine du projet)
