@@ -1,19 +1,21 @@
 // =============================================================================
 // Fichier : app.module.ts
 // Rôle : Module racine de l'API : le « sommaire » de l'application. Charge la
-//   configuration (.env), ouvre la connexion à PostgreSQL et déclare tous les
-//   modules fonctionnels.
+//   configuration (.env), ouvre la connexion à PostgreSQL, active les tâches
+//   planifiées et déclare tous les modules fonctionnels.
 // Utilise :
 //   - .env (racine) : variables POSTGRES_* lues par ConfigModule /
 //     ConfigService
 //   - users/users.module.ts (UsersModule), auth/auth.module.ts (AuthModule),
 //     files/files.module.ts (FilesModule)
+//   - @nestjs/schedule (ScheduleModule) : tâches planifiées (purge, US10)
 //   - app.controller.ts, app.service.ts : exemple provisoire (GET /api)
 // Utilisé par :
 //   - main.ts (NestFactory.create(AppModule))
 // =============================================================================
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
 // En ESM, nos propres fichiers s'importent avec l'extension .js (celle du
 // fichier compilé), alors que les paquets npm (@nestjs/...) s'importent par
@@ -71,6 +73,10 @@ import { FilesModule } from './files/files.module.js';
         synchronize: false,
       }),
     }),
+
+    // 3) Tâches planifiées (purge des fichiers expirés, US10) : NestJS gère
+    //    les minuteurs et les arrête proprement à l'arrêt de l'API.
+    ScheduleModule.forRoot(),
 
     UsersModule,
 

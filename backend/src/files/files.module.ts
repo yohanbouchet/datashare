@@ -10,6 +10,8 @@
 //     storage.service.ts (StorageService)
 //   - download.controller.ts (DownloadController), download.service.ts
 //     (DownloadService) : téléchargement public (US02)
+//   - purge.service.ts (PurgeService) : purge planifiée des fichiers expirés
+//     (US10)
 //   - auth/auth.module.ts (AuthModule) : fournit JwtService à la garde JWT
 //   - @nestjs/platform-express (MulterModule) : réception des fichiers, réglée
 //     par StorageService
@@ -27,6 +29,7 @@ import { FilesService } from './files.service.js';
 import { StorageService } from './storage.service.js';
 import { DownloadController } from './download.controller.js';
 import { DownloadService } from './download.service.js';
+import { PurgeService } from './purge.service.js';
 
 @Module({
   // forFeature : ce module a le droit d'utiliser les tables files et tags
@@ -43,6 +46,6 @@ import { DownloadService } from './download.service.js';
   // controllers : les guichets (routes HTTP) ; providers : les services
   // injectés
   controllers: [FilesController, DownloadController],
-  providers: [FilesService, StorageService, DownloadService],
+  providers: [FilesService, StorageService, DownloadService, PurgeService],
 })
 export class FilesModule {}
