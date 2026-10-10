@@ -12,7 +12,7 @@
 //   Affiche un bandeau d'information si l'utilisateur arrive juste après avoir
 //   créé son compte.
 // Utilise :
-//   - context/useAuth.ts (connexion, utilisateur)
+//   - context/useAuth.ts (login, user)
 //   - services/api.ts (ApiError)
 //   - components/Field.tsx, components/Banner.tsx
 //   - react-router (Link, Navigate, useLocation, useNavigate)

@@ -12,7 +12,7 @@
 //      message de l'API (« Cet email est déjà utilisé », serveur injoignable…).
 // Utilise :
 //   - services/api.ts (authApi.register, ApiError)
-//   - context/useAuth.ts (utilisateur : redirection si déjà connecté)
+//   - context/useAuth.ts (user : redirection si déjà connecté)
 //   - components/Field.tsx, components/Banner.tsx
 //   - react-router (Link, Navigate, useNavigate)
 // Utilisé par :
