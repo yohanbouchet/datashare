@@ -126,7 +126,7 @@ chacune remplace une commande plus longue.
 
 | Fichier | Lu par | Variables |
 |---|---|---|
-| `.env` (racine) | Docker Compose, API | `POSTGRES_*`, `FRONTEND_URL`, `JWT_SECRET`, `JWT_EXPIRES_IN`, `UPLOAD_DIR`, `FORBIDDEN_EXTENSIONS`, `PURGE_INTERVAL_MINUTES`, `HISTORY_RETENTION_DAYS` |
+| `.env` (racine) | Docker Compose, API | `POSTGRES_*`, `FRONTEND_URL`, `JWT_SECRET`, `JWT_EXPIRES_IN`, `UPLOAD_DIR`, `FORBIDDEN_EXTENSIONS`, `PURGE_INTERVAL_MINUTES`, `HISTORY_RETENTION_DAYS`, `API_DOCS` |
 | `frontend/.env` | Vite | `VITE_API_URL` |
 
 Les fichiers `.env` contiennent des secrets : ils sont exclus de Git. Seuls les modèles `.env.example` sont publiés.
@@ -146,6 +146,7 @@ Conception :
 - [Modèle conceptuel de données (MCD)](docs/conception/mcd-datashare.drawio)
 - [Schéma d'architecture](docs/conception/architecture-datashare.drawio)
 - [Contrat d'interface de l'API](docs/conception/contrat-interface.md)
+- Documentation OpenAPI (Swagger), générée à partir du code : http://localhost:3000/api/docs une fois l'API lancée (description et essai de chaque route ; bouton « Authorize » pour coller un JWT obtenu par `/api/auth/login`) ; format JSON sur `/api/docs-json`
 
 ## Avancement
 

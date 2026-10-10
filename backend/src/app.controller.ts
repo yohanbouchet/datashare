@@ -10,10 +10,13 @@
 //   - frontend/src/App.tsx (appel fetch)
 // =============================================================================
 import { Controller, Get } from '@nestjs/common';
+import { ApiExcludeController } from '@nestjs/swagger';
 import { AppService } from './app.service.js';
 
 // @Controller : cette classe reçoit des requêtes HTTP (couche "contrôleur" de
 // l'architecture).
+// Route d'exemple du générateur : exclue de la documentation OpenAPI
+@ApiExcludeController()
 @Controller()
 export class AppController {
   // Injection de dépendances : NestJS fournit automatiquement une instance

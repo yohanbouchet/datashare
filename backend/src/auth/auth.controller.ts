@@ -26,12 +26,21 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from './jwt-auth.guard.js';
 import type { AuthenticatedRequest } from './jwt-auth.guard.js';
 import { AuthService } from './auth.service.js';
 import { RegisterDto } from './dto/register.dto.js';
 import { LoginDto } from './dto/login.dto.js';
 
+// @ApiTags… : documentation OpenAPI (page /api/docs), sans effet sur le
+// fonctionnement ; exemples repris du contrat d'interface
+@ApiTags('Authentification')
 @Controller('auth')
 export class AuthController {
   // Injection de dépendances : NestJS fournit le AuthService (le "cuisinier").
@@ -43,6 +52,24 @@ export class AuthController {
   // Le contrôleur ne fait aucun traitement lui-même : il transmet au service et
   // renvoie sa réponse { id, email, createdAt } avec le code 201, ou l'erreur
   // 409 si l'email est déjà utilisé.
+  @ApiOperation({ summary: 'Créer un compte (US03)' })
+  @ApiResponse({
+    status: 201,
+    description: 'Compte créé',
+    schema: {
+      example: {
+        id: 1,
+        email: 'claire@mail.fr',
+        createdAt: '2026-10-07T09:00:00.000Z',
+      },
+    },
+  })
+  @ApiResponse({
+    status: 400,
+    description:
+      'Données invalides : email, mot de passe de 8 à 72 caractères, champ inattendu',
+  })
+  @ApiResponse({ status: 409, description: 'Cet email est déjà utilisé' })
   @Post('register')
   register(@Body() dto: RegisterDto) {
     return this.authService.register(dto);
@@ -54,6 +81,21 @@ export class AuthController {
   // ne crée rien :
   // le contrat d'interface prévoit 200, avec { accessToken, user }, ou 401 si
   // les identifiants sont faux.
+  @ApiOperation({
+    summary: 'Se connecter et recevoir un JWT valable 1 h (US04)',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Connexion réussie',
+    schema: {
+      example: {
+        accessToken: 'eyJhbGciOiJIUzI1NiIs…',
+        user: { id: 1, email: 'claire@mail.fr' },
+      },
+    },
+  })
+  @ApiResponse({ status: 400, description: 'Données invalides' })
+  @ApiResponse({ status: 401, description: 'Email ou mot de passe incorrect' })
   @Post('login')
   @HttpCode(HttpStatus.OK)
   login(@Body() dto: LoginDto) {
@@ -68,6 +110,16 @@ export class AuthController {
   // (request.user).
   // 🔒 L'identité vient du jeton signé, jamais d'un paramètre envoyé par le
   // navigateur.
+  @ApiOperation({
+    summary: 'Utilisateur connecté (vérification de la session)',
+  })
+  @ApiBearerAuth()
+  @ApiResponse({
+    status: 200,
+    description: 'Utilisateur du jeton',
+    schema: { example: { id: 1, email: 'claire@mail.fr' } },
+  })
+  @ApiResponse({ status: 401, description: 'Jeton absent, invalide ou expiré' })
   @Get('me')
   @UseGuards(JwtAuthGuard)
   getMe(@Req() request: AuthenticatedRequest) {

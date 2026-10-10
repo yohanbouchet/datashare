@@ -1,7 +1,7 @@
 # Contrat d'interface – API DataShare
 
 Ce document décrit les routes de l'API REST exposée par le back-end NestJS et consommée par le front-end React.
-Il sert de référence commune aux deux parties. Une documentation OpenAPI (Swagger) sera générée automatiquement à partir du code (`@nestjs/swagger`).
+Il sert de référence commune aux deux parties. Une documentation OpenAPI (Swagger) est générée automatiquement à partir du code (`@nestjs/swagger`) : page `/api/docs` de l'API en développement (`API_DOCS=true`), avec les exemples de ce contrat.
 
 ## 1. Conventions
 

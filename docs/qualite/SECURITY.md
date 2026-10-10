@@ -69,6 +69,7 @@ Légende : ✅ en place · 🔜 prévu (étape indiquée)
 | Lien expiré ou invalide | ✅ | US02 : jeton inconnu → 404, date dépassée → 410 ; le statut est calculé à chaque demande, même si la purge n'est pas encore passée |
 | Fichier enregistré, jamais ouvert dans la page | ✅ | US02 : `Content-Disposition: attachment` ; type (`Content-Type`) déduit de l'extension par le serveur, sans se fier au type déclaré à l'envoi ; avec `X-Content-Type-Options: nosniff` (helmet), un fichier HTML ou SVG piégé ne peut pas s'exécuter sur le domaine de l'API |
 | Envoi en flux | ✅ | US02 : le fichier est lu sur le disque et envoyé morceau par morceau (jamais entièrement en mémoire) ; fichier absent du disque → 404 avant tout envoi |
+| Documentation de l'API non publiée en production | ✅ | La page OpenAPI (`/api/docs`) n'existe que si `API_DOCS=true` (développement) : en production, la carte complète des routes n'est pas exposée |
 | Limitation des tentatives | 🔜 étape 5 | `@nestjs/throttler` sur la connexion et la vérification de mot de passe de fichier |
 
 ### Front-end

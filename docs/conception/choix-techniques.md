@@ -25,6 +25,7 @@
 | Authentification | JWT (`@nestjs/jwt`), garde NestJS | Sessions serveur, OAuth2 | Exigé par les spécifications ; sans état côté serveur ; durée de vie limitée (1 h) |
 | En-têtes de sécurité HTTP | helmet | Configuration manuelle | Ensemble d'en-têtes recommandés appliqué en une ligne |
 | Configuration | `@nestjs/config` + fichiers `.env` | Valeurs dans le code | Secrets hors du code et du dépôt ; démarrage refusé si une variable manque |
+| Documentation de l'API | OpenAPI 3 avec `@nestjs/swagger` (page `/api/docs`) | Rédaction manuelle seule | Générée à partir du code (routes, DTO et règles de validation via le greffon de compilation) : elle reste à jour ; les exemples du contrat d'interface y sont repris ; essai des routes dans le navigateur |
 
 ## 3. Front-end : bibliothèques et organisation
 

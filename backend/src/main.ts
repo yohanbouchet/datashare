@@ -8,6 +8,7 @@
 //   - app.module.ts (AppModule) : la liste des modules à charger
 //   - @nestjs/config (ConfigService) : lit FRONTEND_URL dans le .env racine
 //   - helmet (paquet npm) : en-têtes de sécurité HTTP
+//   - @nestjs/swagger : documentation OpenAPI (/api/docs, si API_DOCS=true)
 //   - common/validation-exception.factory.ts : messages de validation (un par
 //     champ, en français)
 // Utilisé par :
@@ -16,6 +17,7 @@
 import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
 import { validationExceptionFactory } from './common/validation-exception.factory.js';
 import { AppModule } from './app.module.js';
@@ -53,6 +55,28 @@ async function bootstrap() {
       exceptionFactory: validationExceptionFactory,
     }),
   );
+
+  // Documentation OpenAPI (Swagger) de l'API : page /api/docs, et la
+  // description brute au format JSON sur /api/docs-json. Activée par
+  // API_DOCS=true (développement) ; désactivée en production, pour ne pas
+  // publier la carte de l'API.
+  if (config.get<string>('API_DOCS') === 'true') {
+    const openApi = new DocumentBuilder()
+      .setTitle('DataShare API')
+      .setDescription(
+        'API du MVP DataShare : transfert sécurisé de fichiers. ' +
+          'Contrat détaillé : docs/conception/contrat-interface.md',
+      )
+      .setVersion('1.0')
+      // Bouton « Authorize » : coller un JWT obtenu par /api/auth/login
+      .addBearerAuth()
+      .build();
+    SwaggerModule.setup(
+      'api/docs',
+      app,
+      SwaggerModule.createDocument(app, openApi),
+    );
+  }
 
   // CORS : seul notre front (adresse lue dans le .env) a le droit d'appeler
   // l'API depuis un navigateur

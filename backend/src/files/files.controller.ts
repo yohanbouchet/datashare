@@ -39,6 +39,14 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import type { AuthenticatedRequest } from '../auth/jwt-auth.guard.js';
 import { ListFilesQueryDto } from './dto/list-files-query.dto.js';
@@ -51,6 +59,10 @@ import { UploadExceptionFilter } from './upload-exception.filter.js';
 // ajouté dans main.ts).
 // @UseGuards sur la CLASSE : le vigile protège toutes les routes du guichet
 // (sans jeton valide → 401).
+// @ApiTags, @ApiBearerAuth… : documentation OpenAPI (page /api/docs) ;
+// toutes les routes exigent le JWT (bouton « Authorize » de la page)
+@ApiTags('Fichiers (connecté)')
+@ApiBearerAuth()
 @Controller('files')
 @UseGuards(JwtAuthGuard)
 export class FilesController {
@@ -68,6 +80,63 @@ export class FilesController {
   // → service.
   // @UseFilters : toute erreur efface le fichier déjà reçu
   // (upload-exception.filter.ts).
+  @ApiOperation({ summary: 'Téléverser un fichier (US01)' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      required: ['file'],
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+          description: '1 Go maximum, extension non interdite',
+        },
+        expiresInDays: { type: 'integer', minimum: 1, maximum: 7, default: 7 },
+        password: {
+          type: 'string',
+          minLength: 6,
+          maxLength: 72,
+          description: 'Facultatif',
+        },
+        tags: {
+          type: 'array',
+          maxItems: 10,
+          items: { type: 'string', maxLength: 30 },
+          description: 'Facultatif, sans doublon',
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 201,
+    description:
+      'Fichier enregistré ; token sert à construire le lien /d/<token>',
+    schema: {
+      example: {
+        id: 12,
+        originalName: 'IMG_9210.jpg',
+        size: 2726297,
+        mimeType: 'image/jpeg',
+        createdAt: '2026-10-05T09:00:00.000Z',
+        expiresAt: '2026-10-12T09:00:00.000Z',
+        isExpired: false,
+        isProtected: true,
+        tags: ['photos'],
+        token: 'Xk9f…q2',
+      },
+    },
+  })
+  @ApiResponse({
+    status: 400,
+    description:
+      'Aucun fichier, extension interdite, durée, mot de passe ou tags invalides',
+  })
+  @ApiResponse({ status: 401, description: 'Jeton absent, invalide ou expiré' })
+  @ApiResponse({
+    status: 413,
+    description: 'La taille des fichiers est limitée à 1 Go',
+  })
   @Post()
   @UseGuards(RequestSizeGuard)
   @UseInterceptors(FileInterceptor('file'))
@@ -93,6 +162,32 @@ export class FilesController {
   // défaut, sinon 400).
   // 🔒 L'identifiant vient du jeton signé (sub), jamais de l'adresse :
   // impossible de lister les fichiers d'un autre.
+  @ApiOperation({ summary: 'Historique de mes fichiers (US05)' })
+  @ApiResponse({
+    status: 200,
+    description: 'Liste, du plus récent au plus ancien',
+    schema: {
+      example: [
+        {
+          id: 12,
+          originalName: 'IMG_9210.jpg',
+          size: 2726297,
+          mimeType: 'image/jpeg',
+          createdAt: '2026-10-05T09:00:00.000Z',
+          expiresAt: '2026-10-12T09:00:00.000Z',
+          isExpired: false,
+          isProtected: true,
+          tags: ['photos'],
+          token: 'Xk9f…q2',
+        },
+      ],
+    },
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Filtre invalide (active, expired ou all)',
+  })
+  @ApiResponse({ status: 401, description: 'Jeton absent, invalide ou expiré' })
   @Get()
   list(
     @Req() request: AuthenticatedRequest,
@@ -109,6 +204,15 @@ export class FilesController {
   // d'interface.
   // 🔒 Le propriétaire vient du jeton (sub) : le service refuse (404) le fichier
   // d'un autre.
+  @ApiOperation({
+    summary: 'Supprimer un de mes fichiers : base et disque (US06)',
+  })
+  @ApiResponse({ status: 204, description: 'Fichier supprimé' })
+  @ApiResponse({ status: 401, description: 'Jeton absent, invalide ou expiré' })
+  @ApiResponse({
+    status: 404,
+    description: 'Fichier introuvable (ou appartenant à un autre utilisateur)',
+  })
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   remove(

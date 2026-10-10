@@ -23,6 +23,12 @@ import {
   Res,
   StreamableFile,
 } from '@nestjs/common';
+import {
+  ApiOperation,
+  ApiProduces,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import type { Response } from 'express';
 import contentDisposition from 'content-disposition';
 import { extname } from 'node:path';
@@ -33,11 +39,32 @@ import {
 } from './dto/download-password.dto.js';
 
 // Pas de @UseGuards : routes publiques (le destinataire n'a pas de compte)
+@ApiTags('Téléchargement (public)')
 @Controller('download')
 export class DownloadController {
   constructor(private readonly downloadService: DownloadService) {}
 
   // GET /api/download/:token → 200 (informations), 404 ou 410
+  @ApiOperation({ summary: 'Informations avant téléchargement (US02)' })
+  @ApiResponse({
+    status: 200,
+    description: 'Informations du fichier',
+    schema: {
+      example: {
+        originalName: 'IMG_9210.jpg',
+        size: 2726297,
+        mimeType: 'image/jpeg',
+        expiresAt: '2026-10-08T09:00:00.000Z',
+        isProtected: true,
+      },
+    },
+  })
+  @ApiResponse({ status: 404, description: 'Ce lien est invalide ou a expiré' })
+  @ApiResponse({
+    status: 410,
+    description:
+      "Ce fichier n'est plus disponible en téléchargement car il a expiré.",
+  })
   @Get(':token')
   getInfo(@Param('token') token: string) {
     return this.downloadService.getInfo(token);
@@ -46,6 +73,14 @@ export class DownloadController {
   // POST /api/download/:token/verify → 204 si le mot de passe est correct,
   // 401 sinon (POST : le mot de passe voyage dans le corps, jamais dans
   // l'adresse, qui finit dans l'historique et les journaux)
+  @ApiOperation({
+    summary: "Vérifier le mot de passe d'un fichier protégé (US02)",
+  })
+  @ApiResponse({ status: 204, description: 'Mot de passe correct' })
+  @ApiResponse({ status: 400, description: 'Mot de passe absent' })
+  @ApiResponse({ status: 401, description: 'Mot de passe incorrect' })
+  @ApiResponse({ status: 404, description: 'Ce lien est invalide ou a expiré' })
+  @ApiResponse({ status: 410, description: 'Fichier expiré' })
   @Post(':token/verify')
   @HttpCode(HttpStatus.NO_CONTENT)
   verify(@Param('token') token: string, @Body() dto: VerifyPasswordDto) {
@@ -59,6 +94,18 @@ export class DownloadController {
   // au type déclaré à l'envoi) ; Content-Disposition « attachment » + nom.
   // 🔒 « attachment » : le navigateur enregistre le fichier, il ne l'ouvre
   // jamais dans la page (un fichier HTML piégé ne peut pas s'exécuter).
+  @ApiOperation({ summary: 'Télécharger le fichier, envoyé en flux (US02)' })
+  @ApiProduces('application/octet-stream')
+  @ApiResponse({
+    status: 200,
+    description: 'Le fichier (Content-Disposition: attachment, nom en UTF-8)',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Mot de passe incorrect (fichier protégé)',
+  })
+  @ApiResponse({ status: 404, description: 'Ce lien est invalide ou a expiré' })
+  @ApiResponse({ status: 410, description: 'Fichier expiré' })
   @Post(':token')
   @HttpCode(HttpStatus.OK)
   async download(
