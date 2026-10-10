@@ -68,3 +68,9 @@ Repères déjà fixés :
 
 🔜 Étape 4 : tâche planifiée qui supprime les fichiers expirés (disque et base), au moins une fois par jour,
 avec une fréquence configurable par variable d'environnement.
+
+## 5. Évolutions envisagées
+
+| Évolution | Pourquoi | Mise en œuvre envisagée |
+|---|---|---|
+| Analyse antivirus des fichiers reçus | La liste d'extensions interdites se contourne (renommage, archive `.zip`) et ne détecte pas les documents piégés | Conteneur **ClamAV** ajouté à Docker Compose ; l'API lui transmet chaque fichier reçu avant de l'enregistrer ; mise à jour quotidienne des signatures (`freshclam`) à surveiller comme une dépendance |
