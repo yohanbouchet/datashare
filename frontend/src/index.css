@@ -698,19 +698,41 @@ button.home__button {
   font: inherit;
 }
 
-.upload-card {
+/* Carte d'un fichier (téléversement et téléchargement) : coins de 16 px,
+   ombre douce, éléments espacés de 24 px (maquette Figma) */
+.file-card {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-  max-width: 30rem;
   border-radius: 16px;
   box-shadow: 0 0 12px rgba(0, 0, 0, 0.25);
 }
 
-.upload-card .card__title {
+.file-card .card__title {
   margin: 0;
   font-size: 1.75rem;
   line-height: 2.5rem;
+}
+
+/* Dans une carte, l'espacement vient de la carte : pas de marge en plus */
+.file-card .banner {
+  margin: 0;
+}
+
+.upload-card {
+  max-width: 30rem;
+}
+
+/* Carte de téléchargement : plus large (640 px dans la maquette) */
+.download-card {
+  max-width: 40rem;
+  padding: 1.5rem;
+}
+
+.download-card__status {
+  margin: 0;
+  font-size: 0.875rem;
+  text-align: center;
 }
 
 .upload-card__file {
@@ -797,11 +819,17 @@ button.home__button {
   filter: brightness(0.97);
 }
 
+/* Bouton désactivé : gris beige de la maquette */
 .button-soft:disabled {
-  border-color: var(--color-border);
-  background: #f3eeea;
-  color: var(--color-text-muted);
+  border-color: rgba(183, 167, 156, 0.2);
+  background: rgba(183, 167, 156, 0.2);
+  color: #aea49b;
   cursor: not-allowed;
+}
+
+/* Variante pleine largeur (bouton « Télécharger ») */
+.button-soft--block {
+  align-self: stretch;
 }
 
 .upload-card__progress {

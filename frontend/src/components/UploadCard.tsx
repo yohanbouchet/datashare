@@ -14,8 +14,8 @@
 //   bandeau ; une session expirée (401) renvoie vers la page de connexion.
 // Utilise :
 //   - services/api.ts (filesApi.upload, ApiError, UploadedFile)
-//   - utils/format.ts (formatSize) ; context/useAuth.ts (logout)
-//   - components/Field.tsx, Banner.tsx, Icon.tsx
+//   - context/useAuth.ts (logout)
+//   - components/Field.tsx, Banner.tsx, FileSummary.tsx, Icon.tsx
 // Utilisé par :
 //   - pages/Home.tsx (après le choix d'un fichier)
 // =============================================================================
@@ -23,9 +23,9 @@ import { useState, type SubmitEvent } from 'react';
 import { useNavigate } from 'react-router';
 import { useAuth } from '../context/useAuth.ts';
 import { ApiError, filesApi, type UploadedFile } from '../services/api.ts';
-import { formatSize } from '../utils/format.ts';
 import { Banner } from './Banner.tsx';
 import { Field } from './Field.tsx';
+import { FileSummary } from './FileSummary.tsx';
 import { Icon } from './Icon.tsx';
 
 // Taille maximale d'un fichier : 1 Go (même limite que l'API)
@@ -151,7 +151,10 @@ export function UploadCard({ file, onChangeFile }: UploadCardProps) {
     }
 
     return (
-      <section className="card upload-card" aria-labelledby="upload-title">
+      <section
+        className="card file-card upload-card"
+        aria-labelledby="upload-title"
+      >
         <h1 id="upload-title" className="card__title">
           Ajouter un fichier
         </h1>
@@ -184,7 +187,10 @@ export function UploadCard({ file, onChangeFile }: UploadCardProps) {
 
   // ---- Formulaire ----
   return (
-    <section className="card upload-card" aria-labelledby="upload-title">
+    <section
+      className="card file-card upload-card"
+      aria-labelledby="upload-title"
+    >
       <h1 id="upload-title" className="card__title">
         Ajouter un fichier
       </h1>
@@ -274,30 +280,5 @@ export function UploadCard({ file, onChangeFile }: UploadCardProps) {
         </button>
       </form>
     </section>
-  );
-}
-
-// Résumé d'un fichier : icône, nom (coupé par « … » s'il est long), taille
-interface FileSummaryProps {
-  name: string;
-  size: number;
-  tooLarge?: boolean;
-}
-
-function FileSummary({ name, size, tooLarge = false }: FileSummaryProps) {
-  return (
-    <div className="file-summary">
-      <Icon name="file" size={24} />
-      <div className="file-summary__text">
-        <p className="file-summary__name" title={name}>
-          {name}
-        </p>
-        <p
-          className={`file-summary__size${tooLarge ? ' file-summary__size--error' : ''}`}
-        >
-          {formatSize(size)}
-        </p>
-      </div>
-    </div>
   );
 }
