@@ -12,6 +12,7 @@
     "test:cov": "vitest run --coverage",
     "cy:open": "cypress open",
     "cy:run": "cypress run",
+    "cy:video": "CY_VIDEO=true cypress run --browser chrome",
     "preview": "vite preview",
     "format": "prettier --write \"src/**/*.{ts,tsx,css}\""
   },

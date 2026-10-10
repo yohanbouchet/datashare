@@ -9,8 +9,9 @@ export default defineConfig({
     baseUrl: 'http://localhost:5173',
     specPattern: 'cypress/e2e/**/*.cy.ts',
     supportFile: false,
-    // Pas de vidéo ; capture d'écran automatique en cas d'échec
-    video: false,
+    // Vidéo de chaque scénario seulement sur demande (npm run cy:video :
+    // fichiers .mp4 dans cypress/videos) ; capture d'écran en cas d'échec
+    video: process.env.CY_VIDEO === 'true',
     screenshotOnRunFailure: true,
     // Téléchargements vérifiés par les tests (dossier ignoré par Git)
     downloadsFolder: 'cypress/downloads',

@@ -60,7 +60,17 @@
 | 10/10/2026 | frontend | **Tests unitaires du front** (39 tests, 9 fichiers) : mise en forme (tailles, délais d'expiration en jours calendaires) ; service API (JSON, JWT dans l'en-tête et jamais dans l'adresse, 204, erreurs traduites, serveur injoignable, jeton encodé) ; session (F5 avec jeton valide ou expiré, connexion, déconnexion) ; navigation (en-tête, `RequireAuth`, déconnexion, tiroir mobile, accueil) ; Connexion et Inscription (messages sous les champs, `aria-invalid`, bandeau d'erreur de l'API, redirections) ; carte de téléversement (1,1 Go refusé avant l'envoi, mot de passe et tags, contenu multipart envoyé, lien de succès) ; Téléchargement (bouton grisé, bandeaux d'expiration, mot de passe faux sans téléchargement, formulaire POST avec mot de passe dans le corps, lien expiré) ; Mes fichiers (filtre, cadenas, expiré, suppression avec confirmation) | ✅ 39/39 | **84,3 % des lignes**, 83,9 % des instructions, 74,2 % des branches, 83,3 % des fonctions (seuil 70 %) |
 | 10/10/2026 | frontend | **Scénarios Cypress** (vrai navigateur, application complète) : inscription, connexion, déconnexion et protection de Mon espace ; téléversement d'un fichier protégé puis téléchargement par un destinataire sans compte (fichier reçu identique) ; historique, filtres, suppression avec confirmation et lien devenu invalide | ✅ 3/3 (après correction d'une anomalie) | — |
 
-🔜 Rapport de couverture et capture d'écran (étape 5).
+### Rapports (captures du 10/10/2026, dossier [`docs/rapports/`](../rapports/))
+
+| Rapport | Capture | Commande pour le régénérer |
+|---|---|---|
+| Résultats des 3 suites Vitest (139 tests) | [resultats-tests.png](../rapports/resultats-tests.png) | `npm test` et `npm run test:e2e` (back), `npm test` (front) |
+| Couverture des tests unitaires du back (89,7 % des lignes) | [couverture-backend-unitaires.png](../rapports/couverture-backend-unitaires.png) | `npm run test:cov` (dans `backend/`) |
+| Couverture des tests de bout en bout du back (87,8 % des lignes) | [couverture-backend-e2e.png](../rapports/couverture-backend-e2e.png) | `npm run test:e2e:cov` (dans `backend/`) |
+| Couverture des tests unitaires du front (84,3 % des lignes) | [couverture-frontend.png](../rapports/couverture-frontend.png) | `npm run test:cov` (dans `frontend/`) |
+| Scénarios Cypress (3/3) | [cypress-resultats.png](../rapports/cypress-resultats.png) | `npm run cy:run`, ou `npm run cy:video` pour filmer chaque scénario (`frontend/cypress/videos/`) |
+
+Les rapports de couverture complets (détail ligne par ligne) sont générés en HTML dans `coverage/` et `coverage-e2e/` (non versionnés). La couverture compte **tout** le code source : les dossiers à 0 % du rapport unitaire du back (`app.module.ts`, `app.setup.ts`, modules) ne contiennent que de l'assemblage, vérifié par les tests de bout en bout.
 
 ## 4. Anomalies détectées et corrigées
 
