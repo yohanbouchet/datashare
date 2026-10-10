@@ -8,6 +8,8 @@
 //   - app.module.ts (AppModule) : la liste des modules à charger
 //   - @nestjs/config (ConfigService) : lit FRONTEND_URL dans le .env racine
 //   - helmet (paquet npm) : en-têtes de sécurité HTTP
+//   - common/validation-exception.factory.ts : messages de validation (un par
+//     champ, en français)
 // Utilisé par :
 //   - personne : c'est le point de départ (lancé par Node.js)
 // =============================================================================
@@ -15,6 +17,7 @@ import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
 import helmet from 'helmet';
+import { validationExceptionFactory } from './common/validation-exception.factory.js';
 import { AppModule } from './app.module.js';
 
 // async / await : certaines étapes prennent du temps (connexion à la base…) ;
@@ -45,6 +48,9 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
       // Applique les @Transform (ex. : email en minuscules) avant le contrôle.
       transform: true,
+      // Un seul message par champ, le plus pertinent, en français
+      // (common/validation-exception.factory.ts)
+      exceptionFactory: validationExceptionFactory,
     }),
   );
 
