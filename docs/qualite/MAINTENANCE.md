@@ -74,3 +74,26 @@ avec une fréquence configurable par variable d'environnement.
 | Évolution | Pourquoi | Mise en œuvre envisagée |
 |---|---|---|
 | Analyse antivirus des fichiers reçus | La liste d'extensions interdites se contourne (renommage, archive `.zip`) et ne détecte pas les documents piégés | Conteneur **ClamAV** ajouté à Docker Compose ; l'API lui transmet chaque fichier reçu avant de l'enregistrer ; mise à jour quotidienne des signatures (`freshclam`) à surveiller comme une dépendance |
+| Stockage sur AWS S3 | Disque local limité à un serveur (pas de répartition de charge, sauvegardes à gérer) ; S3 offre une capacité illimitée, une durabilité très élevée et des sauvegardes intégrées | Voir ci-dessous : seul `StorageService` change |
+
+### Passer du disque local à AWS S3
+
+Le stockage est isolé dans **un seul fichier**, `backend/src/files/storage.service.ts` (le « magasinier ») :
+contrôleurs et services ne connaissent qu'un **nom de stockage**, jamais un chemin sur le disque.
+La migration ne modifie donc que lui :
+
+| Méthode de `StorageService` | Aujourd'hui (disque local) | Avec S3 (SDK `@aws-sdk/client-s3`) |
+|---|---|---|
+| `createMulterOptions` (US01) | `diskStorage` : écriture en flux dans `UPLOAD_DIR` | moteur de stockage S3 pour multer (`multer-s3`) : envoi en flux vers le *bucket*, même nom aléatoire comme clé |
+| `openStream` (US02) | `createReadStream` sur le disque | `GetObjectCommand` : le corps de la réponse est déjà un flux |
+| `remove` (US06, purge) | `unlink` | `DeleteObjectCommand` |
+
+Étapes :
+1. Créer le *bucket* privé (accès public bloqué, chiffrement activé) et un rôle IAM limité à ce *bucket*
+   (lecture, écriture, suppression) — jamais de clé d'accès écrite dans le code.
+2. Remplacer `UPLOAD_DIR` par `S3_BUCKET` et `AWS_REGION` dans `.env` ; les identifiants viennent du rôle
+   IAM du serveur.
+3. Réécrire les trois méthodes ci-dessus ; les tests unitaires des autres pièces ne changent pas.
+4. Copier les fichiers existants en conservant leurs noms : `aws s3 sync backend/uploads s3://<bucket>`.
+5. Variante possible pour le téléchargement : une **URL présignée** (lien S3 temporaire) déchargerait
+   l'API de l'envoi des octets, après les mêmes contrôles (jeton, expiration, mot de passe).
