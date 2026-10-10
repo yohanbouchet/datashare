@@ -2,18 +2,20 @@
 // Fichier : storage.service.spec.ts
 // Rôle : Tests unitaires de StorageService (Vitest : npm test). On vérifie les
 //   réglages donnés à multer (nom aléatoire, 1 Go, extensions interdites) et la
-//   suppression sur un VRAI dossier temporaire (créé puis effacé par le test,
-//   jamais le dossier uploads/).
+//   suppression et la lecture en flux sur un VRAI dossier temporaire (créé
+//   puis effacé par le test, jamais le dossier uploads/).
 // Utilise :
 //   - storage.service.ts (la pièce testée), ConfigService (doublure qui renvoie
 //     les variables d'environnement)
 //   - node:fs/promises, node:os, node:path : dossier et fichiers temporaires
+//   - node:stream/consumers (text : lit tout le contenu d'un flux)
 // Utilisé par :
 //   - Vitest (vitest.config.ts)
 // =============================================================================
 import { BadRequestException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { access, mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { text } from 'node:stream/consumers';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { StorageService, MAX_FILE_SIZE } from './storage.service.js';
@@ -120,5 +122,18 @@ describe('StorageService', () => {
     await expect(service.remove('../../.env')).rejects.toThrow(
       'Nom de stockage invalide',
     );
+  });
+
+  it('ouvre un fichier stocké en flux et en restitue le contenu (US02)', async () => {
+    await writeFile(join(directory, 'abc123'), 'contenu du fichier');
+
+    const stream = await service.openStream('abc123');
+
+    expect(stream).not.toBeNull();
+    expect(await text(stream!)).toBe('contenu du fichier');
+  });
+
+  it('renvoie null si le fichier est absent du disque', async () => {
+    expect(await service.openStream('inexistant')).toBeNull();
   });
 });
