@@ -112,6 +112,8 @@ chacune remplace une commande plus longue.
 |---|---|
 | `npm run dev` | Démarre le serveur de développement |
 | `npm run build` | Produit la version optimisée pour la production |
+| `npm test` | Lance les tests unitaires du front (Vitest, faux navigateur jsdom) |
+| `npm run test:cov` | Tests unitaires avec rapport de couverture (`coverage/index.html`) ; échoue sous 70 % |
 | `npm run lint` | Analyse statique du code (Oxlint) |
 
 ### Base de données (racine du projet)
