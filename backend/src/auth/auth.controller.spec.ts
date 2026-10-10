@@ -1,14 +1,15 @@
-// ================================================================================================
+// =============================================================================
 // Fichier : auth.controller.spec.ts
-// Rôle : Tests unitaires de AuthController (Vitest : npm test) : register, login, getMe.
-//   AuthService est remplacé par une doublure : on vérifie que le contrôleur transmet la demande
-//   au service et renvoie sa réponse, sans logique propre.
+// Rôle : Tests unitaires de AuthController (Vitest : npm test) : register,
+//   login, getMe. AuthService est remplacé par une doublure : on vérifie que le
+//   contrôleur transmet la demande au service et renvoie sa réponse, sans
+//   logique propre.
 // Utilise :
 //   - auth.controller.ts (la pièce testée)
 //   - auth.service.ts (AuthService, remplacé par la doublure)
 // Utilisé par :
 //   - Vitest (vitest.config.ts)
-// ================================================================================================
+// =============================================================================
 import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller.js';
@@ -25,8 +26,9 @@ describe('AuthController', () => {
       controllers: [AuthController],
       providers: [
         { provide: AuthService, useValue: authService },
-        // La garde JWT de la route /me a besoin de JwtService : on fournit une doublure vide
-        // (la garde elle-même est testée dans jwt-auth.guard.spec.ts).
+        // La garde JWT de la route /me a besoin de JwtService : on fournit une
+        // doublure vide (la garde elle-même est testée dans
+        // jwt-auth.guard.spec.ts).
         { provide: JwtService, useValue: {} },
       ],
     }).compile();

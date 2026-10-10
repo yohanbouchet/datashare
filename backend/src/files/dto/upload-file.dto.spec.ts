@@ -1,19 +1,23 @@
-// ================================================================================================
+// =============================================================================
 // Fichier : upload-file.dto.spec.ts
-// Rôle : Tests unitaires des règles de UploadFileDto (Vitest : npm test) : on transforme des champs
-//   « tels que reçus en multipart » (tout est texte) puis on les valide, comme le fait le ValidationPipe.
+// Rôle : Tests unitaires des règles de UploadFileDto (Vitest : npm test) : on
+//   transforme des champs « tels que reçus en multipart » (tout est texte) puis
+//   on les valide, comme le fait le ValidationPipe.
 // Utilise :
-//   - upload-file.dto.ts (la pièce testée), class-transformer (plainToInstance), class-validator (validate)
+//   - upload-file.dto.ts (la pièce testée), class-transformer
+//     (plainToInstance), class-validator (validate)
 // Utilisé par :
 //   - Vitest (vitest.config.ts)
-// ================================================================================================
-// reflect-metadata : nécessaire aux décorateurs (@Type…) hors de NestJS (normalement chargé par Nest)
+// =============================================================================
+// reflect-metadata : nécessaire aux décorateurs (@Type…) hors de NestJS
+// (normalement chargé par Nest)
 import 'reflect-metadata';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 import { UploadFileDto } from './upload-file.dto.js';
 
-// Transforme puis valide ; renvoie le DTO obtenu et la liste des messages d'erreur
+// Transforme puis valide ; renvoie le DTO obtenu et la liste des messages
+// d'erreur
 async function check(fields: Record<string, unknown>) {
   const dto = plainToInstance(UploadFileDto, fields);
   const errors = await validate(dto);

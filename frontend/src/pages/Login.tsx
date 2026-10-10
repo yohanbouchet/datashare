@@ -1,11 +1,16 @@
-// ================================================================================================
+// =============================================================================
 // Fichier : Login.tsx
-// Rôle : Page de connexion (adresse « /connexion », US04), conforme à la maquette « Connexion ».
-//   1. Validation côté client (email au bon format, mot de passe renseigné) : message sous chaque champ.
-//   2. Envoi à l'API via le contexte (connexion) ; le bouton est désactivé pendant l'envoi.
-//   3. Succès → retour à l'accueil (l'en-tête affiche « Mon espace ») ; échec → bandeau d'erreur
-//      avec le message de l'API (« Email ou mot de passe incorrect », serveur injoignable…).
-//   Affiche un bandeau d'information si l'utilisateur arrive juste après avoir créé son compte.
+// Rôle : Page de connexion (adresse « /connexion », US04), conforme à la
+//   maquette « Connexion ».
+//   1. Validation côté client (email au bon format, mot de passe renseigné) :
+//      message sous chaque champ.
+//   2. Envoi à l'API via le contexte (connexion) ; le bouton est désactivé
+//      pendant l'envoi.
+//   3. Succès → retour à l'accueil (l'en-tête affiche « Mon espace ») ; échec →
+//      bandeau d'erreur avec le message de l'API (« Email ou mot de passe
+//      incorrect », serveur injoignable…).
+//   Affiche un bandeau d'information si l'utilisateur arrive juste après avoir
+//   créé son compte.
 // Utilise :
 //   - context/useAuth.ts (connexion, utilisateur)
 //   - services/api.ts (ApiError)
@@ -13,7 +18,7 @@
 //   - react-router (Link, Navigate, useLocation, useNavigate)
 // Utilisé par :
 //   - App.tsx (route « /connexion »), Header.tsx et Home.tsx (liens)
-// ================================================================================================
+// =============================================================================
 import { useState, type SubmitEvent } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router';
 import { Banner } from '../components/Banner.tsx';
@@ -21,7 +26,8 @@ import { Field } from '../components/Field.tsx';
 import { useAuth } from '../context/useAuth.ts';
 import { ApiError } from '../services/api.ts';
 
-// Vérification simple du format « quelque-chose@domaine.extension » (le serveur revérifie de toute façon)
+// Vérification simple du format « quelque-chose@domaine.extension » (le serveur
+// revérifie de toute façon)
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 interface LoginErrors {
@@ -32,7 +38,8 @@ interface LoginErrors {
 export function Login() {
   const { login, user } = useAuth();
   const navigate = useNavigate();
-  // location.state : informations transmises par la page précédente (ici : « compte créé »)
+  // location.state : informations transmises par la page précédente (ici : «
+  // compte créé »)
   const location = useLocation();
   const accountCreated = (location.state as { accountCreated?: boolean } | null)
     ?.accountCreated;
@@ -49,7 +56,8 @@ export function Login() {
     return <Navigate to="/" replace />;
   }
 
-  // Validation côté client : confort de l'utilisateur (le serveur reste l'arbitre final)
+  // Validation côté client : confort de l'utilisateur (le serveur reste
+  // l'arbitre final)
   function validate(): LoginErrors {
     const result: LoginErrors = {};
     if (!EMAIL_PATTERN.test(email.trim())) {
@@ -62,9 +70,11 @@ export function Login() {
   }
 
   // async : la soumission attend la réponse de l'API.
-  // SubmitEvent : le type de l'événement « envoi du formulaire » (FormEvent est déclaré obsolète dans React 19).
+  // SubmitEvent : le type de l'événement « envoi du formulaire » (FormEvent est
+  // déclaré obsolète dans React 19).
   async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
-    // preventDefault : empêche le navigateur de recharger la page (comportement par défaut d'un formulaire)
+    // preventDefault : empêche le navigateur de recharger la page (comportement
+    // par défaut d'un formulaire)
     event.preventDefault();
     setServerError(null);
     const foundErrors = validate();
@@ -76,7 +86,8 @@ export function Login() {
       await login(email.trim(), password);
       navigate('/');
     } catch (error) {
-      // ApiError : message prévu par l'API ou par le service ; autre erreur : message générique
+      // ApiError : message prévu par l'API ou par le service ; autre erreur :
+      // message générique
       setServerError(
         error instanceof ApiError
           ? error.message
@@ -99,7 +110,8 @@ export function Login() {
       )}
       {serverError && <Banner variant="error">{serverError}</Banner>}
 
-      {/* noValidate : on désactive les bulles du navigateur pour afficher nos propres messages en français */}
+      {/* noValidate : on désactive les bulles du navigateur pour afficher
+         nos propres messages en français */}
       <form className="form" onSubmit={handleSubmit} noValidate>
         <Field
           id="email"
@@ -126,7 +138,8 @@ export function Login() {
           Créer un compte
         </Link>
 
-        {/* disabled pendant l'envoi : évite les doubles clics (et donc les doubles requêtes) */}
+        {/* disabled pendant l'envoi : évite les doubles clics (et donc les
+           doubles requêtes) */}
         <button type="submit" className="button-primary" disabled={submitting}>
           {submitting ? 'Connexion…' : 'Connexion'}
         </button>

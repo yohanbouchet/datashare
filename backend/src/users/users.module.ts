@@ -1,27 +1,32 @@
-// ================================================================================================
+// =============================================================================
 // Fichier : users.module.ts
-// Rôle : Module « users » : regroupe ce qui concerne les comptes (entité, service).
-//   Donne accès à la table users et partage UsersService avec les autres modules (exports).
+// Rôle : Module « users » : regroupe ce qui concerne les comptes (entité,
+//   service). Donne accès à la table users et partage UsersService avec les
+//   autres modules (exports).
 // Utilise :
 //   - user.entity.ts (User)
 //   - users.service.ts (UsersService)
 // Utilisé par :
 //   - app.module.ts (imports)
 //   - auth/auth.module.ts (imports : pour utiliser UsersService)
-// ================================================================================================
+// =============================================================================
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-// Imports en ".js" (règle ESM) : on vise le fichier compilé, TypeScript retrouve le .ts correspondant.
+// Imports en ".js" (règle ESM) : on vise le fichier compilé, TypeScript
+// retrouve le .ts correspondant.
 import { UsersService } from './users.service.js';
 import { User } from './user.entity.js';
 
 @Module({
-  // forFeature([User]) : ce module a le droit d'utiliser la table décrite par la classe User.
+  // forFeature([User]) : ce module a le droit d'utiliser la table décrite par
+  // la classe User.
   // 🔒 Cloisonnement : un module n'accède qu'aux tables qu'il déclare ici.
   imports: [TypeOrmModule.forFeature([User])],
-  // providers : les services (logique métier) que NestJS crée et fournit aux autres pièces du module.
+  // providers : les services (logique métier) que NestJS crée et fournit aux
+  // autres pièces du module.
   providers: [UsersService],
-  // exports : rend UsersService utilisable par les modules qui importent UsersModule (ici AuthModule).
+  // exports : rend UsersService utilisable par les modules qui importent
+  // UsersModule (ici AuthModule).
   exports: [UsersService],
 })
 export class UsersModule {}

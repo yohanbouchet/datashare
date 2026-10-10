@@ -1,7 +1,8 @@
-// ================================================================================================
+// =============================================================================
 // Fichier : main.tsx
-// Rôle : Point d'entrée du front-end : premier fichier exécuté par le navigateur.
-//   Branche React sur la balise <div id="root"> de index.html et y affiche le composant App.
+// Rôle : Point d'entrée du front-end : premier fichier exécuté par le
+//   navigateur. Branche React sur la balise <div id="root"> de index.html et y
+//   affiche le composant App.
 // Utilise :
 //   - App.tsx (App) : le composant racine
 //   - context/AuthProvider.tsx (AuthProvider) : mémoire de connexion partagée
@@ -10,7 +11,7 @@
 //   - react-router (BrowserRouter)
 // Utilisé par :
 //   - index.html (balise <script>)
-// ================================================================================================
+// =============================================================================
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router';
@@ -20,16 +21,20 @@ import { AuthProvider } from './context/AuthProvider.tsx';
 import './index.css';
 import App from './App.tsx';
 
-// createRoot : React prend le contrôle de la balise <div id="root"> d'index.html
-// et y dessine le composant App. Le "!" indique à TypeScript que cette balise existe forcément.
+// createRoot : React prend le contrôle de la balise <div id="root">
+// d'index.html et y dessine le composant App. Le "!" indique à TypeScript que
+// cette balise existe forcément.
 createRoot(document.getElementById('root')!).render(
-  // StrictMode : mode de vérification réservé au développement. Il exécute volontairement
-  // certains traitements deux fois (dont les useEffect) pour révéler les erreurs
-  // (un appel à l'API apparaît alors deux fois dans l'onglet Réseau). Sans effet en production.
+  // StrictMode : mode de vérification réservé au développement. Il exécute
+  // volontairement certains traitements deux fois (dont les useEffect) pour
+  // révéler les erreurs (un appel à l'API apparaît alors deux fois dans
+  // l'onglet Réseau). Sans effet en production.
   <StrictMode>
-    {/* BrowserRouter : lit l'adresse du navigateur (/connexion…) et la transmet à toute l'application */}
+    {/* BrowserRouter : lit l'adresse du navigateur (/connexion…) et la
+       transmet à toute l'application */}
     <BrowserRouter>
-      {/* AuthProvider : met la mémoire de connexion à disposition de toute l'application */}
+      {/* AuthProvider : met la mémoire de connexion à disposition de toute
+         l'application */}
       <AuthProvider>
         <App />
       </AuthProvider>

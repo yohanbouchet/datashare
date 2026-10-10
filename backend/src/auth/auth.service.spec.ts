@@ -1,8 +1,9 @@
-// ================================================================================================
+// =============================================================================
 // Fichier : auth.service.spec.ts
-// Rôle : Tests unitaires de AuthService – inscription (US03) et connexion (US04) (Vitest : npm test).
-//   UsersService et JwtService sont remplacés par des doublures (mocks) : pas de base de données.
-//   Cas testés : voir le plan de tests docs/qualite/TESTING.md.
+// Rôle : Tests unitaires de AuthService – inscription (US03) et connexion
+//   (US04) (Vitest : npm test). UsersService et JwtService sont remplacés par
+//   des doublures (mocks) : pas de base de données. Cas testés : voir le plan
+//   de tests docs/qualite/TESTING.md.
 // Utilise :
 //   - auth.service.ts (la pièce testée)
 //   - users/users.service.ts (UsersService, remplacé par une doublure)
@@ -10,7 +11,7 @@
 //   - bcrypt (pour fabriquer et vérifier de vraies empreintes)
 // Utilisé par :
 //   - Vitest (vitest.config.ts)
-// ================================================================================================
+// =============================================================================
 import { ConflictException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -21,8 +22,8 @@ import { AuthService } from './auth.service.js';
 describe('AuthService', () => {
   let service: AuthService;
 
-  // Doublure de UsersService : vi.fn() crée une fausse fonction dont on choisit la réponse
-  // dans chaque test, et qui enregistre comment elle a été appelée.
+  // Doublure de UsersService : vi.fn() crée une fausse fonction dont on choisit
+  // la réponse dans chaque test, et qui enregistre comment elle a été appelée.
   const usersService = {
     findByEmail: vi.fn(),
     findByEmailWithPassword: vi.fn(),
@@ -34,7 +35,8 @@ describe('AuthService', () => {
   const createdAt = new Date('2026-10-08T08:00:00Z');
 
   beforeEach(async () => {
-    // Remet les doublures à zéro : un test ne doit jamais dépendre du précédent.
+    // Remet les doublures à zéro : un test ne doit jamais dépendre du
+    // précédent.
     vi.clearAllMocks();
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -50,7 +52,8 @@ describe('AuthService', () => {
   describe('register', () => {
     it('crée le compte et renvoie id, email et createdAt, sans empreinte', async () => {
       usersService.findByEmail.mockResolvedValue(null); // email libre
-      // La doublure renvoie un utilisateur qui CONTIENT passwordHash, comme le vrai save()
+      // La doublure renvoie un utilisateur qui CONTIENT passwordHash, comme le
+      // vrai save()
       usersService.create.mockImplementation(
         (email: string, passwordHash: string) =>
           Promise.resolve({ id: 1, email, passwordHash, createdAt }),
@@ -107,7 +110,8 @@ describe('AuthService', () => {
   });
 
   describe('login', () => {
-    // Vraie empreinte bcrypt de "motdepasse8", calculée une seule fois (coût 4 : rapide, pour les tests).
+    // Vraie empreinte bcrypt de "motdepasse8", calculée une seule fois (coût 4
+    // : rapide, pour les tests).
     let passwordHash: string;
     beforeAll(async () => {
       passwordHash = await bcrypt.hash(dto.password, 4);
@@ -148,13 +152,15 @@ describe('AuthService', () => {
 
     it('refuse un email inconnu avec le MÊME message, après une comparaison factice', async () => {
       usersService.findByEmailWithPassword.mockResolvedValue(null);
-      // "Espion" sur bcrypt.compare : on vérifie qu'il est appelé même si le compte n'existe pas
+      // "Espion" sur bcrypt.compare : on vérifie qu'il est appelé même si le
+      // compte n'existe pas
       const compareSpy = vi.spyOn(bcrypt, 'compare');
 
       await expect(service.login(dto)).rejects.toThrow(
         'Email ou mot de passe incorrect',
       );
-      // 🔒 Comparaison faite quand même (empreinte factice) : la durée ne révèle pas que l'email est inconnu
+      // 🔒 Comparaison faite quand même (empreinte factice) : la durée ne révèle
+      // pas que l'email est inconnu
       expect(compareSpy).toHaveBeenCalledTimes(1);
       expect(jwtService.signAsync).not.toHaveBeenCalled();
       compareSpy.mockRestore();

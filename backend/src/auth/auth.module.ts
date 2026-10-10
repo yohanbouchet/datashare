@@ -1,7 +1,8 @@
-// ================================================================================================
+// =============================================================================
 // Fichier : auth.module.ts
-// Rôle : Module « auth » : l'authentification (inscription US03, puis connexion US04 et JWT).
-//   Regroupe son contrôleur (routes /api/auth/...), son service (la logique) et ses DTO (dossier dto/).
+// Rôle : Module « auth » : l'authentification (inscription US03, puis connexion
+//   US04 et JWT). Regroupe son contrôleur (routes /api/auth/...), son service
+//   (la logique) et ses DTO (dossier dto/).
 // Utilise :
 //   - users/users.module.ts (UsersModule) : fournit UsersService
 //   - auth.controller.ts (AuthController), auth.service.ts (AuthService)
@@ -9,8 +10,9 @@
 //   - .env (JWT_SECRET, JWT_EXPIRES_IN)
 // Utilisé par :
 //   - app.module.ts (imports)
-//   - files/files.module.ts (imports : pour la garde JWT, grâce à exports: [JwtModule])
-// ================================================================================================
+//   - files/files.module.ts (imports : pour la garde JWT, grâce à exports:
+//     [JwtModule])
+// =============================================================================
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
@@ -23,7 +25,8 @@ import { AuthService } from './auth.service.js';
     // UsersModule fournit UsersService (lire et créer les comptes).
     UsersModule,
     // JwtModule fournit JwtService, qui fabrique et vérifie les JWT.
-    // "Async" + useFactory : comme pour la base, les réglages sont lus dans le .env au démarrage.
+    // "Async" + useFactory : comme pour la base, les réglages sont lus dans le
+    // .env au démarrage.
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
@@ -36,8 +39,9 @@ import { AuthService } from './auth.service.js';
   ],
   controllers: [AuthController],
   providers: [AuthService],
-  // exports : partage JwtModule avec les modules qui importent AuthModule (ex. FilesModule),
-  // pour qu'ils puissent utiliser la garde JWT (qui a besoin de JwtService).
+  // exports : partage JwtModule avec les modules qui importent AuthModule (ex.
+  // FilesModule), pour qu'ils puissent utiliser la garde JWT (qui a besoin de
+  // JwtService).
   exports: [JwtModule],
 })
 export class AuthModule {}

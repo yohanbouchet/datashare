@@ -1,15 +1,19 @@
-// ================================================================================================
+// =============================================================================
 // Fichier : files.controller.spec.ts
-// Rôle : Tests unitaires de FilesController (Vitest : npm test).
-//   FilesService est remplacé par une doublure : on vérifie que le guichet transmet au service
-//   l'identifiant tiré du JETON (request.user.sub) et les données reçues (fichier, filtre, id).
+// Rôle : Tests unitaires de FilesController (Vitest : npm test). FilesService
+//   est remplacé par une doublure : on vérifie que le guichet transmet au
+//   service l'identifiant tiré du JETON (request.user.sub) et les données
+//   reçues (fichier, filtre, id).
 // Utilise :
-//   - files.controller.ts (la pièce testée), files.service.ts (remplacé par la doublure)
-//   - storage.service.ts (doublure vide : nécessaire au filtre du téléversement déclaré sur la route)
-//   - @nestjs/jwt (JwtService, doublure vide : nécessaire à la garde déclarée sur le contrôleur)
+//   - files.controller.ts (la pièce testée), files.service.ts (remplacé par la
+//     doublure)
+//   - storage.service.ts (doublure vide : nécessaire au filtre du téléversement
+//     déclaré sur la route)
+//   - @nestjs/jwt (JwtService, doublure vide : nécessaire à la garde déclarée
+//     sur le contrôleur)
 // Utilisé par :
 //   - Vitest (vitest.config.ts)
-// ================================================================================================
+// =============================================================================
 import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 import type { AuthenticatedRequest } from '../auth/jwt-auth.guard.js';
@@ -25,7 +29,8 @@ describe('FilesController', () => {
     findForUser: vi.fn(),
     remove: vi.fn(),
   };
-  // Requête telle que la garde JWT la laisse passer : l'utilisateur n° 7 est connecté
+  // Requête telle que la garde JWT la laisse passer : l'utilisateur n° 7 est
+  // connecté
   const request = {
     user: { sub: 7, email: 'claire@mail.fr' },
   } as AuthenticatedRequest;

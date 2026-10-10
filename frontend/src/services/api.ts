@@ -1,29 +1,35 @@
-// ================================================================================================
+// =============================================================================
 // Fichier : api.ts
 // Rôle : Service API : le SEUL endroit du front qui appelle l'API NestJS.
 //   - construit l'adresse complète à partir de VITE_API_URL ;
 //   - ajoute le JWT (en-tête Authorization) s'il existe ;
-//   - transforme toute erreur (réseau ou réponse de l'API) en ApiError avec un message en français,
-//     prêt à être affiché dans un bandeau d'erreur.
-//   Gère aussi la conservation du JWT dans sessionStorage (effacé à la fermeture de l'onglet).
+//   - transforme toute erreur (réseau ou réponse de l'API) en ApiError avec un
+//     message en français, prêt à être affiché dans un bandeau d'erreur.
+//   Gère aussi la conservation du JWT dans sessionStorage (effacé à la
+//   fermeture de l'onglet).
 // Utilise :
 //   - frontend/.env (VITE_API_URL) : adresse de l'API
-//   - l'API NestJS : routes /api/auth/register, /api/auth/login, /api/auth/me (contrat d'interface)
+//   - l'API NestJS : routes /api/auth/register, /api/auth/login, /api/auth/me
+//     (contrat d'interface)
 // Utilisé par :
 //   - context/AuthContext.tsx (connexion, déconnexion, vérification de session)
 //   - pages/Login.tsx, pages/Register.tsx (brique 3)
-// ================================================================================================
+// =============================================================================
 
-// Adresse de base de l'API (ex. http://localhost:3000/api), lue dans frontend/.env
+// Adresse de base de l'API (ex. http://localhost:3000/api), lue dans
+// frontend/.env
 const API_URL = import.meta.env.VITE_API_URL;
 
 // Nom de la « case » où le JWT est rangé dans le navigateur
 const TOKEN_KEY = 'datashare.token';
 
-// ---- Conservation du JWT --------------------------------------------------------------------
-// 🔒 sessionStorage : le jeton survit au rechargement (F5) mais est effacé à la fermeture de l'onglet.
+// ---- Conservation du JWT
+// --------------------------------------------------------------------
+// 🔒 sessionStorage : le jeton survit au rechargement (F5) mais est effacé à la
+// fermeture de l'onglet.
 // Combiné à la durée de vie d'1 h du JWT, cela limite la fenêtre d'exposition.
-// try/catch : certains navigateurs (navigation privée stricte) refusent l'accès au stockage.
+// try/catch : certains navigateurs (navigation privée stricte) refusent l'accès
+// au stockage.
 export function readToken(): string | null {
   try {
     return sessionStorage.getItem(TOKEN_KEY);
@@ -36,7 +42,8 @@ export function saveToken(token: string): void {
   try {
     sessionStorage.setItem(TOKEN_KEY, token);
   } catch {
-    // Stockage indisponible : la session ne survivra simplement pas au rechargement.
+    // Stockage indisponible : la session ne survivra simplement pas au
+    // rechargement.
   }
 }
 
@@ -48,8 +55,10 @@ export function clearToken(): void {
   }
 }
 
-// ---- Erreurs --------------------------------------------------------------------------------
-// Erreur « maison » qui garde le code HTTP (401, 409…) et un message lisible par l'utilisateur.
+// ---- Erreurs
+// -----------------------------------------------------------------------------
+// Erreur « maison » qui garde le code HTTP (401, 409…) et un message lisible
+// par l'utilisateur.
 // status = 0 : l'API n'a pas pu être jointe (serveur arrêté, réseau coupé).
 export class ApiError extends Error {
   readonly status: number;
@@ -61,7 +70,8 @@ export class ApiError extends Error {
   }
 }
 
-// ---- Types des réponses (repris du contrat d'interface) ---------------------------------------
+// ---- Types des réponses (repris du contrat d'interface)
+// ---------------------------------------
 export interface User {
   id: number;
   email: string;
@@ -76,11 +86,14 @@ export interface RegisterResponse extends User {
   createdAt: string;
 }
 
-// ---- Fonction d'appel commune -----------------------------------------------------------------
-// <T> : le type de la réponse attendue, précisé à chaque appel (ex. requete<Utilisateur>(...)).
+// ---- Fonction d'appel commune
+// ----------------------------------------------------------------- <T> : le
+// type de la réponse attendue, précisé à chaque appel (ex.
+// requete<Utilisateur>(...)).
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const headers = new Headers(options.headers);
-  // Les données envoyées sont du JSON (sauf l'envoi de fichier, qui gérera son propre format)
+  // Les données envoyées sont du JSON (sauf l'envoi de fichier, qui gérera son
+  // propre format)
   if (options.body && !(options.body instanceof FormData)) {
     headers.set('Content-Type', 'application/json');
   }
@@ -97,7 +110,8 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
       headers: headers,
     });
   } catch {
-    // fetch échoue seulement si l'API est injoignable (serveur arrêté, réseau, CORS)
+    // fetch échoue seulement si l'API est injoignable (serveur arrêté, réseau,
+    // CORS)
     throw new ApiError(
       0,
       'Impossible de joindre le serveur. Réessaie dans quelques instants.',
@@ -113,7 +127,8 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const body: unknown = await response.json().catch(() => null);
 
   if (!response.ok) {
-    // Format d'erreur de l'API : { statusCode, message, error } ; message peut être une liste (validation)
+    // Format d'erreur de l'API : { statusCode, message, error } ; message peut
+    // être une liste (validation)
     const message = (body as { message?: string | string[] } | null)?.message;
     const text = Array.isArray(message)
       ? message.join(' ')
@@ -124,7 +139,8 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   return body as T;
 }
 
-// ---- Routes d'authentification (US03, US04) ---------------------------------------------------
+// ---- Routes d'authentification (US03, US04)
+// ---------------------------------------------------
 export const authApi = {
   // POST /api/auth/register → 201 { id, email, createdAt } ou 400 / 409
   register: (email: string, password: string) =>
@@ -140,6 +156,7 @@ export const authApi = {
       body: JSON.stringify({ email, password }),
     }),
 
-  // GET /api/auth/me → 200 { id, email } ou 401 (jeton absent, invalide ou expiré)
+  // GET /api/auth/me → 200 { id, email } ou 401 (jeton absent, invalide ou
+  // expiré)
   me: () => request<User>('/auth/me'),
 };

@@ -1,13 +1,14 @@
-// ================================================================================================
+// =============================================================================
 // Fichier : users.service.spec.ts
-// Rôle : Tests unitaires de UsersService (Vitest : npm test).
-//   Le Repository TypeORM est remplacé par une doublure (mock) : aucun accès à la base de données.
+// Rôle : Tests unitaires de UsersService (Vitest : npm test). Le Repository
+//   TypeORM est remplacé par une doublure (mock) : aucun accès à la base de
+//   données.
 // Utilise :
 //   - users.service.ts (la pièce testée)
 //   - user.entity.ts (User, pour l'étiquette du Repository)
 // Utilisé par :
 //   - Vitest (vitest.config.ts)
-// ================================================================================================
+// =============================================================================
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from './user.entity.js';
@@ -24,7 +25,8 @@ describe('UsersService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         UsersService,
-        // getRepositoryToken(User) : l'"étiquette" sous laquelle NestJS range le Repository de User.
+        // getRepositoryToken(User) : l'"étiquette" sous laquelle NestJS range
+        // le Repository de User.
         { provide: getRepositoryToken(User), useValue: repository },
       ],
     }).compile();

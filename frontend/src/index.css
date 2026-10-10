@@ -1,4 +1,4 @@
-/* ================================================================================================
+/* =============================================================================
    Fichier : index.css
    Rôle : Styles globaux de l'application, d'après les maquettes Figma.
      Les couleurs et réglages communs sont des VARIABLES (--nom) définies une seule fois dans :root,
@@ -8,9 +8,10 @@
      - police DM Sans (chargée dans index.html)
    Utilisé par :
      - main.tsx (import './index.css') ; classes utilisées dans components/ et pages/
-   ================================================================================================ */
+   ========================================================================== */
 
-/* ---- Variables : couleurs relevées dans Figma (panneau « Couleurs » des maquettes) ---- */
+/* ---- Variables : couleurs relevées dans Figma (panneau « Couleurs » des
+   maquettes) ---- */
 :root {
   /* Textes */
   --color-text: #1e1e1e;
@@ -50,7 +51,8 @@
   color: var(--color-text);
 }
 
-/* box-sizing : la largeur d'un bloc inclut ses marges intérieures (calculs plus simples) */
+/* box-sizing : la largeur d'un bloc inclut ses marges intérieures (calculs
+   plus simples) */
 *,
 *::before,
 *::after {
@@ -68,13 +70,15 @@ a {
   color: inherit;
 }
 
-/* Accessibilité : contour bien visible sur l'élément sélectionné au clavier (touche Tab) */
+/* Accessibilité : contour bien visible sur l'élément sélectionné au clavier
+   (touche Tab) */
 :focus-visible {
   outline: 3px solid var(--color-dark);
   outline-offset: 2px;
 }
 
-/* Accessibilité : lien « Aller au contenu », caché hors écran, il apparaît quand on le sélectionne au clavier */
+/* Accessibilité : lien « Aller au contenu », caché hors écran, il apparaît
+   quand on le sélectionne au clavier */
 .skip-link {
   position: absolute;
   left: -9999px;
@@ -103,7 +107,8 @@ a {
   padding: 1rem 1.5rem;
 }
 
-/* Très petits écrans (moins de 360 px) : logo un peu réduit pour laisser la place au bouton */
+/* Très petits écrans (moins de 360 px) : logo un peu réduit pour laisser la
+   place au bouton */
 @media (max-width: 359px) {
   .header {
     padding: 1rem;
@@ -149,7 +154,8 @@ a {
   font-size: 0.9rem;
 }
 
-/* ---- Carte blanche centrale (Connexion, Créer un compte, Télécharger…) ---- */
+/* ---- Carte blanche centrale (Connexion, Créer un compte, Télécharger…)
+   ---- */
 .card {
   background: var(--color-card);
   border-radius: var(--radius);
@@ -206,9 +212,9 @@ a {
   }
 }
 
-/* ================================================================================================
+/* =============================================================================
    Formulaires (Connexion, Créer un compte…)
-   ================================================================================================ */
+   ========================================================================== */
 .form {
   display: flex;
   flex-direction: column;
@@ -238,7 +244,8 @@ a {
   color: var(--color-text-muted);
 }
 
-/* Champ en erreur : bordure rouge (repérée par aria-invalid, donc cohérente avec l'accessibilité) */
+/* Champ en erreur : bordure rouge (repérée par aria-invalid, donc cohérente
+   avec l'accessibilité) */
 .field__input[aria-invalid='true'] {
   border-color: var(--color-error);
 }

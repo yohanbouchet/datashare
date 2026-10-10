@@ -1,24 +1,27 @@
-// ================================================================================================
+// =============================================================================
 // Fichier : jwt-auth.guard.spec.ts
-// Rôle : Tests unitaires de la garde JWT (Vitest : npm test).
-//   JwtService est remplacé par une doublure ; la requête HTTP est simulée par un petit objet.
-//   Cas testés : pas d'en-tête, mauvais format, jeton invalide ou expiré (401) ; jeton valide (accès + request.user).
+// Rôle : Tests unitaires de la garde JWT (Vitest : npm test). JwtService est
+//   remplacé par une doublure ; la requête HTTP est simulée par un petit objet.
+//   Cas testés : pas d'en-tête, mauvais format, jeton invalide ou expiré (401)
+//   ; jeton valide (accès + request.user).
 // Utilise :
 //   - jwt-auth.guard.ts (la pièce testée)
 //   - @nestjs/jwt (JwtService, remplacé par une doublure)
 // Utilisé par :
 //   - Vitest (vitest.config.ts)
-// ================================================================================================
+// =============================================================================
 import { ExecutionContext, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { JwtAuthGuard } from './jwt-auth.guard.js';
 
 describe('JwtAuthGuard', () => {
-  // Doublure de JwtService : on choisit dans chaque test si le jeton est accepté ou refusé.
+  // Doublure de JwtService : on choisit dans chaque test si le jeton est
+  // accepté ou refusé.
   const jwtService = { verifyAsync: vi.fn() };
   const guard = new JwtAuthGuard(jwtService as unknown as JwtService);
 
-  // Fabrique un faux "contexte" NestJS qui contient une requête avec l'en-tête Authorization voulu.
+  // Fabrique un faux "contexte" NestJS qui contient une requête avec l'en-tête
+  // Authorization voulu.
   function contextWith(authorization?: string) {
     const request: Record<string, unknown> = { headers: { authorization } };
     const context = {

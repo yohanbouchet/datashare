@@ -1,16 +1,20 @@
-// ================================================================================================
+// =============================================================================
 // Fichier : files.service.spec.ts
-// Rôle : Tests unitaires de FilesService – téléversement (US01), historique (US05) et suppression (US06) (Vitest : npm test).
-//   Le Repository TypeORM est remplacé par une doublure : on vérifie la REQUÊTE construite
-//   (filtre utilisateur + filtre de date) et la RÉPONSE (sans empreinte, isExpired / isProtected calculés).
-//   StorageService est aussi remplacé : on vérifie la suppression (propriétaire, 404, ordre base puis disque).
+// Rôle : Tests unitaires de FilesService – téléversement (US01), historique
+//   (US05) et suppression (US06) (Vitest : npm test). Le Repository TypeORM est
+//   remplacé par une doublure : on vérifie la REQUÊTE construite (filtre
+//   utilisateur + filtre de date) et la RÉPONSE (sans empreinte, isExpired /
+//   isProtected calculés). StorageService est aussi remplacé : on vérifie la
+//   suppression (propriétaire, 404, ordre base puis disque).
 // Utilise :
-//   - files.service.ts (la pièce testée), file.entity.ts (FileEntity, pour l'étiquette du Repository)
+//   - files.service.ts (la pièce testée), file.entity.ts (FileEntity, pour
+//     l'étiquette du Repository)
 //   - storage.service.ts (remplacé par la doublure storage)
-//   - typeorm (MoreThan, LessThanOrEqual : pour reconnaître les filtres de date)
+//   - typeorm (MoreThan, LessThanOrEqual : pour reconnaître les filtres de
+//     date)
 // Utilisé par :
 //   - Vitest (vitest.config.ts)
-// ================================================================================================
+// =============================================================================
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import bcrypt from 'bcrypt';
@@ -26,7 +30,8 @@ describe('FilesService', () => {
     find: vi.fn(),
     findOne: vi.fn(),
     delete: vi.fn(),
-    // create : renvoie l'objet préparé tel quel ; save : simule l'INSERT (id et date ajoutés par la base)
+    // create : renvoie l'objet préparé tel quel ; save : simule l'INSERT (id et
+    // date ajoutés par la base)
     create: vi.fn((data: object) => data),
     save: vi.fn((data: object) =>
       Promise.resolve({ ...data, id: 12, createdAt: new Date() }),
@@ -137,7 +142,8 @@ describe('FilesService', () => {
       );
       expect(repository.delete).toHaveBeenCalledWith({ id: 1 });
       expect(storage.remove).toHaveBeenCalledWith('abc123');
-      // invocationCallOrder : numéro d'ordre de chaque appel → la base AVANT le disque
+      // invocationCallOrder : numéro d'ordre de chaque appel → la base AVANT le
+      // disque
       expect(repository.delete.mock.invocationCallOrder[0]).toBeLessThan(
         storage.remove.mock.invocationCallOrder[0],
       );
@@ -218,7 +224,8 @@ describe('FilesService', () => {
         .token;
       const token2 = (repository.create.mock.calls[1][0] as { token: string })
         .token;
-      // base64url : lettres, chiffres, « - » et « _ » uniquement (sans risque dans une adresse)
+      // base64url : lettres, chiffres, « - » et « _ » uniquement (sans risque
+      // dans une adresse)
       expect(token1).toMatch(/^[A-Za-z0-9_-]{43}$/);
       expect(token1).not.toBe(token2);
     });

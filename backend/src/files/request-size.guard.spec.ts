@@ -1,12 +1,14 @@
-// ================================================================================================
+// =============================================================================
 // Fichier : request-size.guard.spec.ts
-// Rôle : Tests unitaires de RequestSizeGuard (Vitest : npm test) : la requête est refusée (413)
-//   si son en-tête Content-Length dépasse 1 Go + 1 Mo de marge, acceptée sinon.
+// Rôle : Tests unitaires de RequestSizeGuard (Vitest : npm test) : la requête
+//   est refusée (413) si son en-tête Content-Length dépasse 1 Go + 1 Mo de
+//   marge, acceptée sinon.
 // Utilise :
-//   - request-size.guard.ts (la pièce testée), storage.service.ts (MAX_FILE_SIZE)
+//   - request-size.guard.ts (la pièce testée), storage.service.ts
+//     (MAX_FILE_SIZE)
 // Utilisé par :
 //   - Vitest (vitest.config.ts)
-// ================================================================================================
+// =============================================================================
 import { ExecutionContext, PayloadTooLargeException } from '@nestjs/common';
 import { MAX_FILE_SIZE } from './storage.service.js';
 import { RequestSizeGuard } from './request-size.guard.js';

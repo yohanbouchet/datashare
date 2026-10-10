@@ -1,13 +1,14 @@
-// ================================================================================================
+// =============================================================================
 // Fichier : user.entity.ts
-// Rôle : Entité User : la table « users » décrite en TypeScript (entité UTILISATEUR du MCD).
-//   TypeORM s'en sert pour lire et écrire les comptes, et pour générer les migrations.
+// Rôle : Entité User : la table « users » décrite en TypeScript (entité
+//   UTILISATEUR du MCD). TypeORM s'en sert pour lire et écrire les comptes, et
+//   pour générer les migrations.
 // Utilise :
 //   - typeorm (paquet npm) : décorateurs @Entity, @Column…
 // Utilisé par :
 //   - users.module.ts (forFeature), users.service.ts (Repository<User>)
 //   - database/data-source.ts (génération des migrations)
-// ================================================================================================
+// =============================================================================
 import {
   Column,
   CreateDateColumn,
@@ -15,23 +16,28 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
-// @Entity : cette classe décrit une table. Nom "users" car "user" est un mot réservé en PostgreSQL.
+// @Entity : cette classe décrit une table. Nom "users" car "user" est un mot
+// réservé en PostgreSQL.
 @Entity({ name: 'users' })
 export class User {
   // Clé primaire : numéro interne généré automatiquement par la base (1, 2, 3…)
-  // Le "!" dit à TypeScript (mode strict) : « cette valeur sera remplie par TypeORM, pas par moi ».
+  // Le "!" dit à TypeScript (mode strict) : « cette valeur sera remplie par
+  // TypeORM, pas par moi ».
   @PrimaryGeneratedColumn()
   id!: number;
 
-  // 🔒 unique: true crée une contrainte UNIQUE en base : même si deux inscriptions arrivent
-  // en même temps, la base refusera le doublon (le contrôle dans le code seul ne suffit pas).
+  // 🔒 unique: true crée une contrainte UNIQUE en base : même si deux
+  // inscriptions arrivent en même temps, la base refusera le doublon (le
+  // contrôle dans le code seul ne suffit pas).
   @Column({ type: 'varchar', length: 255, unique: true })
   email!: string;
 
   // 🔒 On stocke uniquement l'empreinte (bcrypt), jamais le mot de passe.
-  // 🔒 select: false : cette colonne n'est PAS lue par défaut, on ne peut donc pas
-  // la renvoyer par erreur dans une réponse de l'API. Il faudra la demander explicitement à la connexion.
-  // name: 'password_hash' : nom de la colonne en base (convention SQL), passwordHash dans le code (convention TS).
+  // 🔒 select: false : cette colonne n'est PAS lue par défaut, on ne peut donc
+  // pas la renvoyer par erreur dans une réponse de l'API. Il faudra la demander
+  // explicitement à la connexion.
+  // name: 'password_hash' : nom de la colonne en base (convention SQL),
+  // passwordHash dans le code (convention TS).
   @Column({
     name: 'password_hash',
     type: 'varchar',
@@ -40,7 +46,8 @@ export class User {
   })
   passwordHash!: string;
 
-  // Date de création remplie automatiquement par la base, avec fuseau horaire (timestamptz)
+  // Date de création remplie automatiquement par la base, avec fuseau horaire
+  // (timestamptz)
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt!: Date;
 }

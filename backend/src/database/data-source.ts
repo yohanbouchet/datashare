@@ -1,22 +1,26 @@
-// ================================================================================================
+// =============================================================================
 // Fichier : data-source.ts
-// Rôle : Source de données AUTONOME, utilisée uniquement par les commandes de migration TypeORM.
-//   L'API, elle, se connecte via app.module.ts. Ce fichier sert à npm run migration:generate / run / revert.
+// Rôle : Source de données AUTONOME, utilisée uniquement par les commandes de
+//   migration TypeORM. L'API, elle, se connecte via app.module.ts. Ce fichier
+//   sert à npm run migration:generate / run / revert.
 // Utilise :
 //   - .env (racine) : variables POSTGRES_* (lues avec process.loadEnvFile)
-//   - users/user.entity.ts (User), files/file.entity.ts (FileEntity), files/tag.entity.ts (Tag) :
+//   - users/user.entity.ts (User), files/file.entity.ts (FileEntity),
+//     files/tag.entity.ts (Tag) :
 //     entités comparées à la base
 //   - dist/database/migrations/*.js : les migrations compilées
 // Utilisé par :
 //   - package.json (scripts migration:*)
-// ================================================================================================
+// =============================================================================
 import { DataSource } from 'typeorm';
-// Une ligne d'import par fichier : chaque classe s'importe depuis le fichier où elle est écrite
+// Une ligne d'import par fichier : chaque classe s'importe depuis le fichier où
+// elle est écrite
 import { User } from '../users/user.entity.js';
 import { FileEntity } from '../files/file.entity.js';
 import { Tag } from '../files/tag.entity.js';
 
-// Lit le .env de la racine (fonction intégrée à Node.js : aucune dépendance à ajouter).
+// Lit le .env de la racine (fonction intégrée à Node.js : aucune dépendance à
+// ajouter).
 // Le chemin part du dossier où la commande est lancée : backend/.
 process.loadEnvFile('../.env');
 

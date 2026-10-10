@@ -1,21 +1,24 @@
-// ================================================================================================
+// =============================================================================
 // Fichier : register.dto.ts
-// Rôle : DTO d'inscription (US03) : forme et règles des données de POST /api/auth/register.
-//   Toute donnée invalide est refusée (400) par le ValidationPipe global avant d'atteindre le service.
-//   Normalise l'email (minuscules, sans espaces) ; mot de passe de 8 à 72 caractères.
+// Rôle : DTO d'inscription (US03) : forme et règles des données de POST
+//   /api/auth/register. Toute donnée invalide est refusée (400) par le
+//   ValidationPipe global avant d'atteindre le service. Normalise l'email
+//   (minuscules, sans espaces) ; mot de passe de 8 à 72 caractères.
 // Utilise :
-//   - class-validator, class-transformer (paquets npm) : règles et transformation
+//   - class-validator, class-transformer (paquets npm) : règles et
+//     transformation
 // Utilisé par :
 //   - auth.controller.ts (@Body)
 //   - auth.service.ts (register)
 //   - main.ts (ValidationPipe qui l'applique)
-// ================================================================================================
+// =============================================================================
 import { Transform } from 'class-transformer';
 import { IsEmail, IsString, MaxLength, MinLength } from 'class-validator';
 
 export class RegisterDto {
-  // 🔒 Normalisation : espaces retirés et minuscules, pour que "Alice@Mail.fr " et "alice@mail.fr"
-  // désignent le même compte (sinon, deux comptes pour une même personne).
+  // 🔒 Normalisation : espaces retirés et minuscules, pour que "Alice@Mail.fr "
+  // et "alice@mail.fr" désignent le même compte (sinon, deux comptes pour une
+  // même personne).
   @Transform(({ value }) =>
     typeof value === 'string' ? value.trim().toLowerCase() : value,
   )
@@ -24,8 +27,9 @@ export class RegisterDto {
   email!: string;
 
   // Règle de l'US03 : au moins 8 caractères.
-  // 🔒 Au plus 72 : bcrypt ignore tout ce qui dépasse 72 octets. Deux mots de passe identiques
-  // sur leurs 72 premiers caractères seraient acceptés l'un pour l'autre : on l'interdit.
+  // 🔒 Au plus 72 : bcrypt ignore tout ce qui dépasse 72 octets. Deux mots de
+  // passe identiques sur leurs 72 premiers caractères seraient acceptés l'un
+  // pour l'autre : on l'interdit.
   @IsString({ message: 'Le mot de passe doit être un texte' })
   @MinLength(8, {
     message: 'Le mot de passe doit contenir au moins 8 caractères',

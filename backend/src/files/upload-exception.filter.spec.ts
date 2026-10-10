@@ -1,12 +1,14 @@
-// ================================================================================================
+// =============================================================================
 // Fichier : upload-exception.filter.spec.ts
-// Rôle : Tests unitaires de UploadExceptionFilter (Vitest : npm test) : en cas d'erreur pendant un
-//   téléversement, le fichier déjà reçu est effacé, et la réponse d'erreur est correcte (400, 413, 500).
+// Rôle : Tests unitaires de UploadExceptionFilter (Vitest : npm test) : en cas
+//   d'erreur pendant un téléversement, le fichier déjà reçu est effacé, et la
+//   réponse d'erreur est correcte (400, 413, 500).
 // Utilise :
-//   - upload-exception.filter.ts (la pièce testée), storage.service.ts (remplacé par une doublure)
+//   - upload-exception.filter.ts (la pièce testée), storage.service.ts
+//     (remplacé par une doublure)
 // Utilisé par :
 //   - Vitest (vitest.config.ts)
-// ================================================================================================
+// =============================================================================
 import {
   ArgumentsHost,
   BadRequestException,
@@ -21,10 +23,12 @@ describe('UploadExceptionFilter', () => {
   const filter = new UploadExceptionFilter(
     storage as unknown as StorageService,
   );
-  // Fausse réponse Express : status(…) renvoie la réponse, pour pouvoir enchaîner .json(…)
+  // Fausse réponse Express : status(…) renvoie la réponse, pour pouvoir
+  // enchaîner .json(…)
   const response = { status: vi.fn(), json: vi.fn() };
 
-  // Faux contexte NestJS avec une requête (éventuellement porteuse d'un fichier reçu) et la fausse réponse
+  // Faux contexte NestJS avec une requête (éventuellement porteuse d'un fichier
+  // reçu) et la fausse réponse
   const contextFor = (request: object) =>
     ({
       switchToHttp: () => ({

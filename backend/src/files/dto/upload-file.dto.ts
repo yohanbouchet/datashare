@@ -1,13 +1,17 @@
-// ================================================================================================
+// =============================================================================
 // Fichier : upload-file.dto.ts
-// Rôle : DTO des champs texte qui accompagnent le fichier dans POST /api/files (US01, multipart/form-data).
-//   Le fichier lui-même est contrôlé par multer (storage.service.ts) ; ici : durée, mot de passe, tags.
-//   Toute valeur invalide → 400 (ValidationPipe) ; le fichier déjà reçu est alors effacé (upload-exception.filter.ts).
+// Rôle : DTO des champs texte qui accompagnent le fichier dans POST /api/files
+//   (US01, multipart/form-data). Le fichier lui-même est contrôlé par multer
+//   (storage.service.ts) ; ici : durée, mot de passe, tags. Toute valeur
+//   invalide → 400 (ValidationPipe) ; le fichier déjà reçu est alors effacé
+//   (upload-exception.filter.ts).
 // Utilise :
-//   - class-validator (règles), class-transformer (Type, Transform : conversion du texte reçu)
+//   - class-validator (règles), class-transformer (Type, Transform : conversion
+//     du texte reçu)
 // Utilisé par :
-//   - files.controller.ts (@Body), files.service.ts (create), main.ts (ValidationPipe)
-// ================================================================================================
+//   - files.controller.ts (@Body), files.service.ts (create), main.ts
+//     (ValidationPipe)
+// =============================================================================
 import { Transform, Type } from 'class-transformer';
 import {
   ArrayMaxSize,
@@ -35,7 +39,8 @@ const EXPIRY_MESSAGE =
   "La durée d'expiration doit être comprise entre 1 et 7 jours";
 
 export class UploadFileDto {
-  // En multipart, tout arrive sous forme de texte : @Type le convertit en nombre avant le contrôle.
+  // En multipart, tout arrive sous forme de texte : @Type le convertit en
+  // nombre avant le contrôle.
   // Absent → 7 jours (règle de l'US01)
   @IsOptional()
   @Type(() => Number)
@@ -44,8 +49,10 @@ export class UploadFileDto {
   @Max(7, { message: EXPIRY_MESSAGE })
   expiresInDays: number = 7;
 
-  // Mot de passe facultatif ; un champ laissé vide ('') est traité comme absent.
-  // 6 caractères minimum (US01) ; 72 maximum (limite de bcrypt, comme pour les comptes)
+  // Mot de passe facultatif ; un champ laissé vide ('') est traité comme
+  // absent.
+  // 6 caractères minimum (US01) ; 72 maximum (limite de bcrypt, comme pour les
+  // comptes)
   @Transform(({ value }: { value: unknown }) =>
     value === '' ? undefined : value,
   )
@@ -59,7 +66,8 @@ export class UploadFileDto {
   })
   password?: string;
 
-  // Tags facultatifs : 10 au plus, 30 caractères chacun, sans doublon (contrainte UNIQUE en base aussi)
+  // Tags facultatifs : 10 au plus, 30 caractères chacun, sans doublon
+  // (contrainte UNIQUE en base aussi)
   @Transform(({ value }: { value: unknown }) => normalizeTags(value))
   @IsOptional()
   @IsArray({ message: 'Les tags doivent être une liste' })

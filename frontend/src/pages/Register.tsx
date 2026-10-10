@@ -1,11 +1,15 @@
-// ================================================================================================
+// =============================================================================
 // Fichier : Register.tsx
-// Rôle : Page « Créer un compte » (adresse « /inscription », US03), conforme à la maquette.
-//   1. Validation côté client : email au bon format, mot de passe d'au moins 8 caractères,
-//      vérification identique au mot de passe ; message sous chaque champ concerné.
-//   2. Envoi à l'API (POST /api/auth/register) ; le bouton est désactivé pendant l'envoi.
-//   3. Succès → page Connexion avec le bandeau « Ton compte est créé » (l'inscription ne connecte pas) ;
-//      échec → bandeau d'erreur avec le message de l'API (« Cet email est déjà utilisé », serveur injoignable…).
+// Rôle : Page « Créer un compte » (adresse « /inscription », US03), conforme à
+//   la maquette.
+//   1. Validation côté client : email au bon format, mot de passe d'au moins 8
+//      caractères, vérification identique au mot de passe ; message sous chaque
+//      champ concerné.
+//   2. Envoi à l'API (POST /api/auth/register) ; le bouton est désactivé
+//      pendant l'envoi.
+//   3. Succès → page Connexion avec le bandeau « Ton compte est créé »
+//      (l'inscription ne connecte pas) ; échec → bandeau d'erreur avec le
+//      message de l'API (« Cet email est déjà utilisé », serveur injoignable…).
 // Utilise :
 //   - services/api.ts (authApi.register, ApiError)
 //   - context/useAuth.ts (utilisateur : redirection si déjà connecté)
@@ -13,7 +17,7 @@
 //   - react-router (Link, Navigate, useNavigate)
 // Utilisé par :
 //   - App.tsx (route « /inscription »), Login.tsx (lien « Créer un compte »)
-// ================================================================================================
+// =============================================================================
 import { useState, type SubmitEvent } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router';
 import { Banner } from '../components/Banner.tsx';
@@ -21,10 +25,12 @@ import { Field } from '../components/Field.tsx';
 import { useAuth } from '../context/useAuth.ts';
 import { ApiError, authApi } from '../services/api.ts';
 
-// Vérification simple du format « quelque-chose@domaine.extension » (le serveur revérifie de toute façon)
+// Vérification simple du format « quelque-chose@domaine.extension » (le serveur
+// revérifie de toute façon)
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-// Messages d'erreur par champ ; le « ? » rend chaque case facultative (présente seulement en cas d'erreur)
+// Messages d'erreur par champ ; le « ? » rend chaque case facultative (présente
+// seulement en cas d'erreur)
 interface RegisterErrors {
   email?: string;
   password?: string;
@@ -32,7 +38,8 @@ interface RegisterErrors {
 }
 
 export function Register() {
-  // Le contexte sert seulement à savoir si quelqu'un est déjà connecté : s'inscrire ne connecte pas
+  // Le contexte sert seulement à savoir si quelqu'un est déjà connecté :
+  // s'inscrire ne connecte pas
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -49,7 +56,8 @@ export function Register() {
     return <Navigate to="/" replace />;
   }
 
-  // Validation côté client : confort de l'utilisateur (le serveur reste l'arbitre final)
+  // Validation côté client : confort de l'utilisateur (le serveur reste
+  // l'arbitre final)
   function validate(): RegisterErrors {
     const result: RegisterErrors = {};
     if (!EMAIL_PATTERN.test(email.trim())) {
@@ -59,7 +67,8 @@ export function Register() {
     if (password.length < 8) {
       result.password = 'Le mot de passe doit contenir au moins 8 caractères';
     }
-    // Vérification uniquement côté client : protège contre les fautes de frappe, l'API n'en a pas besoin
+    // Vérification uniquement côté client : protège contre les fautes de
+    // frappe, l'API n'en a pas besoin
     if (confirmation !== password) {
       result.confirmation = 'Les mots de passe ne correspondent pas';
     }
@@ -69,7 +78,8 @@ export function Register() {
   // async : la soumission attend la réponse de l'API.
   // SubmitEvent : le type de l'événement « envoi du formulaire ».
   async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
-    // preventDefault : empêche le navigateur de recharger la page (comportement par défaut d'un formulaire)
+    // preventDefault : empêche le navigateur de recharger la page (comportement
+    // par défaut d'un formulaire)
     event.preventDefault();
     setServerError(null);
     const foundErrors = validate();
@@ -79,10 +89,12 @@ export function Register() {
     setSubmitting(true);
     try {
       await authApi.register(email.trim(), password);
-      // state : information transmise à la page Connexion, qui affiche alors le bandeau bleu
+      // state : information transmise à la page Connexion, qui affiche alors le
+      // bandeau bleu
       navigate('/connexion', { state: { accountCreated: true } });
     } catch (error) {
-      // ApiError : message prévu par l'API ou par le service ; autre erreur : message générique
+      // ApiError : message prévu par l'API ou par le service ; autre erreur :
+      // message générique
       setServerError(
         error instanceof ApiError
           ? error.message
@@ -100,7 +112,8 @@ export function Register() {
 
       {serverError && <Banner variant="error">{serverError}</Banner>}
 
-      {/* noValidate : on désactive les bulles du navigateur pour afficher nos propres messages en français */}
+      {/* noValidate : on désactive les bulles du navigateur pour afficher
+         nos propres messages en français */}
       <form className="form" onSubmit={handleSubmit} noValidate>
         <Field
           id="email"
@@ -138,7 +151,8 @@ export function Register() {
           J'ai déjà un compte
         </Link>
 
-        {/* disabled pendant l'envoi : évite les doubles clics (et donc les doubles requêtes) */}
+        {/* disabled pendant l'envoi : évite les doubles clics (et donc les
+           doubles requêtes) */}
         <button type="submit" className="button-primary" disabled={submitting}>
           {submitting ? 'Création…' : 'Créer mon compte'}
         </button>

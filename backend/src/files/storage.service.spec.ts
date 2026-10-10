@@ -1,14 +1,16 @@
-// ================================================================================================
+// =============================================================================
 // Fichier : storage.service.spec.ts
-// Rôle : Tests unitaires de StorageService (Vitest : npm test).
-//   On vérifie les réglages donnés à multer (nom aléatoire, 1 Go, extensions interdites) et la suppression
-//   sur un VRAI dossier temporaire (créé puis effacé par le test, jamais le dossier uploads/).
+// Rôle : Tests unitaires de StorageService (Vitest : npm test). On vérifie les
+//   réglages donnés à multer (nom aléatoire, 1 Go, extensions interdites) et la
+//   suppression sur un VRAI dossier temporaire (créé puis effacé par le test,
+//   jamais le dossier uploads/).
 // Utilise :
-//   - storage.service.ts (la pièce testée), ConfigService (doublure qui renvoie les variables d'environnement)
+//   - storage.service.ts (la pièce testée), ConfigService (doublure qui renvoie
+//     les variables d'environnement)
 //   - node:fs/promises, node:os, node:path : dossier et fichiers temporaires
 // Utilisé par :
 //   - Vitest (vitest.config.ts)
-// ================================================================================================
+// =============================================================================
 import { BadRequestException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { access, mkdtemp, rm, writeFile } from 'node:fs/promises';
@@ -49,7 +51,8 @@ describe('StorageService', () => {
     await rm(directory, { recursive: true, force: true });
   });
 
-  // Appelle le fileFilter de multer pour un nom de fichier et renvoie [erreur, accepté]
+  // Appelle le fileFilter de multer pour un nom de fichier et renvoie [erreur,
+  // accepté]
   const runFilter = (name: string) =>
     new Promise<[Error | null, unknown]>((done) =>
       options.fileFilter({}, { originalname: name }, (error, accepted) =>

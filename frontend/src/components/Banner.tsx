@@ -1,13 +1,15 @@
-// ================================================================================================
+// =============================================================================
 // Fichier : Banner.tsx
-// Rôle : Composant réutilisable « Callout Component » des maquettes : bandeau coloré avec icône.
-//   3 variantes (variant) : info (bleu), warning (orange, alerte), error (rouge, erreur).
-//   Accessible : une erreur est annoncée immédiatement (role="alert"), une information poliment (role="status").
+// Rôle : Composant réutilisable « Callout Component » des maquettes : bandeau
+//   coloré avec icône. 3 variantes (variant) : info (bleu), warning (orange,
+//   alerte), error (rouge, erreur). Accessible : une erreur est annoncée
+//   immédiatement (role="alert"), une information poliment (role="status").
 // Utilise :
 //   - index.css : classes banner, banner--info, banner--warning, banner--error
 // Utilisé par :
-//   - pages/Login.tsx, pages/Register.tsx (et plus tard la page de téléchargement)
-// ================================================================================================
+//   - pages/Login.tsx, pages/Register.tsx (et plus tard la page de
+//     téléchargement)
+// =============================================================================
 import type { ReactNode } from 'react';
 
 interface BannerProps {
@@ -21,7 +23,8 @@ export function Banner({ variant, children }: BannerProps) {
       className={`banner banner--${variant}`}
       role={variant === 'error' ? 'alert' : 'status'}
     >
-      {/* Icône décorative (cercle avec « i » ou « ! ») : ignorée par les lecteurs d'écran */}
+      {/* Icône décorative (cercle avec « i » ou « ! ») : ignorée par les
+         lecteurs d'écran */}
       <svg
         width="18"
         height="18"
