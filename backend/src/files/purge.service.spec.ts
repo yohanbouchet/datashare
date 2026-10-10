@@ -1,10 +1,11 @@
 // =============================================================================
 // Fichier : purge.service.spec.ts
-// Rôle : Tests unitaires de PurgeService – purge planifiée (US10) (Vitest :
-//   npm test). Archiviste, magasinier, configuration et registre des tâches
-//   sont remplacés par des doublures : on vérifie la recherche des fichiers
-//   expirés, l'ordre base puis disque, la poursuite après une erreur et la
-//   programmation de la tâche répétée.
+// Rôle : Tests unitaires de PurgeService – purge planifiée en deux temps (US10)
+//   (Vitest : npm test). Archiviste, magasinier, configuration et registre des
+//   tâches sont remplacés par des doublures : on vérifie l'effacement du disque
+//   puis le marquage (purged_at), la suppression des lignes après la durée de
+//   conservation, la poursuite après une erreur et la programmation de la
+//   tâche répétée.
 // Utilise :
 //   - purge.service.ts (la pièce testée), file.entity.ts (FileEntity),
 //     storage.service.ts (doublure), @nestjs/schedule (SchedulerRegistry)
@@ -14,40 +15,49 @@
 import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { SchedulerRegistry } from '@nestjs/schedule';
-import { Test, TestingModule } from '@nestjs/testing';
+import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { LessThanOrEqual } from 'typeorm';
+import { IsNull, LessThanOrEqual } from 'typeorm';
 import { FileEntity } from './file.entity.js';
 import { PurgeService } from './purge.service.js';
 import { StorageService } from './storage.service.js';
 
+const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+
 describe('PurgeService', () => {
-  let service: PurgeService;
-  const repository = { find: vi.fn(), delete: vi.fn() };
+  const repository = { find: vi.fn(), update: vi.fn(), delete: vi.fn() };
   const storage = { remove: vi.fn() };
   const scheduler = { addInterval: vi.fn() };
-  // Valeur de PURGE_INTERVAL_MINUTES renvoyée par la fausse configuration
-  let interval = '60';
+  // Valeurs renvoyées par la fausse configuration (modifiables par test)
+  let settings: Record<string, string>;
 
-  beforeEach(async () => {
+  // Fabrique le service avec la configuration du moment
+  const createService = async () => {
+    const module = await Test.createTestingModule({
+      providers: [
+        PurgeService,
+        { provide: getRepositoryToken(FileEntity), useValue: repository },
+        { provide: StorageService, useValue: storage },
+        { provide: SchedulerRegistry, useValue: scheduler },
+        {
+          provide: ConfigService,
+          useValue: { getOrThrow: (name: string) => settings[name] },
+        },
+      ],
+    }).compile();
+    return module.get<PurgeService>(PurgeService);
+  };
+
+  beforeEach(() => {
     vi.clearAllMocks();
     // Faux minuteurs : le temps est piloté par le test (aucune vraie attente)
     vi.useFakeTimers();
     // Journal rendu silencieux pendant les tests
     vi.spyOn(Logger.prototype, 'log').mockImplementation(() => undefined);
     vi.spyOn(Logger.prototype, 'error').mockImplementation(() => undefined);
-    interval = '60';
+    settings = { PURGE_INTERVAL_MINUTES: '60', HISTORY_RETENTION_DAYS: '30' };
     repository.find.mockResolvedValue([]);
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        PurgeService,
-        { provide: getRepositoryToken(FileEntity), useValue: repository },
-        { provide: StorageService, useValue: storage },
-        { provide: ConfigService, useValue: { getOrThrow: () => interval } },
-        { provide: SchedulerRegistry, useValue: scheduler },
-      ],
-    }).compile();
-    service = module.get<PurgeService>(PurgeService);
+    repository.delete.mockResolvedValue({ affected: 0 });
   });
 
   afterEach(() => {
@@ -55,50 +65,86 @@ describe('PurgeService', () => {
   });
 
   describe('purgeExpired', () => {
-    it('cherche les fichiers expirés (date dépassée) et les supprime : base puis disque', async () => {
+    it('efface du disque les fichiers expirés pas encore purgés, puis les marque', async () => {
+      const service = await createService();
       repository.find.mockResolvedValue([
         { id: 1, storageName: 'abc' },
         { id: 2, storageName: 'def' },
       ]);
 
-      expect(await service.purgeExpired()).toBe(2);
+      const result = await service.purgeExpired();
 
+      expect(result.filesErased).toBe(2);
+      // Recherche : date dépassée ET purged_at vide (traité une seule fois)
       expect(repository.find).toHaveBeenCalledWith(
         expect.objectContaining({
-          where: { expiresAt: LessThanOrEqual(expect.any(Date)) },
+          where: {
+            expiresAt: LessThanOrEqual(expect.any(Date)),
+            purgedAt: IsNull(),
+          },
         }),
       );
-      expect(repository.delete).toHaveBeenCalledWith({ id: 1 });
       expect(storage.remove).toHaveBeenCalledWith('abc');
-      // invocationCallOrder : la ligne en base est supprimée AVANT le fichier
-      expect(repository.delete.mock.invocationCallOrder[0]).toBeLessThan(
-        storage.remove.mock.invocationCallOrder[0],
+      expect(repository.update).toHaveBeenCalledWith(
+        { id: 1 },
+        { purgedAt: expect.any(Date) },
       );
+      // invocationCallOrder : le disque est effacé AVANT le marquage
+      expect(storage.remove.mock.invocationCallOrder[0]).toBeLessThan(
+        repository.update.mock.invocationCallOrder[0],
+      );
+    });
+
+    it('supprime les lignes purgées depuis plus de HISTORY_RETENTION_DAYS jours', async () => {
+      const service = await createService();
+      repository.delete.mockResolvedValue({ affected: 3 });
+      const before = Date.now();
+
+      const result = await service.purgeExpired();
+
+      expect(result.rowsDeleted).toBe(3);
+      // La limite passée à la requête est « maintenant - 30 jours »
+      const where = repository.delete.mock.calls[0][0] as {
+        purgedAt: { value: Date };
+      };
+      expect(where.purgedAt).toEqual(LessThanOrEqual(expect.any(Date)));
+      expect(where.purgedAt.value.getTime()).toBe(before - 30 * ONE_DAY_MS);
     });
 
     it('continue avec les fichiers suivants si l’un d’eux échoue', async () => {
+      const service = await createService();
       repository.find.mockResolvedValue([
         { id: 1, storageName: 'abc' },
         { id: 2, storageName: 'def' },
       ]);
-      repository.delete.mockRejectedValueOnce(new Error('base indisponible'));
+      storage.remove.mockRejectedValueOnce(new Error('disque en panne'));
 
-      expect(await service.purgeExpired()).toBe(1);
+      const result = await service.purgeExpired();
 
-      expect(storage.remove).toHaveBeenCalledTimes(1);
-      expect(storage.remove).toHaveBeenCalledWith('def');
+      expect(result.filesErased).toBe(1);
+      // Le premier fichier n'est pas marqué (il sera retraité la fois suivante)
+      expect(repository.update).toHaveBeenCalledTimes(1);
+      expect(repository.update).toHaveBeenCalledWith(
+        { id: 2 },
+        { purgedAt: expect.any(Date) },
+      );
     });
 
-    it('ne fait rien s’il n’y a aucun fichier expiré', async () => {
-      expect(await service.purgeExpired()).toBe(0);
+    it('ne fait rien s’il n’y a rien à purger', async () => {
+      const service = await createService();
 
-      expect(repository.delete).not.toHaveBeenCalled();
+      expect(await service.purgeExpired()).toEqual({
+        filesErased: 0,
+        rowsDeleted: 0,
+      });
+      expect(storage.remove).not.toHaveBeenCalled();
     });
   });
 
-  describe('onApplicationBootstrap', () => {
+  describe('démarrage', () => {
     it('purge au démarrage, puis à chaque intervalle configuré', async () => {
-      interval = '15';
+      settings.PURGE_INTERVAL_MINUTES = '15';
+      const service = await createService();
       const purge = vi.spyOn(service, 'purgeExpired');
 
       service.onApplicationBootstrap();
@@ -113,12 +159,18 @@ describe('PurgeService', () => {
       expect(purge).toHaveBeenCalledTimes(2);
     });
 
-    it('refuse de démarrer avec une fréquence invalide', () => {
-      for (const value of ['0', '-5', 'abc', '1.5']) {
-        interval = value;
-        expect(() => service.onApplicationBootstrap()).toThrow(
-          'PURGE_INTERVAL_MINUTES doit être un entier ≥ 1',
-        );
+    it('refuse de démarrer avec une valeur invalide', async () => {
+      for (const name of ['PURGE_INTERVAL_MINUTES', 'HISTORY_RETENTION_DAYS']) {
+        for (const value of ['0', '-5', 'abc', '1.5']) {
+          settings = {
+            PURGE_INTERVAL_MINUTES: '60',
+            HISTORY_RETENTION_DAYS: '30',
+            [name]: value,
+          };
+          await expect(createService()).rejects.toThrow(
+            `${name} doit être un entier ≥ 1`,
+          );
+        }
       }
     });
   });
