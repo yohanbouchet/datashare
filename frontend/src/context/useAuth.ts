@@ -2,7 +2,7 @@
 // Fichier : useAuth.ts
 // Rôle : « Hook » personnalisé pour lire la mémoire d'authentification depuis
 //   n'importe quel composant :
-//   const { utilisateur, connexion, deconnexion } = useAuth();
+//   const { user, login, logout } = useAuth();
 // Utilise :
 //   - context/AuthContext.ts (AuthContext, type AuthValue)
 // Utilisé par :

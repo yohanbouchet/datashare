@@ -2,8 +2,8 @@
 // Fichier : AuthProvider.tsx
 // Rôle : Composant qui tient la mémoire partagée de l'authentification («
 //   gestion d'état » du front). Fournit à toute l'application : l'utilisateur
-//   connecté (ou null), un indicateur de chargement, et les actions connexion /
-//   deconnexion. Au démarrage (et donc après un F5), vérifie le JWT conservé en
+//   connecté (user, ou null), un indicateur de chargement (loading), et les
+//   actions de connexion (login) et de déconnexion (logout). Au démarrage (et donc après un F5), vérifie le JWT conservé en
 //   appelant GET /api/auth/me : s'il est expiré ou invalide, il est effacé.
 // Utilise :
 //   - services/api.ts : authApi, readToken, saveToken, clearToken, type

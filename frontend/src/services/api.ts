@@ -12,7 +12,7 @@
 //   - l'API NestJS : routes /api/auth/register, /api/auth/login, /api/auth/me
 //     (contrat d'interface)
 // Utilisé par :
-//   - context/AuthContext.tsx (connexion, déconnexion, vérification de session)
+//   - context/AuthProvider.tsx (connexion, déconnexion, vérification de session)
 //   - pages/Login.tsx, pages/Register.tsx (brique 3)
 // =============================================================================
 
@@ -23,8 +23,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 // Nom de la « case » où le JWT est rangé dans le navigateur
 const TOKEN_KEY = 'datashare.token';
 
-// ---- Conservation du JWT
-// --------------------------------------------------------------------
+// ---- Conservation du JWT ----------------------------------------------------
 // 🔒 sessionStorage : le jeton survit au rechargement (F5) mais est effacé à la
 // fermeture de l'onglet.
 // Combiné à la durée de vie d'1 h du JWT, cela limite la fenêtre d'exposition.
@@ -55,8 +54,7 @@ export function clearToken(): void {
   }
 }
 
-// ---- Erreurs
-// -----------------------------------------------------------------------------
+// ---- Erreurs ----------------------------------------------------------------
 // Erreur « maison » qui garde le code HTTP (401, 409…) et un message lisible
 // par l'utilisateur.
 // status = 0 : l'API n'a pas pu être jointe (serveur arrêté, réseau coupé).
@@ -70,8 +68,7 @@ export class ApiError extends Error {
   }
 }
 
-// ---- Types des réponses (repris du contrat d'interface)
-// ---------------------------------------
+// ---- Types des réponses (repris du contrat d'interface) ---------------------
 export interface User {
   id: number;
   email: string;
@@ -86,10 +83,9 @@ export interface RegisterResponse extends User {
   createdAt: string;
 }
 
-// ---- Fonction d'appel commune
-// ----------------------------------------------------------------- <T> : le
-// type de la réponse attendue, précisé à chaque appel (ex.
-// requete<Utilisateur>(...)).
+// ---- Fonction d'appel commune -----------------------------------------------
+// <T> : le type de la réponse attendue, précisé à chaque appel (ex.
+// request<User>(...)).
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const headers = new Headers(options.headers);
   // Les données envoyées sont du JSON (sauf l'envoi de fichier, qui gérera son
@@ -139,8 +135,7 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   return body as T;
 }
 
-// ---- Routes d'authentification (US03, US04)
-// ---------------------------------------------------
+// ---- Routes d'authentification (US03, US04) ---------------------------------
 export const authApi = {
   // POST /api/auth/register → 201 { id, email, createdAt } ou 400 / 409
   register: (email: string, password: string) =>
