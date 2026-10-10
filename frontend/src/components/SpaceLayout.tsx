@@ -12,7 +12,7 @@
 // Utilisé par :
 //   - App.tsx (route parente de /mon-espace, derrière RequireAuth)
 // =============================================================================
-import { useState } from 'react';
+import { startTransition, useState } from 'react';
 import { Link, NavLink, Outlet, useNavigate } from 'react-router';
 import { useAuth } from '../context/useAuth.ts';
 import { Icon } from './Icon.tsx';
@@ -23,10 +23,16 @@ export function SpaceLayout() {
   // Tiroir du menu mobile : ouvert ou fermé
   const [menuOpen, setMenuOpen] = useState(false);
 
-  // Déconnexion : on oublie le JWT (côté navigateur) et on revient à l'accueil
+  // Déconnexion : on revient à l'accueil et on oublie le JWT (côté
+  // navigateur). ⚠️ React Router applique chaque changement de page dans une
+  // « transition » (mise à jour moins prioritaire) : la déconnexion est placée
+  // dans une transition elle aussi, pour que les deux s'appliquent ENSEMBLE.
+  // Sinon, la déconnexion passe avant : le vigile RequireAuth voit un
+  // visiteur sur /mon-espace et le renvoie vers /connexion (anomalie trouvée
+  // par Cypress).
   function handleLogout() {
-    logout();
     navigate('/');
+    startTransition(() => logout());
   }
 
   return (
