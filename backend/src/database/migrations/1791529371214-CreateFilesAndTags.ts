@@ -1,19 +1,22 @@
-// ================================================================================================
+// =============================================================================
 // Fichier : 1791529371214-CreateFilesAndTags.ts
-// Rôle : Migration n°2 : création des tables « files » et « tags » (générée par npm run migration:generate,
-//   relue avant application). Crée aussi l'index sur expires_at et les deux clés étrangères.
+// Rôle : Migration n°2 : création des tables « files » et « tags » (générée par
+//   npm run migration:generate, relue avant application). Crée aussi l'index
+//   sur expires_at et les deux clés étrangères.
 // Utilise :
 //   - typeorm (QueryRunner) : exécute le SQL
 // Utilisé par :
-//   - database/data-source.ts (liste des migrations) ; npm run migration:run / migration:revert
-// ================================================================================================
+//   - database/data-source.ts (liste des migrations) ; npm run migration:run /
+//     migration:revert
+// =============================================================================
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class CreateFilesAndTags1791529371214 implements MigrationInterface {
   name = 'CreateFilesAndTags1791529371214';
 
-  // up : appliquée par « npm run migration:run ». Ordre : tables, index, puis clés étrangères
-  // (une clé étrangère ne peut viser qu'une table qui existe déjà).
+  // up : appliquée par « npm run migration:run ». Ordre : tables, index, puis
+  // clés étrangères (une clé étrangère ne peut viser qu'une table qui existe
+  // déjà).
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
       `CREATE TABLE "tags" ("id" SERIAL NOT NULL, "label" character varying(30) NOT NULL, "file_id" integer NOT NULL, CONSTRAINT "UQ_0cd72a2d043ff1a21312867fd34" UNIQUE ("file_id", "label"), CONSTRAINT "PK_e7dc17249a1148a1970748eda99" PRIMARY KEY ("id"))`,
@@ -32,7 +35,8 @@ export class CreateFilesAndTags1791529371214 implements MigrationInterface {
     );
   }
 
-  // down : « npm run migration:revert ». Ordre inverse : on retire d'abord les clés étrangères.
+  // down : « npm run migration:revert ». Ordre inverse : on retire d'abord les
+  // clés étrangères.
   // ⚠️ Supprime les tables, donc tous les fichiers enregistrés et leurs tags.
   public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
