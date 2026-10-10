@@ -72,7 +72,9 @@ Repères déjà fixés :
 |---|---|
 | Fréquence | `PURGE_INTERVAL_MINUTES` dans `.env` (60 par défaut) ; une valeur invalide (0, négative, non entière) empêche l'API de démarrer |
 | Démarrage | Une purge est lancée dès le démarrage de l'API (rattrapage après un arrêt), puis à chaque intervalle |
-| Traitement | Fichiers dont `expires_at` est dépassée (recherche rapide grâce à l'index) : ligne en base (tags en cascade), puis fichier sur le disque |
+| Étape 1 : disque | Fichiers dont `expires_at` est dépassée et pas encore purgés (`purged_at` vide) : fichier effacé du disque, puis date de purge enregistrée dans `purged_at` ; la ligne reste visible dans l'historique (« Ce fichier a expiré, il n'est plus stocké chez nous ») et le lien répond 410 |
+| Étape 2 : historique | Lignes purgées depuis plus de `HISTORY_RETENTION_DAYS` jours (30 par défaut) : supprimées de la base (tags en cascade) ; le lien répond alors 404 |
+| Reprise sur erreur | Ordre disque puis marquage : l'opération peut être rejouée sans risque (« déjà absent » est accepté) |
 | Robustesse | Un échec sur un fichier est consigné dans le journal et n'interrompt pas la purge des suivants |
 | Suivi | Journal de l'API : `[PurgeService] Purge : N fichier(s) expiré(s) supprimé(s)` |
 | Plusieurs serveurs | À prévoir si l'API est répartie sur plusieurs instances : une seule doit purger (verrou en base ou tâche planifiée externe) |

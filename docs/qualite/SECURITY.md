@@ -92,7 +92,7 @@ Légende : ✅ en place · 🔜 prévu (étape indiquée)
 | Sujet | Dans le MVP | Pour une mise en production |
 |---|---|---|
 | Minimisation des données (RGPD) | Seuls l'email et l'empreinte du mot de passe sont conservés pour un compte | — |
-| Durée de conservation limitée | Fichiers expirés après 1 à 7 jours, puis purgés (disque et base) | Durée de conservation des comptes inactifs à définir |
+| Durée de conservation limitée | Fichiers expirés après 1 à 7 jours, effacés du disque par la purge ; leur ligne d'historique (nom, taille, dates) est supprimée après `HISTORY_RETENTION_DAYS` jours (30 par défaut, réglable) | Durée de conservation des comptes inactifs à définir |
 | Sécurité des données | Hachage bcrypt, JWT à durée limitée, secrets hors du code ; HTTPS en production | Chiffrement du stockage (ex. *bucket* S3 chiffré) |
 | Droits des personnes | — | Suppression de son compte et de ses fichiers (droit à l'effacement), export de ses données ; page de confidentialité et mentions légales |
 | Localisation | Serveur de développement local | Hébergement dans l'Union européenne (ex. région AWS `eu-west-3`, Paris) |

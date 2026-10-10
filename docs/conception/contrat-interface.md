@@ -213,8 +213,8 @@ Ces routes ne demandent pas de JWT : l'accès repose sur le jeton aléatoire du 
 ```
 
 **Erreurs**
-- 404 : « Ce lien est invalide ou a expiré » (jeton inconnu, ou fichier déjà purgé)
-- 410 : « Ce fichier n'est plus disponible en téléchargement car il a expiré. »
+- 404 : « Ce lien est invalide ou a expiré » (jeton inconnu, ou ligne supprimée de l'historique après la durée de conservation)
+- 410 : « Ce fichier n'est plus disponible en téléchargement car il a expiré. » (date dépassée, que le fichier ait déjà été effacé du disque par la purge ou non)
 
 **Note** : les bandeaux « Ce fichier expirera dans 3 jours » (info) et « Ce fichier expirera demain » (alerte) sont calculés par le front à partir de `expiresAt`.
 

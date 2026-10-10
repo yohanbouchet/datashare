@@ -23,7 +23,7 @@
 | Téléchargement | US02 | Lien valide ; lien inconnu ; lien expiré ; mot de passe juste / faux / absent ; fichier absent du disque ; nom accentué ou non latin | Unitaire + e2e | 200 ; 404 ; 410 ; 200 / 401 / 401 ; 404 ; nom exact (UTF-8) | ✅ unitaire (14 tests) · 🔜 e2e |
 | Historique | US05 | Fichiers de l'utilisateur seulement ; filtre actifs (par défaut) / expirés / tous ; filtre invalide ; sans connexion | Unitaire + e2e | Aucun fichier d'un autre compte ; aucune empreinte dans la réponse ; 400 ; 401 | ✅ unitaire (5 tests) · 🔜 e2e |
 | Suppression | US06 | Son propre fichier ; fichier d'un autre ; id invalide ou hors limites ; sans connexion | Unitaire + e2e | 204, ligne, tags et fichier effacés (base puis disque) ; 404 sans rien supprimer ; 404 ; 401 | ✅ unitaire (3 tests) · 🔜 e2e |
-| Purge planifiée | US10 | Fichiers expirés supprimés (base, tags, disque) ; ordre base puis disque ; poursuite après une erreur ; purge au démarrage et à chaque intervalle ; fréquence invalide | Unitaire + manuel | Aucun fichier expiré restant ; démarrage refusé si `PURGE_INTERVAL_MINUTES` est invalide | ✅ unitaire (5 tests) · ✅ manuel |
+| Purge planifiée | US10 | Étape 1 : fichiers expirés effacés du disque puis marqués (`purged_at`), une seule fois ; étape 2 : lignes supprimées après la durée de conservation ; poursuite après une erreur ; purge au démarrage et à chaque intervalle ; réglages invalides | Unitaire + manuel | Aucun fichier expiré sur le disque, historique conservé N jours ; démarrage refusé si un réglage est invalide | ✅ unitaire (6 tests) · ✅ manuel |
 | Parcours complet | — | Inscription → connexion → téléversement → téléchargement | Cypress | Parcours sans erreur | 🔜 étape 5 |
 
 ## 3. Résultats
@@ -49,6 +49,8 @@
 | 10/10/2026 | backend | Tests unitaires du téléchargement : informations sans donnée sensible, 404, 410, mot de passe bon / faux, revérification au téléchargement (fichier jamais ouvert sans mot de passe), fichier absent du disque ; contrôleur (délégation, en-têtes `Content-Type` et `Content-Disposition` UTF-8) ; stockage (lecture en flux, fichier absent) | ✅ 67/67 (total) | — |
 | 10/10/2026 | backend | Purge planifiée, test manuel : fichier téléversé avec un tag puis rendu expiré ; au redémarrage de l'API, journal « Purge : 1 fichier(s) expiré(s) supprimé(s) », ligne, tag et fichier sur le disque supprimés ; les fichiers actifs sont conservés | ✅ 1/1 | — |
 | 10/10/2026 | backend | Tests unitaires de la purge : recherche des fichiers expirés, base puis disque, poursuite après une erreur, aucun fichier expiré, purge au démarrage puis après l'intervalle (horloge factice), fréquence invalide refusée | ✅ 72/72 (total) | — |
+| 10/10/2026 | backend + frontend | Purge en deux temps, test manuel : fichier « vacances_ardeche.mp4 » (avec un tag) rendu expiré ; au redémarrage de l'API, fichier effacé du disque, ligne et tag conservés avec `purged_at` renseigné ; dans Mon espace, ligne « Expiré » avec « Ce fichier a expiré, il n'est plus stocké chez nous » (conforme à la maquette) ; lien → 410 | ✅ 4/4 | — |
+| 10/10/2026 | backend | Tests unitaires de la purge en deux temps : effacement du disque puis marquage, une seule fois ; suppression des lignes après la durée de conservation (date limite exacte) ; poursuite après une erreur ; rien à purger ; démarrage et intervalle (horloge factice) ; réglages invalides | ✅ 73/73 (total) | — |
 
 🔜 Rapport de couverture et capture d'écran (étape 5).
 
