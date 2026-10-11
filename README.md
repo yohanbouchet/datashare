@@ -16,7 +16,7 @@ Projet 3 du Master Expert DevOps – OpenClassrooms (« Pilotez le développemen
 | Base de données | PostgreSQL 18 (conteneur Docker) |
 | Accès aux données | TypeORM + migrations versionnées |
 | Stockage des fichiers | Disque local (dossier `uploads/`) |
-| Tests | Vitest (back et front), Cypress (de bout en bout) |
+| Tests | Vitest (back et front), Cypress (de bout en bout), k6 et Lighthouse (performance) |
 | Qualité du code | Oxlint, Prettier |
 
 ## Structure du dépôt
@@ -30,6 +30,7 @@ datashare/
 │   ├── conception/     MCD, schéma d'architecture, contrat d'interface
 │   ├── qualite/        Suivi qualité : TESTING, SECURITY, PERF, MAINTENANCE
 │   └── rapports/       Captures des rapports de tests et de couverture
+├── perf/               Test de performance k6 (transfert.k6.js, voir PERF.md)
 ├── scripts/            Déploiement (deploy.sh) et contrôles de sécurité (scan-security.sh)
 ├── docker-compose.yml  Service PostgreSQL
 └── .env.example        Modèle des variables d'environnement (racine)

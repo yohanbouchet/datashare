@@ -99,7 +99,7 @@ Repères :
 
 | Sujet | État |
 |---|---|
-| Logs de l'API en JSON sur la sortie standard | 🔜 étape 5 |
+| Logs de l'API en JSON sur la sortie standard | Évolution (PERF.md, section 5) : utiles dès qu'ils sont centralisés |
 | Rotation des journaux du conteneur PostgreSQL | ✅ 3 fichiers de 10 Mo au plus (`logging: json-file`, `max-size`, `max-file` dans `docker-compose.yml`) — par défaut, Docker ne limite pas leur taille et peut remplir le disque |
 | Centralisation (ex. Loki + Grafana) | Évolution hors MVP, pertinente avec plusieurs serveurs |
 
