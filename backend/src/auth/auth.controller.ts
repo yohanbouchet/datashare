@@ -32,6 +32,8 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
+import { STRICT_LIMIT } from '../common/rate-limits.js';
 import { JwtAuthGuard } from './jwt-auth.guard.js';
 import type { AuthenticatedRequest } from './jwt-auth.guard.js';
 import { AuthService } from './auth.service.js';
@@ -70,6 +72,11 @@ export class AuthController {
       'Données invalides : email, mot de passe de 8 à 72 caractères, champ inattendu',
   })
   @ApiResponse({ status: 409, description: 'Cet email est déjà utilisé' })
+  @ApiResponse({
+    status: 429,
+    description: 'Trop de tentatives (5 par minute)',
+  })
+  @Throttle(STRICT_LIMIT)
   @Post('register')
   register(@Body() dto: RegisterDto) {
     return this.authService.register(dto);
@@ -96,6 +103,11 @@ export class AuthController {
   })
   @ApiResponse({ status: 400, description: 'Données invalides' })
   @ApiResponse({ status: 401, description: 'Email ou mot de passe incorrect' })
+  @ApiResponse({
+    status: 429,
+    description: 'Trop de tentatives (5 par minute)',
+  })
+  @Throttle(STRICT_LIMIT)
   @Post('login')
   @HttpCode(HttpStatus.OK)
   login(@Body() dto: LoginDto) {

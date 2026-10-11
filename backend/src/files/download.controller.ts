@@ -30,9 +30,11 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import type { Response } from 'express';
+import { Throttle } from '@nestjs/throttler';
 import contentDisposition from 'content-disposition';
 import { extname } from 'node:path';
 import { DownloadService } from './download.service.js';
+import { DOWNLOAD_LIMIT, STRICT_LIMIT } from '../common/rate-limits.js';
 import {
   DownloadFileDto,
   VerifyPasswordDto,
@@ -81,6 +83,11 @@ export class DownloadController {
   @ApiResponse({ status: 401, description: 'Mot de passe incorrect' })
   @ApiResponse({ status: 404, description: 'Ce lien est invalide ou a expiré' })
   @ApiResponse({ status: 410, description: 'Fichier expiré' })
+  @ApiResponse({
+    status: 429,
+    description: 'Trop de tentatives (5 par minute)',
+  })
+  @Throttle(STRICT_LIMIT)
   @Post(':token/verify')
   @HttpCode(HttpStatus.NO_CONTENT)
   verify(@Param('token') token: string, @Body() dto: VerifyPasswordDto) {
@@ -106,6 +113,11 @@ export class DownloadController {
   })
   @ApiResponse({ status: 404, description: 'Ce lien est invalide ou a expiré' })
   @ApiResponse({ status: 410, description: 'Fichier expiré' })
+  @ApiResponse({
+    status: 429,
+    description: 'Trop de tentatives (10 par minute)',
+  })
+  @Throttle(DOWNLOAD_LIMIT)
   @Post(':token')
   @HttpCode(HttpStatus.OK)
   async download(

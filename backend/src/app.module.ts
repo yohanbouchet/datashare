@@ -13,8 +13,10 @@
 //   - main.ts (NestFactory.create(AppModule))
 // =============================================================================
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { TypeOrmModule } from '@nestjs/typeorm';
 // En ESM, nos propres fichiers s'importent avec l'extension .js (celle du
 // fichier compilé), alors que les paquets npm (@nestjs/...) s'importent par
@@ -22,6 +24,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module.js';
 import { AuthModule } from './auth/auth.module.js';
 import { FilesModule } from './files/files.module.js';
+import { GLOBAL_LIMIT, RATE_LIMIT_MESSAGE } from './common/rate-limits.js';
 
 // @Module : le "sommaire" de l'application. Il liste les briques à charger
 // (imports), les points d'entrée HTTP (controllers) et la logique métier
@@ -75,11 +78,22 @@ import { FilesModule } from './files/files.module.js';
     //    les minuteurs et les arrête proprement à l'arrêt de l'API.
     ScheduleModule.forRoot(),
 
+    // 4) 🔒 Limitation du nombre de requêtes (anti-force brute) : compteur par
+    //    adresse IP et par route, limites dans common/rate-limits.ts
+    ThrottlerModule.forRoot({
+      throttlers: [GLOBAL_LIMIT],
+      errorMessage: RATE_LIMIT_MESSAGE,
+    }),
+
     UsersModule,
 
     AuthModule,
 
     FilesModule,
   ],
+
+  // APP_GUARD : la garde de limitation s'applique à TOUTES les routes de
+  // l'API (au-delà de la limite : 429 « Trop de tentatives »)
+  providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
 export class AppModule {}
