@@ -57,7 +57,8 @@ describe('Parcours : téléversement puis téléchargement par lien', () => {
       });
     cy.contains('h1', 'Télécharger un fichier');
     cy.contains('rapport-annuel.txt');
-    cy.contains('Ce fichier expirera dans 3 jours.');
+    cy.contains('text/plain');
+    cy.contains('Ce fichier expirera dans 3 jours, le ');
     cy.contains('button', 'Télécharger').should('be.disabled');
 
     // 5. Mauvais mot de passe : message, aucun téléchargement

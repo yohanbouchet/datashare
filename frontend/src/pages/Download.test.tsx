@@ -1,7 +1,7 @@
 // =============================================================================
 // Fichier : Download.test.tsx
-// Rôle : Tests de la page publique « Télécharger un fichier » (US02) : bandeau
-//   d'expiration, bouton grisé tant que le mot de passe est vide, mot de passe
+// Rôle : Tests de la page publique « Télécharger un fichier » (US02) :
+//   informations du fichier (type compris), bandeau d'expiration avec la date, bouton grisé tant que le mot de passe est vide, mot de passe
 //   faux sans téléchargement, lien expiré. Les appels à l'API sont des
 //   doublures, et l'envoi du formulaire par le navigateur est intercepté.
 // Utilise :
@@ -13,6 +13,7 @@
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ApiError, downloadApi } from '../services/api.ts';
+import { formatDate } from '../utils/format.ts';
 import { renderPage } from '../test/render.tsx';
 import { Download } from './Download.tsx';
 
@@ -59,8 +60,10 @@ describe('Page Télécharger un fichier', () => {
 
     expect(await screen.findByText('photo.jpg')).toBeInTheDocument();
     expect(downloadApi.info).toHaveBeenCalledWith('jeton');
+    // Type et taille (US02)
+    expect(screen.getByText('2 Ko · image/jpeg')).toBeInTheDocument();
     expect(screen.getByRole('status')).toHaveTextContent(
-      'Ce fichier expirera dans 3 jours.',
+      `Ce fichier expirera dans 3 jours, le ${formatDate(inDays(3))}.`,
     );
     const button = screen.getByRole('button', { name: 'Télécharger' });
     expect(button).toBeDisabled();
@@ -84,7 +87,9 @@ describe('Page Télécharger un fichier', () => {
 
     // Expire demain : bandeau orange
     expect(
-      await screen.findByText('Ce fichier expirera demain.'),
+      await screen.findByText(
+        `Ce fichier expirera demain, le ${formatDate(inDays(1))}.`,
+      ),
     ).toBeInTheDocument();
     await userEvent.type(screen.getByLabelText('Mot de passe'), 'faux123');
     await userEvent.click(screen.getByRole('button', { name: 'Télécharger' }));
