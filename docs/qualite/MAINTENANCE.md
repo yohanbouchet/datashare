@@ -49,10 +49,33 @@ le même principe que Terraform à l'infrastructure.
 
 ## 2. Mise à jour des dépendances
 
-🔜 À documenter (étape 5) : procédure (`npm outdated`, mise à jour, tests, `npm audit`), fréquence et risques.
+### Cycle de vie des technologies (source : [endoflife.date](https://endoflife.date), relevé du 11/10/2026)
 
-Repères déjà fixés :
-- **Node.js 24 LTS** (support jusqu'en avril 2028) ; PostgreSQL 18.
+| Technologie | Version utilisée | Fin de support (correctifs de sécurité) | Action à prévoir |
+|---|---|---|---|
+| Node.js | 24.21 (**LTS**) | 30/04/2028 | Passer à Node.js 26 (LTS à partir d'octobre 2026, support jusqu'en avril 2029) au plus tard début 2028 |
+| PostgreSQL | 18.6 | 14/11/2030 | Aucune avant 2030 ; appliquer les versions correctives 18.x (sauvegarde, puis nouvelle image Docker) |
+| Ubuntu (serveur) | 26.04.1 (**LTS**) | 29/05/2031 | Aucune ; mises à jour de sécurité régulières (`apt`) |
+| Docker Engine | 29.8 | Version 29 maintenue (dernière : 29.9) | Mettre à jour vers 29.9 |
+| React | 19.3 | Pas de date : seule la dernière version majeure reçoit les correctifs | Suivre les versions 19.x ; migrer à la prochaine version majeure dans l'année suivant sa sortie |
+| NestJS | 12.1 | Pas de date publiée : seule la dernière version majeure est maintenue | Idem : suivre les 12.x, planifier la migration à la version 13 |
+| TypeScript, Vite, Vitest, Cypress | 6.0 / 8.3 / 4.1 / 16.1 | Outils de développement, sans politique de support à long terme | Mises à jour mineures régulières ; majeures planifiées (absentes de la production) |
+
+**Principe** : on privilégie les versions **LTS** (*Long Term Support*, support long) pour ce qui tourne en production (Node.js, Ubuntu) ; on anticipe chaque fin de support **au moins 6 mois avant** la date ; un composant ne passe en production qu'après le passage des tests sur la nouvelle version.
+
+### Procédure de mise à jour (mensuelle, et dès qu'une faille est publiée)
+
+| Étape | Commande (dans `backend/` puis `frontend/`) | But |
+|---|---|---|
+| 1. Repérer | `npm outdated` ; `npm audit` | Versions en retard ; failles connues |
+| 2. Mettre à jour | `npm update` (versions mineures et correctives) ; une version majeure se traite seule, sur une branche, en lisant ses notes de version | Limiter le risque de régression |
+| 3. Vérifier | `npm run lint`, `npm test`, `npm run test:e2e` (back), `npm run cy:run` (front) | Rien n'est cassé : seuils de couverture compris |
+| 4. Valider | `npm audit` à 0 vulnérabilité haute ou critique ; commit `chore(deps): …` | Traçabilité |
+
+⚠️ `npm audit fix --force` n'est jamais utilisé : il peut installer des versions majeures incompatibles.
+Évolution : automatiser l'étape 1 avec **Dependabot** (propositions de mise à jour par GitHub) et l'étape 3 dans une **intégration continue**.
+
+Repères :
 - Les versions exactes sont verrouillées par les fichiers `package-lock.json` (installation reproductible).
 - Les versions compatibles de NestJS et React ont été fixées par leurs générateurs officiels.
 
