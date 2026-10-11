@@ -1,6 +1,14 @@
-// Configuration de Vitest pour les tests UNITAIRES du front (npm test).
-// Reprend la configuration de Vite (plugin React) et simule un navigateur
-// avec jsdom : les composants sont affichés en mémoire, sans fenêtre.
+// =============================================================================
+// Fichier : vitest.config.ts
+// Rôle : Configuration de Vitest pour les tests UNITAIRES du front (npm test,
+//   npm run test:cov). Reprend la configuration de Vite (plugin React) et
+//   simule un navigateur avec jsdom : les composants sont affichés en
+//   mémoire, sans fenêtre. Seuil de couverture de l'énoncé : 70 %.
+// Utilise :
+//   - vite.config.ts ; src/test/setup.ts (setupFiles)
+// Utilisé par :
+//   - package.json (scripts test, test:watch, test:cov)
+// =============================================================================
 import { defineConfig, mergeConfig } from 'vitest/config';
 import viteConfig from './vite.config.ts';
 
@@ -12,7 +20,8 @@ export default mergeConfig(
       globals: true,
       // Faux navigateur (document, window, formulaires…)
       environment: 'jsdom',
-      // Exécuté avant chaque fichier de tests (vérifications « toBeInTheDocument »…)
+      // Exécuté avant chaque fichier de tests (vérifications
+      // « toBeInTheDocument »…)
       setupFiles: ['./src/test/setup.ts'],
       include: ['src/**/*.test.{ts,tsx}'],
       // Couverture (npm run test:cov) : tout le code du front est compté,

@@ -5,7 +5,7 @@
 //   l'espace connecté (déconnexion, tiroir mobile) et accueil (bouton rond).
 // Utilise :
 //   - components/Header.tsx, RequireAuth.tsx, SpaceLayout.tsx, pages/Home.tsx
-//   - test/render.tsx ; Testing Library
+//   - context/AuthContext.ts ; test/render.tsx ; Testing Library
 // Utilisé par :
 //   - Vitest (vitest.config.ts)
 // =============================================================================

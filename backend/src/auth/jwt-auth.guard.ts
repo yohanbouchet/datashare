@@ -11,7 +11,8 @@
 //   - express (type Request) : la forme d'une requête HTTP
 // Utilisé par :
 //   - auth.controller.ts (route GET /api/auth/me)
-//   - plus tard : les routes des fichiers (US01, US05, US06)
+//   - files/files.controller.ts (toutes les routes des fichiers : US01, US05,
+//     US06)
 // =============================================================================
 import {
   CanActivate,

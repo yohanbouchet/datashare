@@ -12,9 +12,10 @@
 //   - l'API NestJS : routes /api/auth/*, /api/files, /api/download/*
 //     (contrat d'interface)
 // Utilisé par :
-//   - context/AuthProvider.tsx (connexion, déconnexion, vérification de session)
-//   - pages/Login.tsx, pages/Register.tsx, pages/MySpace.tsx,
-//     components/UploadCard.tsx (téléversement), page Téléchargement
+//   - context/AuthProvider.tsx (connexion, déconnexion, vérification de
+//     session), context/AuthContext.ts (type User)
+//   - pages/Login.tsx, Register.tsx, MySpace.tsx, Download.tsx
+//   - components/UploadCard.tsx (téléversement)
 // =============================================================================
 
 // Adresse de base de l'API (ex. http://localhost:3000/api), lue dans

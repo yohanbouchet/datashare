@@ -8,9 +8,11 @@
 // Utilise :
 //   - download.service.ts (DownloadService) : getInfo, verify, open
 //   - dto/download-password.dto.ts (VerifyPasswordDto, DownloadFileDto)
+//   - common/rate-limits.ts (STRICT_LIMIT, DOWNLOAD_LIMIT)
 //   - content-disposition (en-tête du nom de fichier, version UTF-8 comprise)
 // Utilisé par :
-//   - files.module.ts (controllers) ; le front (page Téléchargement, à venir)
+//   - files.module.ts (controllers)
+//   - le front, par services/api.ts (downloadApi) : page Téléchargement
 // =============================================================================
 import {
   Body,

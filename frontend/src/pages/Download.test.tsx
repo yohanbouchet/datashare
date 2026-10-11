@@ -1,12 +1,14 @@
 // =============================================================================
 // Fichier : Download.test.tsx
 // Rôle : Tests de la page publique « Télécharger un fichier » (US02) :
-//   informations du fichier (type compris), bandeau d'expiration avec la date, bouton grisé tant que le mot de passe est vide, mot de passe
-//   faux sans téléchargement, lien expiré. Les appels à l'API sont des
-//   doublures, et l'envoi du formulaire par le navigateur est intercepté.
+//   informations du fichier (type compris), bandeau d'expiration avec la
+//   date, bouton grisé tant que le mot de passe est vide, mot de passe faux
+//   sans téléchargement, lien expiré. Les appels à l'API sont des doublures,
+//   et l'envoi du formulaire par le navigateur est intercepté.
 // Utilise :
 //   - pages/Download.tsx (la pièce testée) ; test/render.tsx
-//   - services/api.ts (downloadApi, ApiError) ; Testing Library
+//   - services/api.ts (downloadApi, ApiError) ; utils/format.ts (formatDate)
+//   - Testing Library
 // Utilisé par :
 //   - Vitest (vitest.config.ts)
 // =============================================================================

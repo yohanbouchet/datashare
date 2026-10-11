@@ -11,6 +11,7 @@
 //     déclaré sur la route)
 //   - @nestjs/jwt (JwtService, doublure vide : nécessaire à la garde déclarée
 //     sur le contrôleur)
+//   - auth/jwt-auth.guard.ts, dto/upload-file.dto.ts (types)
 // Utilisé par :
 //   - Vitest (vitest.config.ts)
 // =============================================================================

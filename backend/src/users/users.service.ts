@@ -7,6 +7,7 @@
 //   - user.entity.ts (User) : la forme d'un compte
 //   - @nestjs/typeorm / typeorm : Repository<User> fourni par NestJS
 // Utilisé par :
+//   - users.module.ts (providers, exports)
 //   - auth/auth.service.ts (findByEmail, findByEmailWithPassword, create)
 // =============================================================================
 import { Injectable } from '@nestjs/common';

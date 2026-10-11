@@ -7,6 +7,7 @@
 // Utilise :
 //   - auth.controller.ts (la pièce testée)
 //   - auth.service.ts (AuthService, remplacé par la doublure)
+//   - jwt-auth.guard.ts (type AuthenticatedRequest)
 // Utilisé par :
 //   - Vitest (vitest.config.ts)
 // =============================================================================

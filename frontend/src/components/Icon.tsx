@@ -8,7 +8,8 @@
 // Utilise :
 //   - rien (SVG standard)
 // Utilisé par :
-//   - components/SpaceLayout.tsx, pages/MySpace.tsx (et les écrans suivants)
+//   - components/SpaceLayout.tsx, UploadCard.tsx, FileSummary.tsx
+//   - pages/Home.tsx, MySpace.tsx, Download.tsx
 // =============================================================================
 import type { ReactNode } from 'react';
 

@@ -1,8 +1,8 @@
 // =============================================================================
 // Fichier : format.test.ts
 // Rôle : Tests unitaires des fonctions de mise en forme (npm test) : taille
-//   lisible, date et délais d'expiration. La date « maintenant » est fixée par le
-//   test, pour que le résultat ne dépende pas du jour où il est lancé.
+//   lisible, date et délais d'expiration. La date « maintenant » est fixée
+//   par le test, pour que le résultat ne dépende pas du jour où il est lancé.
 // Utilise :
 //   - utils/format.ts (la pièce testée)
 // Utilisé par :

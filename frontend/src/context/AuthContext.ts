@@ -5,11 +5,12 @@
 //   composants ne doit exporter que des composants (règle du rechargement à
 //   chaud de Vite, vérifiée par Oxlint).
 // Utilise :
-//   - services/api.ts (type Utilisateur)
+//   - services/api.ts (type User)
 //   - react (createContext)
 // Utilisé par :
 //   - context/AuthProvider.tsx (remplit le contexte), context/useAuth.ts (le
 //     lit)
+//   - test/render.tsx (contexte simulé dans les tests)
 // =============================================================================
 import { createContext } from 'react';
 import type { User } from '../services/api.ts';

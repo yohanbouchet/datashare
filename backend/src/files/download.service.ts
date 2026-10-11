@@ -9,6 +9,7 @@
 //   - storage.service.ts (openStream : lecture du fichier sur le disque)
 //   - bcrypt (compare : vérification du mot de passe du fichier)
 // Utilisé par :
+//   - files.module.ts (providers)
 //   - download.controller.ts (getInfo, verify, open)
 // =============================================================================
 import {

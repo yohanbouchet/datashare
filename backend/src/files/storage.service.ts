@@ -18,7 +18,8 @@
 // Utilisé par :
 //   - files.module.ts (providers + MulterModule.registerAsync),
 //     files.service.ts (remove), upload-exception.filter.ts (remove),
-//     request-size.guard.ts (MAX_FILE_SIZE), download.service.ts (openStream)
+//     request-size.guard.ts (MAX_FILE_SIZE), download.service.ts (openStream),
+//     purge.service.ts (remove)
 // =============================================================================
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';

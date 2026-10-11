@@ -4,11 +4,13 @@
 //   1. dès qu'un fichier a expiré, il est effacé du DISQUE (son contenu
 //      disparaît, la place est libérée) et marqué « purgé » (purged_at) ; sa
 //      ligne reste dans l'historique (« Ce fichier a expiré, il n'est plus
-//      stocké chez nous », maquette Mon espace) ;
+//      stocké chez nous », maquette Mon espace), car l'énoncé (US05) demande
+//      d'afficher l'état « expiré » d'un lien ;
 //   2. après HISTORY_RETENTION_DAYS jours, la ligne est supprimée de la base
 //      (tags compris, ON DELETE CASCADE) : conservation limitée (RGPD).
 //   La purge s'exécute au démarrage de l'API (rattrapage si le serveur était
-//   arrêté), puis toutes les PURGE_INTERVAL_MINUTES minutes.
+//   arrêté), puis toutes les PURGE_INTERVAL_MINUTES minutes (60 par défaut :
+//   plus souvent que la purge quotidienne demandée par l'énoncé, US10).
 // Utilise :
 //   - file.entity.ts (FileEntity) via le Repository de TypeORM
 //   - storage.service.ts (remove : suppression sur le disque)

@@ -6,8 +6,8 @@
 // Utilise :
 //   - context/AuthContext.ts (AuthContext, type AuthValue)
 // Utilisé par :
-//   - components/Header.tsx, pages/Login.tsx (brique 3), et toute page qui a
-//     besoin de l'utilisateur
+//   - components/Header.tsx, RequireAuth.tsx, SpaceLayout.tsx, UploadCard.tsx
+//   - pages/Home.tsx, Login.tsx, Register.tsx, MySpace.tsx
 // =============================================================================
 import { useContext } from 'react';
 import { AuthContext, type AuthValue } from './AuthContext.ts';

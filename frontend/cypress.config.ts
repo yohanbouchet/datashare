@@ -1,6 +1,15 @@
-// Configuration de Cypress : tests de bout en bout dans un VRAI navigateur,
-// sur l'application complète (front + API + base). Prérequis : la base Docker,
-// l'API (npm run start:dev) et le front (npm run dev) sont démarrés.
+// =============================================================================
+// Fichier : cypress.config.ts
+// Rôle : Configuration de Cypress : tests de bout en bout dans un VRAI
+//   navigateur, sur l'application complète (front + API + base). Prérequis :
+//   la base Docker, l'API (npm run start:dev) et le front (npm run dev) sont
+//   démarrés.
+// Utilise :
+//   - cypress/e2e/*.cy.ts (les scénarios) ; cypress/fixtures/ (fichiers
+//     envoyés)
+// Utilisé par :
+//   - package.json (scripts cy:open, cy:run, cy:video)
+// =============================================================================
 import { defineConfig } from 'cypress';
 
 export default defineConfig({

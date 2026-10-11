@@ -16,7 +16,9 @@
 //   - auth/jwt-auth.guard.ts (JwtAuthGuard, type AuthenticatedRequest) : vigile
 //     + utilisateur du jeton
 // Utilisé par :
-//   - files.module.ts (controllers) ; le front (écran « Mon espace », à venir)
+//   - files.module.ts (controllers)
+//   - le front, par services/api.ts (filesApi) : carte de téléversement et
+//     page Mon espace
 // =============================================================================
 import {
   BadRequestException,

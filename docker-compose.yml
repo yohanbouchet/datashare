@@ -1,3 +1,13 @@
+# =============================================================================
+# Fichier : docker-compose.yml
+# Rôle : Service PostgreSQL de DataShare (développement et démonstration),
+#   construit à partir de database/Dockerfile ; données dans un volume,
+#   port publié sur la machine seulement, contrôle de santé, journaux limités.
+# Utilise :
+#   - database/Dockerfile ; .env (POSTGRES_*)
+# Utilisé par :
+#   - scripts/deploy.sh ; commandes docker compose (README, MAINTENANCE.md)
+# =============================================================================
 services:
   db:
     build: ./database                  # notre image : l'officielle sans gosu (database/Dockerfile)

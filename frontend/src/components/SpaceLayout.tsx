@@ -41,7 +41,7 @@ export function SpaceLayout() {
         Aller au contenu
       </a>
 
-      {/* Barre latérale : toujours visible sur ordinateur, tiroir sur mobile */}
+      {/* Barre latérale : visible sur ordinateur, tiroir sur mobile */}
       <aside
         id="space-menu"
         className={`space__sidebar${menuOpen ? ' space__sidebar--open' : ''}`}

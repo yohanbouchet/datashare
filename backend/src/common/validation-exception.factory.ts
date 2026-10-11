@@ -9,7 +9,7 @@
 // Utilise :
 //   - class-validator (type ValidationError : le détail d'une erreur)
 // Utilisé par :
-//   - main.ts (ValidationPipe, option exceptionFactory)
+//   - app.setup.ts (ValidationPipe, option exceptionFactory)
 // =============================================================================
 import { BadRequestException } from '@nestjs/common';
 import type { ValidationError } from 'class-validator';

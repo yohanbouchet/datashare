@@ -7,7 +7,8 @@
 // Utilise :
 //   - rien (fonctions JavaScript standard)
 // Utilisé par :
-//   - pages Mon espace, Téléversement et Téléchargement
+//   - pages/MySpace.tsx, pages/Download.tsx
+//   - components/FileSummary.tsx
 // =============================================================================
 
 const UNITS = ['o', 'Ko', 'Mo', 'Go'];

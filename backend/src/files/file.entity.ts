@@ -13,8 +13,9 @@
 //   - tag.entity.ts (Tag) : les tags du fichier (association ÉTIQUETER du MCD)
 // Utilisé par :
 //   - files.module.ts (forFeature), database/data-source.ts (migrations)
-//   - plus tard : les services des US01 (upload), US02 (téléchargement), US05
-//     (historique), US06 (suppression)
+//   - tag.entity.ts (relation inverse)
+//   - files.service.ts (US01, US05, US06), download.service.ts (US02),
+//     purge.service.ts (US10)
 // =============================================================================
 import {
   Column,

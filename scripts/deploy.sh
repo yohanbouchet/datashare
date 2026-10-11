@@ -22,6 +22,8 @@
 #   - .env.example, frontend/.env.example, docker-compose.yml,
 #     database/Dockerfile
 #   - backend/package.json (script migration:run)
+# Utilisé par :
+#   - l'administrateur, à l'installation et après chaque git pull (README)
 # =============================================================================
 # -e : arrêt à la 1re erreur ; -u : variable inconnue = erreur ; pipefail :
 # une erreur dans un enchaînement de commandes (|) n'est pas masquée

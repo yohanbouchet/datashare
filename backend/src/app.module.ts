@@ -2,15 +2,18 @@
 // Fichier : app.module.ts
 // Rôle : Module racine de l'API : le « sommaire » de l'application. Charge la
 //   configuration (.env), ouvre la connexion à PostgreSQL, active les tâches
-//   planifiées et déclare tous les modules fonctionnels.
+//   planifiées et la limitation des tentatives, et déclare tous les modules
+//   fonctionnels.
 // Utilise :
 //   - .env (racine) : variables POSTGRES_* lues par ConfigModule /
 //     ConfigService
 //   - users/users.module.ts (UsersModule), auth/auth.module.ts (AuthModule),
 //     files/files.module.ts (FilesModule)
 //   - @nestjs/schedule (ScheduleModule) : tâches planifiées (purge, US10)
+//   - @nestjs/throttler + common/rate-limits.ts : limitation des tentatives
 // Utilisé par :
 //   - main.ts (NestFactory.create(AppModule))
+//   - test/e2e-app.ts (API démarrée pour les tests de bout en bout)
 // =============================================================================
 import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';

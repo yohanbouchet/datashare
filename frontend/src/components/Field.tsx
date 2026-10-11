@@ -8,8 +8,8 @@
 // Utilise :
 //   - index.css : classes field, field__label, field__input, field__error
 // Utilisé par :
-//   - pages/Login.tsx, pages/Register.tsx (et plus tard les formulaires de
-//     fichiers)
+//   - pages/Login.tsx, Register.tsx, Download.tsx
+//   - components/UploadCard.tsx
 // =============================================================================
 import type { ChangeEvent } from 'react';
 

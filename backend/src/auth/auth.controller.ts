@@ -11,10 +11,11 @@
 //     règles des données reçues
 //   - jwt-auth.guard.ts (JwtAuthGuard, type AuthenticatedRequest) : protège /me
 //     et fournit request.user
+//   - common/rate-limits.ts (STRICT_LIMIT) : 5 essais par minute
 // Utilisé par :
 //   - auth.module.ts (déclaré dans controllers)
-//   - le front (formulaires d'inscription et de connexion, vérification de
-//     session au rechargement : à venir)
+//   - le front, par services/api.ts (authApi) : inscription, connexion,
+//     vérification de session au rechargement
 // =============================================================================
 import {
   Body,

@@ -7,6 +7,7 @@
 //   - typeorm (QueryRunner) : exécute le SQL
 // Utilisé par :
 //   - database/data-source.ts (liste des migrations) ; npm run migration:run /
+//   - test/e2e-global-setup.ts (base de test)
 //     migration:revert
 // =============================================================================
 import { MigrationInterface, QueryRunner } from 'typeorm';

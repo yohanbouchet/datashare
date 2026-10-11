@@ -1,7 +1,16 @@
-// Configuration de Vitest pour les tests END-TO-END (npm run test:e2e) du
-// back-end : l'API complète est démarrée et interrogée par de vraies requêtes
-// HTTP (supertest), sur une base PostgreSQL de TEST (datashare_test).
-// Prérequis : la base Docker est démarrée (docker compose up -d --wait).
+// =============================================================================
+// Fichier : vitest.config.e2e.ts
+// Rôle : Configuration de Vitest pour les tests DE BOUT EN BOUT du back-end
+//   (npm run test:e2e) : l'API complète est démarrée et interrogée par de
+//   vraies requêtes HTTP (supertest), sur une base PostgreSQL de TEST
+//   (datashare_test). Prérequis : la base Docker est démarrée
+//   (docker compose up -d --wait).
+// Utilise :
+//   - test/e2e-env.ts (E2E_ENV), test/e2e-global-setup.ts (globalSetup)
+//   - vite-tsconfig-paths
+// Utilisé par :
+//   - package.json (scripts test:e2e, test:e2e:cov)
+// =============================================================================
 import { defineConfig } from 'vitest/config';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import { E2E_ENV } from './test/e2e-env.js';

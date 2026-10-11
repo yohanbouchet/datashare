@@ -7,6 +7,7 @@
 //   - typeorm (paquet npm) : décorateurs @Entity, @Column…
 // Utilisé par :
 //   - users.module.ts (forFeature), users.service.ts (Repository<User>)
+//   - files/file.entity.ts (propriétaire d'un fichier)
 //   - database/data-source.ts (génération des migrations)
 // =============================================================================
 import {

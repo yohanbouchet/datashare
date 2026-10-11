@@ -7,8 +7,8 @@
 // Utilise :
 //   - index.css : classes banner, banner--info, banner--warning, banner--error
 // Utilisé par :
-//   - pages/Login.tsx, pages/Register.tsx (et plus tard la page de
-//     téléchargement)
+//   - pages/Login.tsx, Register.tsx, MySpace.tsx, Download.tsx
+//   - components/UploadCard.tsx
 // =============================================================================
 import type { ReactNode } from 'react';
 

@@ -19,6 +19,9 @@
 # Utilise :
 #   - backend/, frontend/ (package-lock.json) ; database/Dockerfile ;
 #     Docker (conteneurs lancés)
+# Utilisé par :
+#   - l'administrateur, chaque semaine (MAINTENANCE.md) ; intégration continue
+#     (évolution)
 # =============================================================================
 set -uo pipefail
 cd "$(dirname "$0")/.." || exit 1

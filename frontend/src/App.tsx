@@ -1,11 +1,13 @@
 // =============================================================================
 // Fichier : App.tsx
 // Rôle : Composant racine : la table de navigation (quelle adresse affiche
-//   quelle page). Toutes les pages sont « enfants » du Layout : elles partagent
-//   l'en-tête et le pied de page.
+//   quelle page). Les pages publiques sont « enfants » du Layout (en-tête et
+//   pied de page communs) ; Mon espace est protégé par RequireAuth et affiché
+//   dans SpaceLayout.
 // Utilise :
 //   - react-router (Routes, Route)
-//   - components/Layout.tsx ; pages/Accueil, Connexion, Inscription, NotFound
+//   - components/Layout.tsx, RequireAuth.tsx, SpaceLayout.tsx
+//   - pages/Home, Login, Register, Download, MySpace, NotFound
 // Utilisé par :
 //   - main.tsx
 // =============================================================================

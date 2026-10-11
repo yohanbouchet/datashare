@@ -97,7 +97,8 @@ describe('Téléchargement public (e2e)', () => {
       .type('form')
       .send({ password: 'faux123' })
       .expect(401);
-    // Formulaire envoyé comme par le navigateur (application/x-www-form-urlencoded)
+    // Formulaire envoyé comme par le navigateur
+    // (application/x-www-form-urlencoded)
     await api()
       .post(`/api/download/${protectedToken}`)
       .type('form')
