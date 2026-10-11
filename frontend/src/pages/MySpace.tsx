@@ -3,8 +3,10 @@
 // Rôle : Page « Mes fichiers » (adresse /mon-espace, US05 et US06), conforme
 //   à la maquette :
 //   1. charge l'historique depuis l'API (GET /api/files?status=…) selon le
-//      filtre choisi : Tous (par défaut, comme la maquette), Actifs, Expiré ;
-//   2. affiche chaque fichier : nom, délai d'expiration, cadenas s'il est
+//      filtre choisi : Tous, Actifs (par défaut : seuls les fichiers non
+//      expirés, règle de l'énoncé US06), Expiré ;
+//   2. affiche chaque fichier (US05) : nom, taille, date d'envoi, date
+//      d'expiration, état du lien (délai ou « Expiré »), cadenas s'il est
 //      protégé, boutons « Supprimer » et « Accéder » (menu « ⋮ » sur mobile) ;
 //   3. supprime un fichier après confirmation (DELETE /api/files/:id).
 //   Session expirée (401) → déconnexion et retour à la page de connexion.
@@ -25,7 +27,7 @@ import {
   type FileHistoryItem,
   type FileStatus,
 } from '../services/api.ts';
-import { expiryLabel } from '../utils/format.ts';
+import { expiryLabel, formatDate, formatSize } from '../utils/format.ts';
 
 // Les 3 options de l'interrupteur (valeur envoyée à l'API + texte affiché)
 const FILTERS: { value: FileStatus; label: string }[] = [
@@ -37,8 +39,9 @@ const FILTERS: { value: FileStatus; label: string }[] = [
 export function MySpace() {
   const { logout } = useAuth();
   const navigate = useNavigate();
-  // Mémoire de la page
-  const [status, setStatus] = useState<FileStatus>('all');
+  // Mémoire de la page. Filtre « Actifs » par défaut : l'énoncé (US06) veut
+  // que seuls les fichiers non expirés soient affichés par défaut
+  const [status, setStatus] = useState<FileStatus>('active');
   // null = en cours de chargement ; [] = aucun fichier
   const [files, setFiles] = useState<FileHistoryItem[] | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -187,6 +190,11 @@ function FileRow({ file, onDelete }: FileRowProps) {
         {/* title : infobulle avec le nom complet, s'il est coupé par « … » */}
         <p className="file-row__name" title={file.originalName}>
           {file.originalName}
+        </p>
+        {/* Taille et dates demandées par l'énoncé (US05) */}
+        <p className="file-row__meta">
+          {formatSize(file.size)} · envoyé le {formatDate(file.createdAt)} ·{' '}
+          {file.isExpired ? 'expiré' : 'expire'} le {formatDate(file.expiresAt)}
         </p>
         <p
           className={`file-row__expiry${file.isExpired ? ' file-row__expiry--expired' : ''}`}

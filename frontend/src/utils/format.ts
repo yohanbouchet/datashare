@@ -1,8 +1,9 @@
 // =============================================================================
 // Fichier : format.ts
 // Rôle : Fonctions de mise en forme partagées par les écrans (aucun affichage
-//   ici) : taille lisible (« 2,6 Mo ») et délai d'expiration en français
-//   (« Expire dans 2 jours », « Expire demain », « Expiré »).
+//   ici) : taille lisible (« 2,6 Mo »), date (« 08/10/2026 ») et délai
+//   d'expiration en français (« Expire dans 2 jours », « Expire demain »,
+//   « Expiré »).
 // Utilise :
 //   - rien (fonctions JavaScript standard)
 // Utilisé par :
@@ -23,6 +24,12 @@ export function formatSize(bytes: number): string {
   }
   const digits = unit === 0 ? 0 : 1;
   return `${value.toLocaleString('fr-FR', { maximumFractionDigits: digits })} ${UNITS[unit]}`;
+}
+
+// « 2026-10-08T09:00:00.000Z » → « 08/10/2026 » : date à la française, dans
+// le fuseau horaire du navigateur
+export function formatDate(isoDate: string): string {
+  return new Date(isoDate).toLocaleDateString('fr-FR');
 }
 
 // Nombre de jours CALENDAIRES entre aujourd'hui et la date d'expiration :

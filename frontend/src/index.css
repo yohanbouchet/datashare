@@ -508,6 +508,13 @@ a {
   white-space: nowrap;
 }
 
+/* Taille et dates (US05) : ligne discrète sous le nom */
+.file-row__meta {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 0.75rem;
+}
+
 .file-row__expiry {
   margin: 0;
   font-size: 0.8rem;
