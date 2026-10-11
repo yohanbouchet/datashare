@@ -5,18 +5,20 @@
 #   1. npm audit : failles connues dans les dépendances (back et front) ;
 #   2. trivy : 2e avis sur les dépendances (autre base de failles), à partir
 #      des package-lock.json ;
-#   3. trivy : failles des images de TOUS les conteneurs en cours
+#   3. hadolint : bonnes pratiques de notre Dockerfile (database/) ;
+#   4. trivy : failles des images de TOUS les conteneurs en cours
 #      d'exécution (aujourd'hui, la base PostgreSQL), pour information
 #      (décisions dans SECURITY.md).
 #   De nouvelles failles sont publiées chaque jour : le script est à relancer
 #   chaque semaine (procédure dans MAINTENANCE.md).
-#   trivy est lancé depuis son image Docker officielle : rien à installer.
-#   Le script échoue (code de sortie 1) si une faille HAUTE ou CRITIQUE est
-#   trouvée dans nos dépendances : utilisable tel quel dans une intégration
-#   continue.
+#   trivy et hadolint sont lancés depuis leurs images Docker officielles :
+#   rien à installer. Le script échoue (code de sortie 1) si une faille HAUTE
+#   ou CRITIQUE est trouvée dans nos dépendances, ou si hadolint fait une
+#   remarque : utilisable tel quel dans une intégration continue.
 # Usage (depuis n'importe quel dossier) : scripts/scan-security.sh
 # Utilise :
-#   - backend/, frontend/ (package-lock.json) ; Docker (conteneurs lancés)
+#   - backend/, frontend/ (package-lock.json) ; database/Dockerfile ;
+#     Docker (conteneurs lancés)
 # =============================================================================
 set -uo pipefail
 cd "$(dirname "$0")/.." || exit 1
@@ -43,7 +45,11 @@ for project in backend frontend; do
     || failed=1
 done
 
-echo "=== 3. trivy (images des conteneurs en cours d'exécution) ==="
+echo "=== 3. hadolint (database/Dockerfile) ==="
+docker run --rm -i hadolint/hadolint:v2.14.0 < database/Dockerfile \
+  && echo "aucune remarque" || failed=1
+
+echo "=== 4. trivy (images des conteneurs en cours d'exécution) ==="
 # docker ps : conteneurs lancés ; sort -u : chaque image une seule fois
 images="$(docker ps --format '{{.Image}}' | sort -u)"
 if [ -z "$images" ]; then
@@ -55,7 +61,7 @@ for image in $images; do
 done
 
 if [ "$failed" -eq 0 ]; then
-  echo "✅ Aucune faille haute ou critique dans nos dépendances."
+  echo "✅ Tous les contrôles de sécurité sont passés."
 else
   echo "❌ Au moins un contrôle a échoué (voir ci-dessus)." >&2
 fi

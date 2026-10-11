@@ -11,14 +11,16 @@
 #      ALÉATOIREMENT (jamais de secret par défaut) ;
 #   3. installe les dépendances du back et du front (versions exactes du
 #      package-lock.json) ;
-#   4. démarre PostgreSQL et attend qu'il soit prêt ;
+#   4. construit l'image PostgreSQL (database/Dockerfile), démarre la base
+#      et attend qu'elle soit prête ;
 #   5. crée ou met à jour les tables (migrations) ;
 #   6. affiche les commandes de lancement.
 #   Relançable sans risque : un .env existant n'est jamais modifié, et seules
 #   les migrations en attente sont appliquées (mise à jour après un git pull).
 # Usage (depuis n'importe quel dossier) : scripts/deploy.sh
 # Utilise :
-#   - .env.example, frontend/.env.example, docker-compose.yml
+#   - .env.example, frontend/.env.example, docker-compose.yml,
+#     database/Dockerfile
 #   - backend/package.json (script migration:run)
 # =============================================================================
 # -e : arrêt à la 1re erreur ; -u : variable inconnue = erreur ; pipefail :
@@ -63,9 +65,10 @@ echo "▶ 3/5 Installation des dépendances"
 (cd backend && npm ci)
 (cd frontend && npm ci)
 
-# 4. Base de données : démarrage et attente du healthcheck
+# 4. Base de données : construction de l'image (--build : reconstruite si le
+# Dockerfile a changé), démarrage et attente du healthcheck
 echo "▶ 4/5 Démarrage de PostgreSQL"
-docker compose up -d --wait
+docker compose up -d --build --wait
 
 # 5. Tables : migrations versionnées (seules celles en attente sont appliquées)
 echo "▶ 5/5 Migrations de la base"
