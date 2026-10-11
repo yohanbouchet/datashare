@@ -13,6 +13,11 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
+    logging:                           # rotation des journaux : 3 fichiers de 10 Mo au plus
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
 
 volumes:
   db-data:
