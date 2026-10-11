@@ -82,6 +82,12 @@ export function UploadCard({ file, onChangeFile }: UploadCardProps) {
       .filter((tag) => tag !== '');
   }
 
+  // Un champ modifié perd son message d'erreur (il sera recalculé au
+  // prochain envoi)
+  function clearError(field: keyof UploadErrors) {
+    setErrors((current) => ({ ...current, [field]: undefined }));
+  }
+
   // Validation côté client : confort (l'API applique les mêmes règles)
   function validate(): UploadErrors {
     const found: UploadErrors = {};
@@ -227,7 +233,10 @@ export function UploadCard({ file, onChangeFile }: UploadCardProps) {
           label="Mot de passe"
           type="password"
           value={password}
-          onChange={setPassword}
+          onChange={(value) => {
+            setPassword(value);
+            clearError('password');
+          }}
           placeholder="Optionnel"
           autoComplete="new-password"
           error={errors.password}
@@ -253,7 +262,10 @@ export function UploadCard({ file, onChangeFile }: UploadCardProps) {
           id="file-tags"
           label="Tags"
           value={tags}
-          onChange={setTags}
+          onChange={(value) => {
+            setTags(value);
+            clearError('tags');
+          }}
           placeholder="Optionnel, séparés par des virgules"
           error={errors.tags}
         />
