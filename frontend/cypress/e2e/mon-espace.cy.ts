@@ -37,8 +37,8 @@ describe('Parcours : historique et suppression', () => {
     // Cypress relancerait la recherche plus tard, sur une autre page)
     cy.get('.upload-card__link').invoke('text').as('link', { type: 'static' });
 
-    // Mon espace : le fichier apparaît dans « Tous » et « Actifs »,
-    // pas dans « Expiré »
+    // Mon espace : le fichier apparaît dans « Actifs » (filtre par défaut)
+    // et « Tous », pas dans « Expiré »
     cy.visit('/mon-espace');
     cy.contains('li', 'rapport-annuel.txt').should(
       'contain.text',
@@ -46,7 +46,7 @@ describe('Parcours : historique et suppression', () => {
     );
     cy.contains('button', 'Expiré').click();
     cy.contains('Aucun fichier à afficher.');
-    cy.contains('button', 'Actifs').click();
+    cy.contains('button', 'Tous').click();
     cy.contains('li', 'rapport-annuel.txt');
 
     // Suppression : la boîte de confirmation est remplacée par une doublure

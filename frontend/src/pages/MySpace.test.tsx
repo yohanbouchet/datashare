@@ -41,7 +41,30 @@ describe('Page Mes fichiers', () => {
     vi.mocked(filesApi.remove).mockReset();
   });
 
-  it('affiche tous les fichiers par défaut, avec cadenas et fichier expiré', async () => {
+  it('affiche les fichiers actifs par défaut (US06), avec taille et dates (US05)', async () => {
+    vi.mocked(filesApi.list).mockResolvedValue([
+      file({
+        id: 1,
+        originalName: 'photo.jpg',
+        size: 2726297,
+        createdAt: new Date(2026, 9, 8, 12, 0).toISOString(),
+        expiresAt: new Date(2026, 9, 15, 12, 0).toISOString(),
+      }),
+    ]);
+    renderPage(<MySpace />, { auth: { user } });
+
+    expect(await screen.findByText('photo.jpg')).toBeInTheDocument();
+    expect(filesApi.list).toHaveBeenCalledWith('active');
+    expect(screen.getByRole('button', { name: 'Actifs' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    expect(
+      screen.getByText('2,6 Mo · envoyé le 08/10/2026 · expire le 15/10/2026'),
+    ).toBeInTheDocument();
+  });
+
+  it('affiche le cadenas et un fichier expiré', async () => {
     vi.mocked(filesApi.list).mockResolvedValue([
       file({ id: 1, originalName: 'photo.jpg', isProtected: true }),
       file({
@@ -54,27 +77,22 @@ describe('Page Mes fichiers', () => {
     renderPage(<MySpace />, { auth: { user } });
 
     expect(await screen.findByText('photo.jpg')).toBeInTheDocument();
-    expect(filesApi.list).toHaveBeenCalledWith('all');
-    expect(screen.getByRole('button', { name: 'Tous' })).toHaveAttribute(
-      'aria-pressed',
-      'true',
-    );
     expect(screen.getByText('Protégé par mot de passe')).toBeInTheDocument();
     expect(
       screen.getByText("Ce fichier a expiré, il n'est plus stocké chez nous"),
     ).toBeInTheDocument();
   });
 
-  it('recharge la liste quand on choisit le filtre « Actifs »', async () => {
+  it('recharge la liste quand on choisit le filtre « Tous »', async () => {
     vi.mocked(filesApi.list).mockResolvedValue([]);
     renderPage(<MySpace />, { auth: { user } });
 
     expect(
       await screen.findByText('Aucun fichier à afficher.'),
     ).toBeInTheDocument();
-    await userEvent.click(screen.getByRole('button', { name: 'Actifs' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Tous' }));
 
-    expect(filesApi.list).toHaveBeenLastCalledWith('active');
+    expect(filesApi.list).toHaveBeenLastCalledWith('all');
   });
 
   it('supprime un fichier après confirmation, et rien sans confirmation', async () => {

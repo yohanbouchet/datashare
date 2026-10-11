@@ -1,14 +1,14 @@
 // =============================================================================
 // Fichier : format.test.ts
 // Rôle : Tests unitaires des fonctions de mise en forme (npm test) : taille
-//   lisible et délais d'expiration. La date « maintenant » est fixée par le
+//   lisible, date et délais d'expiration. La date « maintenant » est fixée par le
 //   test, pour que le résultat ne dépende pas du jour où il est lancé.
 // Utilise :
 //   - utils/format.ts (la pièce testée)
 // Utilisé par :
 //   - Vitest (vitest.config.ts)
 // =============================================================================
-import { daysUntil, expiryLabel, formatSize } from './format.ts';
+import { daysUntil, expiryLabel, formatDate, formatSize } from './format.ts';
 
 describe('formatSize', () => {
   it('affiche octets, Ko, Mo et Go avec une virgule à la française', () => {
@@ -17,6 +17,15 @@ describe('formatSize', () => {
     expect(formatSize(2726297)).toBe('2,6 Mo');
     expect(formatSize(1024 ** 3)).toBe('1 Go');
     expect(formatSize(1.1 * 1024 ** 3)).toBe('1,1 Go');
+  });
+});
+
+describe('formatDate', () => {
+  it('affiche la date à la française (jour/mois/année)', () => {
+    // Le 8 octobre 2026 à midi, heure locale
+    expect(formatDate(new Date(2026, 9, 8, 12, 0).toISOString())).toBe(
+      '08/10/2026',
+    );
   });
 });
 
