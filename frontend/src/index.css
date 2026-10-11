@@ -1,13 +1,19 @@
 /* =============================================================================
    Fichier : index.css
    Rôle : Styles globaux de l'application, d'après les maquettes Figma.
-     Les couleurs et réglages communs sont des VARIABLES (--nom) définies une seule fois dans :root,
-     puis réutilisées partout : changer une couleur = modifier une seule ligne.
-     Mobile d'abord : les règles de base visent le téléphone, @media (min-width: 768px) adapte à l'ordinateur.
+     Les couleurs et réglages communs sont des VARIABLES (--nom) définies une
+     seule fois dans :root, puis réutilisées partout : changer une couleur =
+     modifier une seule ligne.
+     ♿ Les couleurs de TEXTE respectent le contraste minimal de la norme WCAG
+     (4,5:1) : celles de la maquette trop claires ont été foncées (audit
+     Lighthouse, PERF.md).
+     Mobile d'abord : les règles de base visent le téléphone,
+     @media (min-width: 768px) adapte à l'ordinateur.
    Utilise :
      - police DM Sans (chargée dans index.html)
    Utilisé par :
-     - main.tsx (import './index.css') ; classes utilisées dans components/ et pages/
+     - main.tsx (import './index.css') ; classes utilisées dans components/
+       et pages/
    ========================================================================== */
 
 /* ---- Variables : couleurs relevées dans Figma (panneau « Couleurs » des
@@ -26,18 +32,18 @@
     13,
     0.15
   ); /* anneau autour du bouton rond (#2F190D à 15 %) */
-  --color-accent: #e27f29; /* liens orange (« Créer un compte ») */
-  --color-accent-text: #ba681f; /* texte des boutons orange */
+  --color-accent: #a0561a; /* liens orange (« Créer un compte ») : 5,5:1 */
+  --color-accent-text: #a0561a; /* texte des boutons orange : 4,9:1 */
   --color-accent-bg: #ffeeec; /* fond des boutons orange */
   --color-accent-border: #ffa569; /* bordure des boutons orange */
-  --color-error: #f14343; /* messages d'erreur sous les champs */
+  --color-error: #c62828; /* messages d'erreur sous les champs : 5,6:1 */
   /* Bandeaux (« Callout Component ») : information, alerte, erreur */
   --info-bg: #e2ecff;
   --info-border: #b1c9f5;
   --info-text: #2a3f72;
   --warning-bg: #fff5ed;
   --warning-border: #e6cbb5;
-  --warning-text: #aa642b;
+  --warning-text: #8f4d16; /* texte du bandeau orange : 6:1 */
   --error-bg: #ffe2e2;
   --error-border: #e8a6a6;
   --error-text: #9c3333;
@@ -52,7 +58,7 @@
   --space-bg: #fff8f3; /* fond du contenu */
   --space-topbar: #ffeee3; /* barre du haut, fond de l'interrupteur */
   --space-nav-text: #803a00; /* lien « Mes fichiers » de la barre latérale */
-  --switch-selected: #e77a6e; /* option sélectionnée de l'interrupteur */
+  --switch-selected: #bb4d43; /* option sélectionnée (texte blanc : 4,9:1) */
   --row-border: #f1e9e2; /* bordure des lignes de fichiers */
   --color-text-secondary: #6b6b6b; /* textes secondaires (contraste ≥ 4,5:1) */
   font-family: 'DM Sans', system-ui, sans-serif;

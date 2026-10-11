@@ -1,0 +1,10 @@
+# Fichier : robots.txt
+# Rôle : Consignes aux moteurs de recherche (Google…). 🔒 Les liens de
+#   partage (/d/…) et l'espace personnel ne doivent jamais être indexés :
+#   un lien partagé reste confidentiel.
+# Utilisé par :
+#   - les robots des moteurs de recherche (copié tel quel par Vite à la
+#     racine du site : /robots.txt)
+User-agent: *
+Disallow: /d/
+Disallow: /mon-espace
