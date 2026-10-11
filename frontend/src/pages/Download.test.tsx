@@ -101,6 +101,12 @@ describe('Page Télécharger un fichier', () => {
       await screen.findByText('Mot de passe incorrect'),
     ).toBeInTheDocument();
     expect(submit).not.toHaveBeenCalled();
+
+    // Nouvelle saisie : le message disparaît
+    await userEvent.type(screen.getByLabelText('Mot de passe'), '4');
+    expect(
+      screen.queryByText('Mot de passe incorrect'),
+    ).not.toBeInTheDocument();
   });
 
   it('bon mot de passe : le formulaire part vers l’API, mot de passe dans le corps', async () => {

@@ -70,6 +70,12 @@ describe('Carte « Ajouter un fichier »', () => {
       screen.getByText('Un même tag ne peut pas être ajouté deux fois'),
     ).toBeInTheDocument();
     expect(filesApi.upload).not.toHaveBeenCalled();
+
+    // Le message disparaît dès que le champ est modifié
+    await userEvent.type(screen.getByLabelText('Tags'), 's');
+    expect(
+      screen.queryByText('Un même tag ne peut pas être ajouté deux fois'),
+    ).not.toBeInTheDocument();
   });
 
   it('envoie le fichier, la durée, le mot de passe et les tags, puis affiche le lien', async () => {

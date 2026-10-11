@@ -35,6 +35,23 @@ describe('Page Connexion', () => {
     expect(auth.login).not.toHaveBeenCalled();
   });
 
+  it('efface le message d’un champ dès qu’on le corrige', async () => {
+    renderPage(<Login />);
+    await userEvent.click(screen.getByRole('button', { name: 'Connexion' }));
+
+    await userEvent.type(screen.getByLabelText('Email'), 'c');
+
+    expect(
+      screen.queryByText("L'adresse email n'est pas valide"),
+    ).not.toBeInTheDocument();
+    // Le champ n'est plus signalé en erreur aux lecteurs d'écran
+    expect(screen.getByLabelText('Email')).not.toHaveAttribute('aria-invalid');
+    // L'autre champ, non modifié, garde son message
+    expect(
+      screen.getByText('Le mot de passe est obligatoire'),
+    ).toBeInTheDocument();
+  });
+
   it('connecte l’utilisateur (email sans espaces) et revient à l’accueil', async () => {
     const auth = renderPage(<Login />, {
       auth: { login: vi.fn().mockResolvedValue(undefined) },

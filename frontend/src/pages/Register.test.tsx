@@ -54,6 +54,12 @@ describe('Page Créer un compte', () => {
       screen.getByText('Les mots de passe ne correspondent pas'),
     ).toBeInTheDocument();
     expect(authApi.register).not.toHaveBeenCalled();
+
+    // Le message disparaît dès que le champ est modifié
+    await userEvent.type(screen.getByLabelText('Mot de passe'), 'x');
+    expect(
+      screen.queryByText('Le mot de passe doit contenir au moins 8 caractères'),
+    ).not.toBeInTheDocument();
   });
 
   it('crée le compte puis mène à la page de connexion', async () => {
