@@ -70,7 +70,7 @@ Légende : ✅ en place · 🔜 prévu (étape indiquée)
 | Fichier enregistré, jamais ouvert dans la page | ✅ | US02 : `Content-Disposition: attachment` ; type (`Content-Type`) déduit de l'extension par le serveur, sans se fier au type déclaré à l'envoi ; avec `X-Content-Type-Options: nosniff` (helmet), un fichier HTML ou SVG piégé ne peut pas s'exécuter sur le domaine de l'API |
 | Envoi en flux | ✅ | US02 : le fichier est lu sur le disque et envoyé morceau par morceau (jamais entièrement en mémoire) ; fichier absent du disque → 404 avant tout envoi |
 | Documentation de l'API non publiée en production | ✅ | La page OpenAPI (`/api/docs`) n'existe que si `API_DOCS=true` (développement) : en production, la carte complète des routes n'est pas exposée |
-| Limitation des tentatives (anti-force brute) | ✅ | `@nestjs/throttler`, compteur par adresse IP et par route sur une minute : **5** essais pour l'inscription, la connexion et la vérification du mot de passe d'un fichier ; **10** téléchargements (qui revérifient le mot de passe) ; **100** requêtes pour toute autre route. Au-delà : 429 « Trop de tentatives. Réessaie dans une minute. » avec l'en-tête `Retry-After`. Limites réunies dans `backend/src/common/rate-limits.ts`. En production derrière un proxy (Docker, étape 5), activer `trust proxy` pour compter la vraie adresse du client ; avec plusieurs instances de l'API, partager les compteurs (ex. Redis) |
+| Limitation des tentatives (anti-force brute) | ✅ | `@nestjs/throttler`, compteur par adresse IP et par route sur une minute : **5** essais pour l'inscription, la connexion et la vérification du mot de passe d'un fichier ; **10** téléchargements (qui revérifient le mot de passe) ; **100** requêtes pour toute autre route. Au-delà : 429 « Trop de tentatives. Réessaie dans une minute. » avec l'en-tête `Retry-After`. Limites réunies dans `backend/src/common/rate-limits.ts`. Si l'API est placée un jour derrière un proxy inverse (évolution), activer `trust proxy` pour compter la vraie adresse du client ; avec plusieurs instances de l'API, partager les compteurs (ex. Redis) |
 
 ### Front-end
 
@@ -106,8 +106,8 @@ L'[OWASP Top 10](https://top10.owasp.org/2025) recense les 10 risques de sécuri
 | Risque OWASP | Mesures en place dans DataShare | Limites ou évolutions |
 |---|---|---|
 | **A01 Broken Access Control** (contrôle d'accès défaillant) | Garde JWT sur toutes les routes privées ; identité lue dans le jeton signé, jamais dans un paramètre (un `userId` envoyé est refusé, 400) ; recherche par numéro **et** propriétaire, 404 pour le fichier d'un autre ; lien de partage non devinable (256 bits) ; vérifié par les tests e2e (Claire ne voit ni ne supprime les fichiers de Bob) | — |
-| **A02 Security Misconfiguration** (mauvaise configuration) | En-têtes helmet ; CORS limité au front ; secrets dans `.env`, hors de Git ; démarrage refusé si une variable manque ; base exposée seulement sur `127.0.0.1` ; documentation OpenAPI désactivée en production ; erreurs 500 sans détail technique | Configuration de production (HTTPS, Docker) : étape 5 |
-| **A03 Software Supply Chain Failures** (chaîne d'approvisionnement) | `package-lock.json` (versions exactes) ; `npm audit` à 0 vulnérabilité ; outil inutile retiré ; scripts d'installation bloqués par npm 11 ; versions LTS suivies (MAINTENANCE.md, endoflife.date) | Scan des images Docker par `trivy` (étape 5) ; mise à jour automatisée (Dependabot) en évolution |
+| **A02 Security Misconfiguration** (mauvaise configuration) | En-têtes helmet ; CORS limité au front ; secrets dans `.env`, hors de Git ; démarrage refusé si une variable manque ; base exposée seulement sur `127.0.0.1` ; documentation OpenAPI désactivée en production ; erreurs 500 sans détail technique | HTTPS à la mise en production (certificat, ex. Let's Encrypt) |
+| **A03 Software Supply Chain Failures** (chaîne d'approvisionnement) | `package-lock.json` (versions exactes) ; `npm audit` à 0 vulnérabilité ; outil inutile retiré ; scripts d'installation bloqués par npm 11 ; versions LTS suivies (MAINTENANCE.md, endoflife.date) | `trivy` en 2e avis sur les dépendances et sur l'image PostgreSQL (`scripts/scan-security.sh`) ; mise à jour automatisée (Dependabot) en évolution |
 | **A04 Cryptographic Failures** (défaillances cryptographiques) | Mots de passe des comptes et des fichiers hachés et salés (bcrypt, coût 12) ; JWT signé (HS256, clé aléatoire de 48 octets) ; jetons et noms de stockage issus d'un générateur cryptographique (`crypto.randomBytes`) | HTTPS obligatoire en production (en-tête HSTS déjà envoyé) ; chiffrement du stockage (*bucket* chiffré) en évolution |
 | **A05 Injection** | Requêtes SQL paramétrées (TypeORM) ; validation stricte de toutes les entrées (DTO, liste blanche des champs) ; React échappe le texte affiché ; noms de fichiers jamais utilisés comme chemin ; téléchargement en `attachment` + `nosniff` (un fichier HTML ne s'exécute pas) | — |
 | **A06 Insecure Design** (conception non sécurisée) | Sécurité intégrée dès la conception (ce document, tenu à jour brique par brique) ; stockage isolé dans un seul service ; 3 niveaux de contrôle de la taille ; expiration et purge automatiques ; principe du moindre privilège (colonnes sensibles en `select: false`) | — |
@@ -137,9 +137,20 @@ Les vulnérabilités du back-end concernent des dépendances **indirectes**, pri
 
 **Résultat : `npm audit` → 0 vulnérabilité dans le back-end comme dans le front-end** (11/10/2026), compilation et 75 tests unitaires vérifiés après la suppression.
 Principe appliqué : **retirer ce qui ne sert pas** réduit la surface d'attaque, plutôt que de mettre à jour un outil inutile.
-Le scan des images Docker par `trivy` complétera cette analyse (étape 5, Docker).
 
 ⚠️ La commande `npm audit fix --force` n'est pas utilisée : elle peut installer des versions majeures incompatibles.
+
+### Scan complémentaire avec trivy (11/10/2026, `scripts/scan-security.sh`)
+
+`trivy` (outil libre d'Aqua Security, lancé depuis son image Docker, version fixée 0.75.0) apporte un **2e avis** : il utilise d'autres bases de failles que `npm audit`, et sait analyser une image Docker.
+
+| Contrôle | Résultat | Décision |
+|---|---|---|
+| `trivy`, dépendances du back-end et du front-end (`package-lock.json`) | **0 faille haute ou critique** | — |
+| `trivy`, image officielle `postgres:18-alpine` (système Alpine 3.24) | Système : 0. **25 failles (24 hautes, 1 critique), toutes dans `gosu`**, petit outil compilé en Go 1.24.6 qui sert uniquement, au démarrage du conteneur, à passer de l'utilisateur root à l'utilisateur `postgres` | **Risque accepté, surveillé** : `gosu` ne traite aucune donnée extérieure (les failles concernent des fonctions réseau et cryptographiques de la bibliothèque Go qu'il n'utilise pas), et la base n'est joignable que depuis la machine (`127.0.0.1`). Nous ne pouvons pas corriger une image officielle : à réévaluer à chaque nouvelle image PostgreSQL (procédure de mise à jour, MAINTENANCE.md) |
+| `hadolint` (bonnes pratiques des Dockerfile) | Non applicable | Le projet n'a pas de Dockerfile : la base utilise l'image officielle telle quelle. À ajouter si l'application est conteneurisée (évolution, MAINTENANCE.md) |
+
+Le script `scripts/scan-security.sh` lance `npm audit` et `trivy` en une commande ; il échoue si une faille haute ou critique est trouvée dans nos dépendances (utilisable dans une intégration continue).
 
 ### Scripts d'installation des paquets
 

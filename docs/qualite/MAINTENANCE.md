@@ -45,7 +45,15 @@ le même principe que Terraform à l'infrastructure.
 
 ### Sauvegarde et restauration
 
-🔜 À documenter (étape 5) : sauvegarde par `pg_dump`, restauration et test de restauration.
+| Action | Commande (racine du projet) |
+|---|---|
+| Sauvegarder la base (fichier SQL) | `docker compose exec -T db pg_dump -U datashare datashare > sauvegarde.sql` |
+| Restaurer dans une base vide | `docker compose exec -T db psql -U datashare -d datashare < sauvegarde.sql` |
+| Sauvegarder les fichiers déposés | copier le dossier `backend/uploads/` (ex. `tar czf fichiers.tgz -C backend uploads`) |
+
+✅ Restauration testée le 11/10/2026 dans une base temporaire : mêmes nombres de lignes dans les 4 tables (`users`, `files`, `tags`, `migrations`).
+⚠️ La base et les fichiers vont ensemble : les sauvegarder au même moment, sinon une ligne peut désigner un fichier absent (ou l'inverse).
+🔒 Une sauvegarde contient les adresses email et les hachés des mots de passe : à stocker chiffrée, hors du serveur.
 
 ## 2. Mise à jour des dépendances
 
@@ -84,7 +92,7 @@ Repères :
 | Sujet | État |
 |---|---|
 | Logs de l'API en JSON sur la sortie standard | 🔜 étape 5 |
-| Rotation des journaux des conteneurs (`max-size`, `max-file` dans `docker-compose.yml`) | 🔜 étape 5 — par défaut, Docker ne limite pas la taille des journaux |
+| Rotation des journaux du conteneur PostgreSQL | ✅ 3 fichiers de 10 Mo au plus (`logging: json-file`, `max-size`, `max-file` dans `docker-compose.yml`) — par défaut, Docker ne limite pas leur taille et peut remplir le disque |
 | Centralisation (ex. Loki + Grafana) | Évolution hors MVP, pertinente avec plusieurs serveurs |
 
 ## 4. Nettoyage des fichiers expirés
@@ -109,6 +117,8 @@ Repères :
 | Analyse antivirus des fichiers reçus | La liste d'extensions interdites se contourne (renommage, archive `.zip`) et ne détecte pas les documents piégés | Conteneur **ClamAV** ajouté à Docker Compose ; l'API lui transmet chaque fichier reçu avant de l'enregistrer ; mise à jour quotidienne des signatures (`freshclam`) à surveiller comme une dépendance |
 | Quota par utilisateur | Empêche un seul compte de remplir le disque du serveur ; base d'une offre commerciale | Colonne `quota` dans `users` ; au téléversement, somme des tailles des fichiers actifs (`SUM(size)`), refus au-delà avec un message clair |
 | Offre payante (*freemium*) | Modèle des services de transfert (gratuit limité, payant pour plus) | Quota, taille maximale et durée d'expiration plus élevés pour les comptes payants ; paiement confié à un prestataire (ex. Stripe) : aucune donnée bancaire stockée par DataShare (norme PCI-DSS) |
+| Conteneuriser toute l'application | Déploiement identique sur n'importe quel serveur, isolation de l'API | Dockerfile multi-étapes (images légères, sans root) vérifiés par `hadolint` et analysés par `trivy` ; un serveur web (ex. Nginx) pour servir le site et relayer l'API ; sur Kubernetes, exposition par la **Gateway API** avec un contrôleur maintenu (Ingress NGINX Controller est arrêté depuis mars 2026) |
+| Intégration et déploiement continus (CI/CD) | Tests et contrôles de sécurité automatiques à chaque envoi de code | GitHub Actions : tests, `scripts/scan-security.sh`, puis publication des images (ex. GitHub Container Registry) |
 | Stockage sur AWS S3 | Disque local limité à un serveur (pas de répartition de charge, sauvegardes à gérer) ; S3 offre une capacité illimitée, une durabilité très élevée et des sauvegardes intégrées | Voir ci-dessous : seul `StorageService` change |
 
 ### Passer du disque local à AWS S3

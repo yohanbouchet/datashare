@@ -62,6 +62,7 @@
 | 10/10/2026 | frontend | **Scénarios Cypress** (vrai navigateur, application complète) : inscription, connexion, déconnexion et protection de Mon espace ; téléversement d'un fichier protégé puis téléchargement par un destinataire sans compte (fichier reçu identique) ; historique, filtres, suppression avec confirmation et lien devenu invalide | ✅ 3/3 (après correction d'une anomalie) | — |
 | 11/10/2026 | backend | Limitation des tentatives : tests e2e (6e connexion → 429 avec `Retry-After` ; mot de passe d'un fichier bloqué après 5 essais, même le bon) ; test manuel `curl` sur l'API lancée (401 ×5 puis 429) ; scénarios Cypress toujours verts avec la limitation active | ✅ 27/27 e2e · ✅ 3/3 Cypress | — |
 | 11/10/2026 | backend + frontend | `npm audit` après suppression de `@nestjs/mau` (outil inutilisé) | ✅ 0 vulnérabilité (back et front) | — |
+| 11/10/2026 | déploiement | `scripts/deploy.sh` sur un **clone neuf** du dépôt (base séparée) : `.env` créé avec des secrets aléatoires et des droits `600`, dépendances installées, base démarrée, 3 migrations appliquées ; `scripts/scan-security.sh` : npm audit 0, trivy 0 faille haute ou critique dans nos dépendances ; sauvegarde puis restauration de la base dans une base temporaire (mêmes données) | ✅ | — |
 
 ### Rapports (captures du 10/10/2026, dossier [`docs/rapports/`](../rapports/))
 

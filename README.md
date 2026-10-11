@@ -16,7 +16,7 @@ Projet 3 du Master Expert DevOps – OpenClassrooms (« Pilotez le développemen
 | Base de données | PostgreSQL 18 (conteneur Docker) |
 | Accès aux données | TypeORM + migrations versionnées |
 | Stockage des fichiers | Disque local (dossier `uploads/`) |
-| Tests | Vitest (back et front) |
+| Tests | Vitest (back et front), Cypress (de bout en bout) |
 | Qualité du code | Oxlint, Prettier |
 
 ## Structure du dépôt
@@ -27,7 +27,9 @@ datashare/
 ├── frontend/           Application React
 ├── docs/
 │   ├── conception/     MCD, schéma d'architecture, contrat d'interface
-│   └── qualite/        Suivi qualité : TESTING, SECURITY, PERF, MAINTENANCE
+│   ├── qualite/        Suivi qualité : TESTING, SECURITY, PERF, MAINTENANCE
+│   └── rapports/       Captures des rapports de tests et de couverture
+├── scripts/            Déploiement (deploy.sh) et contrôles de sécurité (scan-security.sh)
 ├── docker-compose.yml  Service PostgreSQL
 └── .env.example        Modèle des variables d'environnement (racine)
 ```
@@ -51,6 +53,18 @@ git --version
 ```
 
 ## Installation
+
+### Automatique (recommandée)
+
+```bash
+git clone https://github.com/yohanbouchet/datashare.git
+cd datashare
+scripts/deploy.sh
+```
+
+Le script vérifie les prérequis, crée les fichiers `.env` à partir des modèles (🔒 mot de passe de la base et clé JWT **générés aléatoirement**, fichier lisible par son seul propriétaire), installe les dépendances, démarre PostgreSQL et crée les tables (migrations). Il peut être relancé sans risque, par exemple après un `git pull` : un `.env` existant n'est jamais modifié et seules les nouvelles migrations sont appliquées. Prérequis supplémentaire : `openssl`.
+
+### Manuelle (étape par étape)
 
 ```bash
 # 1. Récupérer le projet
@@ -117,9 +131,11 @@ chacune remplace une commande plus longue.
 | `npm run cy:run` | Scénarios Cypress dans un vrai navigateur, sans fenêtre (base, API et front démarrés) ; ils créent des comptes `cypress-…@mail.fr` dans la base de développement |
 | `npm run cy:video` | Comme `cy:run`, dans Chrome, en filmant chaque scénario (`cypress/videos/*.mp4`, lisibles dans VS Code) |
 | `npm run cy:open` | Ouvre Cypress pour voir les scénarios s'exécuter pas à pas |
-
-> Cypress : si son navigateur n'est pas téléchargé, lancer `npx cypress install`. Si Cypress refuse de démarrer (« bad option: --no-sandbox ») dans un terminal lancé par un outil basé sur Electron, la variable `ELECTRON_RUN_AS_NODE` est en cause : `env -u ELECTRON_RUN_AS_NODE npm run cy:run`.
 | `npm run lint` | Analyse statique du code (Oxlint) |
+
+> Les scénarios créent des comptes et se connectent : la limitation des tentatives (5 connexions par minute et par adresse IP) peut bloquer deux lancements trop rapprochés ; attendre une minute.
+>
+> Cypress : si son navigateur n'est pas téléchargé, lancer `npx cypress install`. Si Cypress refuse de démarrer (« bad option: --no-sandbox ») dans un terminal lancé par un outil basé sur Electron, la variable `ELECTRON_RUN_AS_NODE` est en cause : `env -u ELECTRON_RUN_AS_NODE npm run cy:run`.
 
 ### Base de données (racine du projet)
 
@@ -129,6 +145,15 @@ chacune remplace une commande plus longue.
 | `docker compose ps` | Affiche l'état du conteneur (`healthy` attendu) |
 | `docker compose stop` | Arrête la base (les données sont conservées dans le volume) |
 | `docker compose exec db psql -U datashare -d datashare` | Ouvre une console SQL |
+
+### Scripts (racine du projet)
+
+| Commande | Rôle |
+|---|---|
+| `scripts/deploy.sh` | Installation et configuration de la base (voir « Installation ») |
+| `scripts/scan-security.sh` | Contrôles de sécurité : `npm audit` et `trivy` (dépendances, image PostgreSQL) ; échoue si une faille haute ou critique est trouvée dans nos dépendances. Nécessite Docker (trivy est lancé depuis son image) |
+
+Sauvegarde et restauration de la base : voir [MAINTENANCE.md](docs/qualite/MAINTENANCE.md).
 
 ## Variables d'environnement
 
