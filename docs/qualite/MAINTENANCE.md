@@ -87,6 +87,14 @@ Repères :
 - Les versions exactes sont verrouillées par les fichiers `package-lock.json` (installation reproductible).
 - Les versions compatibles de NestJS et React ont été fixées par leurs générateurs officiels.
 
+### Contrôle de sécurité hebdomadaire
+
+| Étape | Commande (racine du projet) | But |
+|---|---|---|
+| 1. Analyser | `scripts/scan-security.sh` (base démarrée) | `npm audit` et `trivy` sur nos dépendances ; `trivy` sur l'image de chaque conteneur en cours d'exécution (de nouvelles failles sont publiées chaque jour) |
+| 2. Faille dans nos dépendances | Procédure de mise à jour ci-dessus | Le script échoue : correction avant toute mise en production |
+| 3. Faille dans une image (ex. PostgreSQL) | Vérifier si une nouvelle image la corrige, puis sauvegarde de la base, `docker compose pull` et `docker compose up -d --wait` | Le conteneur est recréé avec la nouvelle image ; les données restent dans le volume. Sinon : analyser l'exposition réelle et consigner la décision dans SECURITY.md |
+
 ## 3. Journaux (logs)
 
 | Sujet | État |

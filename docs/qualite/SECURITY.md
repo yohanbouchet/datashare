@@ -147,10 +147,10 @@ Principe appliqué : **retirer ce qui ne sert pas** réduit la surface d'attaque
 | Contrôle | Résultat | Décision |
 |---|---|---|
 | `trivy`, dépendances du back-end et du front-end (`package-lock.json`) | **0 faille haute ou critique** | — |
-| `trivy`, image officielle `postgres:18-alpine` (système Alpine 3.24) | Système : 0. **25 failles (24 hautes, 1 critique), toutes dans `gosu`**, petit outil compilé en Go 1.24.6 qui sert uniquement, au démarrage du conteneur, à passer de l'utilisateur root à l'utilisateur `postgres` | **Risque accepté, surveillé** : `gosu` ne traite aucune donnée extérieure (les failles concernent des fonctions réseau et cryptographiques de la bibliothèque Go qu'il n'utilise pas), et la base n'est joignable que depuis la machine (`127.0.0.1`). Nous ne pouvons pas corriger une image officielle : à réévaluer à chaque nouvelle image PostgreSQL (procédure de mise à jour, MAINTENANCE.md) |
-| `hadolint` (bonnes pratiques des Dockerfile) | Non applicable | Le projet n'a pas de Dockerfile : la base utilise l'image officielle telle quelle. À ajouter si l'application est conteneurisée (évolution, MAINTENANCE.md) |
+| `trivy`, images des conteneurs en cours d'exécution : image officielle `postgres:18-alpine` (système Alpine 3.24) | Système : 0. **25 failles (24 hautes, 1 critique), toutes dans `gosu`**, petit outil compilé en Go 1.24.6 qui sert uniquement, au démarrage du conteneur, à passer de l'utilisateur root à l'utilisateur `postgres` | **Risque accepté, surveillé** : `gosu` ne traite aucune donnée extérieure (les failles concernent des fonctions réseau et cryptographiques de la bibliothèque Go qu'il n'utilise pas), et la base n'est joignable que depuis la machine (`127.0.0.1`). Nous ne pouvons pas corriger une image officielle : à réévaluer à chaque nouvelle image PostgreSQL (procédure de mise à jour, MAINTENANCE.md) |
 
-Le script `scripts/scan-security.sh` lance `npm audit` et `trivy` en une commande ; il échoue si une faille haute ou critique est trouvée dans nos dépendances (utilisable dans une intégration continue).
+Le script `scripts/scan-security.sh` lance `npm audit` et `trivy` en une commande ; il analyse automatiquement l'image de **chaque conteneur en cours d'exécution** et échoue si une faille haute ou critique est trouvée dans nos dépendances (utilisable dans une intégration continue).
+De nouvelles failles sont publiées chaque jour : une image saine aujourd'hui peut ne plus l'être demain. Le script est donc relancé chaque semaine (MAINTENANCE.md).
 
 ### Scripts d'installation des paquets
 
