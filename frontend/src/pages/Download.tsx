@@ -165,7 +165,11 @@ export function Download() {
                 label="Mot de passe"
                 type="password"
                 value={password}
-                onChange={setPassword}
+                onChange={(value) => {
+                  setPassword(value);
+                  // Nouvelle saisie : l'ancien message d'erreur disparaît
+                  setPasswordError(null);
+                }}
                 placeholder="Saisissez le mot de passe..."
                 autoComplete="off"
                 error={passwordError ?? undefined}

@@ -75,6 +75,13 @@ export function Register() {
     return result;
   }
 
+  // Un champ modifié perd son message d'erreur (il sera recalculé au
+  // prochain envoi) : l'utilisateur voit tout de suite que sa correction est
+  // prise en compte
+  function clearError(field: keyof RegisterErrors) {
+    setErrors((current) => ({ ...current, [field]: undefined }));
+  }
+
   // async : la soumission attend la réponse de l'API.
   // SubmitEvent : le type de l'événement « envoi du formulaire ».
   async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
@@ -120,7 +127,10 @@ export function Register() {
           label="Email"
           type="email"
           value={email}
-          onChange={setEmail}
+          onChange={(value) => {
+            setEmail(value);
+            clearError('email');
+          }}
           placeholder="Saisissez votre email..."
           autoComplete="email"
           error={errors.email}
@@ -130,7 +140,10 @@ export function Register() {
           label="Mot de passe"
           type="password"
           value={password}
-          onChange={setPassword}
+          onChange={(value) => {
+            setPassword(value);
+            clearError('password');
+          }}
           placeholder="Saisissez votre mot de passe..."
           autoComplete="new-password"
           error={errors.password}
@@ -141,7 +154,10 @@ export function Register() {
           label="Vérification du mot de passe"
           type="password"
           value={confirmation}
-          onChange={setConfirmation}
+          onChange={(value) => {
+            setConfirmation(value);
+            clearError('confirmation');
+          }}
           placeholder="Saisissez le à nouveau"
           autoComplete="new-password"
           error={errors.confirmation}

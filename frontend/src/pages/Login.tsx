@@ -69,6 +69,13 @@ export function Login() {
     return result;
   }
 
+  // Un champ modifié perd son message d'erreur (il sera recalculé au
+  // prochain envoi) : l'utilisateur voit tout de suite que sa correction est
+  // prise en compte
+  function clearError(field: keyof LoginErrors) {
+    setErrors((current) => ({ ...current, [field]: undefined }));
+  }
+
   // async : la soumission attend la réponse de l'API.
   // SubmitEvent : le type de l'événement « envoi du formulaire » (FormEvent est
   // déclaré obsolète dans React 19).
@@ -118,7 +125,10 @@ export function Login() {
           label="Email"
           type="email"
           value={email}
-          onChange={setEmail}
+          onChange={(value) => {
+            setEmail(value);
+            clearError('email');
+          }}
           placeholder="Saisissez votre email..."
           autoComplete="email"
           error={errors.email}
@@ -128,7 +138,10 @@ export function Login() {
           label="Mot de passe"
           type="password"
           value={password}
-          onChange={setPassword}
+          onChange={(value) => {
+            setPassword(value);
+            clearError('password');
+          }}
           placeholder="Saisissez votre mot de passe..."
           autoComplete="current-password"
           error={errors.password}
