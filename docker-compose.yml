@@ -1,6 +1,7 @@
 services:
   db:
-    image: postgres:18-alpine          # PostgreSQL 18, version "alpine" = image légère
+    build: ./database                  # notre image : l'officielle sans gosu (database/Dockerfile)
+    image: datashare-db:18.6           # nom donné à l'image construite
     container_name: datashare-db
     restart: unless-stopped            # redémarre seul après un reboot de la machine
     env_file: .env                     # lit POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB
