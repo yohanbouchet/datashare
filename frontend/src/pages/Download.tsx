@@ -3,11 +3,12 @@
 // Rôle : Page publique « Télécharger un fichier » (adresse /d/<jeton>, US02),
 //   conforme à la maquette Figma (section Téléchargement). Aucun compte n'est
 //   demandé : le jeton aléatoire du lien suffit.
-//   1. Charge les informations du fichier (GET /api/download/:token) : nom,
-//      taille, date d'expiration, protégé ou non. Lien inconnu (404) ou
-//      expiré (410) → bandeau rouge avec le message de l'API.
-//   2. Bandeau d'expiration : bleu « expirera dans N jours », orange
-//      « expirera demain » ou « aujourd'hui ».
+//   1. Charge les informations du fichier (GET /api/download/:token) et
+//      affiche celles demandées par l'énoncé (US02) : nom, type, taille, date
+//      d'expiration ; protégé ou non. Lien inconnu (404) ou expiré (410) →
+//      bandeau rouge avec le message de l'API.
+//   2. Bandeau d'expiration, avec la date : bleu « expirera dans N jours »,
+//      orange « expirera demain » ou « aujourd'hui ».
 //   3. Fichier protégé : champ mot de passe ; le bouton reste grisé tant
 //      qu'il est vide. Au clic, le mot de passe est vérifié (POST …/verify) :
 //      faux → message sous le champ, sans lancer de téléchargement.
@@ -29,24 +30,35 @@ import { Field } from '../components/Field.tsx';
 import { FileSummary } from '../components/FileSummary.tsx';
 import { Icon } from '../components/Icon.tsx';
 import { ApiError, downloadApi, type DownloadInfo } from '../services/api.ts';
-import { daysUntil } from '../utils/format.ts';
+import { daysUntil, formatDate } from '../utils/format.ts';
 
 const UNEXPECTED = 'Une erreur inattendue est survenue.';
 
 // Bandeau d'expiration de la maquette : bleu (info) s'il reste plusieurs
-// jours, orange (alerte) si le fichier expire demain ou aujourd'hui
+// jours, orange (alerte) si le fichier expire demain ou aujourd'hui ; la date
+// exacte est ajoutée (US02 : « date d'expiration » visible)
 function expiryNotice(expiresAt: string): {
   variant: 'info' | 'warning';
   text: string;
 } {
   const days = daysUntil(expiresAt);
+  const date = formatDate(expiresAt);
   if (days <= 0) {
-    return { variant: 'warning', text: "Ce fichier expirera aujourd'hui." };
+    return {
+      variant: 'warning',
+      text: `Ce fichier expirera aujourd'hui, le ${date}.`,
+    };
   }
   if (days === 1) {
-    return { variant: 'warning', text: 'Ce fichier expirera demain.' };
+    return {
+      variant: 'warning',
+      text: `Ce fichier expirera demain, le ${date}.`,
+    };
   }
-  return { variant: 'info', text: `Ce fichier expirera dans ${days} jours.` };
+  return {
+    variant: 'info',
+    text: `Ce fichier expirera dans ${days} jours, le ${date}.`,
+  };
 }
 
 export function Download() {
@@ -139,7 +151,11 @@ export function Download() {
           onSubmit={handleSubmit}
           noValidate
         >
-          <FileSummary name={info.originalName} size={info.size} />
+          <FileSummary
+            name={info.originalName}
+            size={info.size}
+            type={info.mimeType}
+          />
           <Banner variant={expiry.variant}>{expiry.text}</Banner>
 
           {info.isProtected && (
