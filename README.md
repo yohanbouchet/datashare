@@ -24,6 +24,7 @@ Projet 3 du Master Expert DevOps – OpenClassrooms (« Pilotez le développemen
 ```
 datashare/
 ├── backend/            API NestJS
+├── database/           Image Docker de PostgreSQL (Dockerfile)
 ├── frontend/           Application React
 ├── docs/
 │   ├── conception/     MCD, schéma d'architecture, contrat d'interface
@@ -151,7 +152,7 @@ chacune remplace une commande plus longue.
 | Commande | Rôle |
 |---|---|
 | `scripts/deploy.sh` | Installation et configuration de la base (voir « Installation ») |
-| `scripts/scan-security.sh` | Contrôles de sécurité : `npm audit` et `trivy` (dépendances, image PostgreSQL) ; échoue si une faille haute ou critique est trouvée dans nos dépendances. Nécessite Docker (trivy est lancé depuis son image) |
+| `scripts/scan-security.sh` | Contrôles de sécurité : `npm audit`, `trivy` (dépendances et images des conteneurs lancés) et `hadolint` (`database/Dockerfile`) ; échoue si une faille haute ou critique est trouvée dans nos dépendances. Nécessite Docker (trivy et hadolint sont lancés depuis leurs images) |
 
 Sauvegarde et restauration de la base : voir [MAINTENANCE.md](docs/qualite/MAINTENANCE.md).
 

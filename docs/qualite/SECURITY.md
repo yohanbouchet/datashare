@@ -21,6 +21,7 @@ Légende : ✅ en place · 🔜 prévu (étape indiquée)
 | Mesure | État | Détail |
 |---|---|---|
 | Base non exposée sur le réseau | ✅ | Port publié uniquement sur `127.0.0.1` (`docker-compose.yml`) |
+| Conteneur sans root, image minimale | ✅ | Image construite à partir de l'officielle (`database/Dockerfile`, version fixée `postgres:18.6-alpine3.24`) : le conteneur démarre directement sous l'utilisateur `postgres` (70) et l'outil `gosu`, devenu inutile, est supprimé (voir le scan trivy ci-dessous) |
 | Unicité de l'email garantie par la base | ✅ | Contrainte `UNIQUE` (migration `CreateUsers`) : protège aussi contre deux inscriptions simultanées |
 | Empreinte du mot de passe jamais lue par défaut | ✅ | `select: false` sur `password_hash` : elle ne peut pas être renvoyée par erreur dans une réponse |
 | Fichier rattaché à un compte existant | ✅ | Clé étrangère `files.user_id` → `users.id` (`ON DELETE CASCADE`) |
@@ -140,16 +141,19 @@ Principe appliqué : **retirer ce qui ne sert pas** réduit la surface d'attaque
 
 ⚠️ La commande `npm audit fix --force` n'est pas utilisée : elle peut installer des versions majeures incompatibles.
 
-### Scan complémentaire avec trivy (11/10/2026, `scripts/scan-security.sh`)
+### Scan complémentaire avec trivy et hadolint (11/10/2026, `scripts/scan-security.sh`)
 
 `trivy` (outil libre d'Aqua Security, lancé depuis son image Docker, version fixée 0.75.0) apporte un **2e avis** : il utilise d'autres bases de failles que `npm audit`, et sait analyser une image Docker.
 
 | Contrôle | Résultat | Décision |
 |---|---|---|
 | `trivy`, dépendances du back-end et du front-end (`package-lock.json`) | **0 faille haute ou critique** | — |
-| `trivy`, images des conteneurs en cours d'exécution : image officielle `postgres:18-alpine` (système Alpine 3.24) | Système : 0. **25 failles (24 hautes, 1 critique), toutes dans `gosu`**, petit outil compilé en Go 1.24.6 qui sert uniquement, au démarrage du conteneur, à passer de l'utilisateur root à l'utilisateur `postgres` | **Risque accepté, surveillé** : `gosu` ne traite aucune donnée extérieure (les failles concernent des fonctions réseau et cryptographiques de la bibliothèque Go qu'il n'utilise pas), et la base n'est joignable que depuis la machine (`127.0.0.1`). Nous ne pouvons pas corriger une image officielle : à réévaluer à chaque nouvelle image PostgreSQL (procédure de mise à jour, MAINTENANCE.md) |
+| `trivy`, image officielle `postgres:18-alpine` (1er passage) | Système : 0. **25 failles (24 hautes, 1 critique), toutes dans `gosu`**, petit outil compilé en Go 1.24.6 qui sert uniquement, au démarrage du conteneur, à passer de l'utilisateur root à l'utilisateur `postgres` | Risque faible (`gosu` n'utilise pas les fonctions réseau et cryptographiques concernées), mais **supprimable** : `gosu` ne sert à rien si le conteneur démarre directement en `postgres`. Image maison `database/Dockerfile` : `USER 70:70` et suppression de `gosu` (vérifié : base neuve et copie de la base existante démarrent sans root, tests e2e 27/27) |
+| `trivy`, image `datashare-db:18.6` (après correction) | **0 faille haute ou critique** | À revérifier chaque semaine (MAINTENANCE.md) |
+| `hadolint`, `database/Dockerfile` (version fixée 2.14.0) | **Aucune remarque** (utilisateur désigné par son numéro, image de base à version fixée) | — |
 
-Le script `scripts/scan-security.sh` lance `npm audit` et `trivy` en une commande ; il analyse automatiquement l'image de **chaque conteneur en cours d'exécution** et échoue si une faille haute ou critique est trouvée dans nos dépendances (utilisable dans une intégration continue).
+Le script `scripts/scan-security.sh` lance `npm audit`, `trivy` et `hadolint` en une commande ; il analyse automatiquement l'image de **chaque conteneur en cours d'exécution** et échoue si une faille haute ou critique est trouvée dans nos dépendances ou si `hadolint` fait une remarque (utilisable dans une intégration continue).
+Principe appliqué, comme pour `@nestjs/mau` : **retirer ce qui ne sert pas** plutôt qu'accepter un risque.
 De nouvelles failles sont publiées chaque jour : une image saine aujourd'hui peut ne plus l'être demain. Le script est donc relancé chaque semaine (MAINTENANCE.md).
 
 ### Scripts d'installation des paquets

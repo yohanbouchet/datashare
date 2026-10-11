@@ -43,7 +43,7 @@
 |---|---|---|---|
 | Gestion de versions | Git + GitHub, *conventional commits* | GitLab | Exigé par l'énoncé ; historique lisible par type de changement |
 | Gestion des dépendances | npm + `package-lock.json` | pnpm, yarn | Fourni avec Node.js ; versions exactes verrouillées, installation reproductible |
-| Conteneurisation | Docker Compose (PostgreSQL) | Installation locale | Base identique sur toutes les machines, démarrage en une commande, healthcheck |
+| Conteneurisation | Docker Compose (PostgreSQL) ; image construite à partir de l'officielle (`database/Dockerfile`) | Installation locale ; image officielle telle quelle | Base identique sur toutes les machines, démarrage en une commande, healthcheck ; l'image maison démarre sans root et sans l'outil `gosu`, source des 25 failles signalées par trivy dans l'image officielle |
 | Tests | Vitest (back et front), Cypress (E2E) | Jest | Choix par défaut de NestJS 12 en ES Modules et de Vite : un seul outil de test pour tout le projet |
 | Analyse statique | Oxlint | ESLint | Installé par les deux générateurs ; même outil des deux côtés, très rapide |
 | Mise en forme | Prettier | — | Présentation homogène du code, appliquée automatiquement |

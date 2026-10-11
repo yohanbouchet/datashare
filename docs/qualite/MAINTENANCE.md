@@ -62,7 +62,7 @@ le même principe que Terraform à l'infrastructure.
 | Technologie | Version utilisée | Fin de support (correctifs de sécurité) | Action à prévoir |
 |---|---|---|---|
 | Node.js | 24.21 (**LTS**) | 30/04/2028 | Passer à Node.js 26 (LTS à partir d'octobre 2026, support jusqu'en avril 2029) au plus tard début 2028 |
-| PostgreSQL | 18.6 | 14/11/2030 | Aucune avant 2030 ; appliquer les versions correctives 18.x (sauvegarde, puis nouvelle image Docker) |
+| PostgreSQL | 18.6 | 14/11/2030 | Aucune avant 2030 ; appliquer les versions correctives 18.x : sauvegarde, nouvelle version dans le `FROM` de `database/Dockerfile`, puis `docker compose up -d --build --wait` |
 | Ubuntu (serveur) | 26.04.1 (**LTS**) | 29/05/2031 | Aucune ; mises à jour de sécurité régulières (`apt`) |
 | Docker Engine | 29.8 | Version 29 maintenue (dernière : 29.9) | Mettre à jour vers 29.9 |
 | React | 19.3 | Pas de date : seule la dernière version majeure reçoit les correctifs | Suivre les versions 19.x ; migrer à la prochaine version majeure dans l'année suivant sa sortie |
@@ -91,9 +91,9 @@ Repères :
 
 | Étape | Commande (racine du projet) | But |
 |---|---|---|
-| 1. Analyser | `scripts/scan-security.sh` (base démarrée) | `npm audit` et `trivy` sur nos dépendances ; `trivy` sur l'image de chaque conteneur en cours d'exécution (de nouvelles failles sont publiées chaque jour) |
+| 1. Analyser | `scripts/scan-security.sh` (base démarrée) | `npm audit` et `trivy` sur nos dépendances ; `hadolint` sur `database/Dockerfile` ; `trivy` sur l'image de chaque conteneur en cours d'exécution (de nouvelles failles sont publiées chaque jour) |
 | 2. Faille dans nos dépendances | Procédure de mise à jour ci-dessus | Le script échoue : correction avant toute mise en production |
-| 3. Faille dans une image (ex. PostgreSQL) | Vérifier si une nouvelle image la corrige, puis sauvegarde de la base, `docker compose pull` et `docker compose up -d --wait` | Le conteneur est recréé avec la nouvelle image ; les données restent dans le volume. Sinon : analyser l'exposition réelle et consigner la décision dans SECURITY.md |
+| 3. Faille dans l'image de la base | Vérifier si une nouvelle image officielle la corrige ; sauvegarde de la base ; nouvelle version dans le `FROM` de `database/Dockerfile` (ou même version republiée : `docker compose build --pull`) ; `docker compose up -d --build --wait` ; relancer le scan | Le conteneur est recréé avec la nouvelle image ; les données restent dans le volume. Sinon : analyser l'exposition réelle et consigner la décision dans SECURITY.md |
 
 ## 3. Journaux (logs)
 

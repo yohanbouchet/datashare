@@ -63,6 +63,7 @@
 | 11/10/2026 | backend | Limitation des tentatives : tests e2e (6e connexion → 429 avec `Retry-After` ; mot de passe d'un fichier bloqué après 5 essais, même le bon) ; test manuel `curl` sur l'API lancée (401 ×5 puis 429) ; scénarios Cypress toujours verts avec la limitation active | ✅ 27/27 e2e · ✅ 3/3 Cypress | — |
 | 11/10/2026 | backend + frontend | `npm audit` après suppression de `@nestjs/mau` (outil inutilisé) | ✅ 0 vulnérabilité (back et front) | — |
 | 11/10/2026 | déploiement | `scripts/deploy.sh` sur un **clone neuf** du dépôt (base séparée) : `.env` créé avec des secrets aléatoires et des droits `600`, dépendances installées, base démarrée, 3 migrations appliquées ; `scripts/scan-security.sh` : npm audit 0, trivy 0 faille haute ou critique dans nos dépendances ; sauvegarde puis restauration de la base dans une base temporaire (mêmes données) | ✅ | — |
+| 11/10/2026 | base de données | Image PostgreSQL maison (`database/Dockerfile`, sans `gosu`, utilisateur `postgres`) : démarrage sur une base neuve et sur une copie de la base de développement (données lues), puis sur la vraie base ; tests e2e de l'API ; `scripts/scan-security.sh` | ✅ utilisateur 70 · ✅ 27/27 e2e · ✅ trivy 0 faille, hadolint 0 remarque | — |
 
 ### Rapports (captures du 10/10/2026, dossier [`docs/rapports/`](../rapports/))
 
