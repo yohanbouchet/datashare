@@ -174,6 +174,7 @@ Suivi de la qualité et de la maintenance (tenu à jour au fil du projet) :
 - [SECURITY.md](docs/qualite/SECURITY.md) – mesures de sécurité et scans des dépendances
 - [PERF.md](docs/qualite/PERF.md) – tests de performance et métriques
 - [MAINTENANCE.md](docs/qualite/MAINTENANCE.md) – procédures (base de données, migrations, dépendances, journaux)
+- [REVUE-IA-US01.md](docs/qualite/REVUE-IA-US01.md) – revue technique du code écrit par l'IA (US01) : périmètre, supervision, constats et correctifs
 
 Conception :
 
