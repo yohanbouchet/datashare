@@ -2,8 +2,8 @@
 // Fichier : app.module.ts
 // Rôle : Module racine de l'API : le « sommaire » de l'application. Charge la
 //   configuration (.env), ouvre la connexion à PostgreSQL, active les tâches
-//   planifiées et la limitation des tentatives, et déclare tous les modules
-//   fonctionnels.
+//   planifiées, la limitation des tentatives et le journal des requêtes, et
+//   déclare tous les modules fonctionnels.
 // Utilise :
 //   - .env (racine) : variables POSTGRES_* lues par ConfigModule /
 //     ConfigService
@@ -11,11 +11,12 @@
 //     files/files.module.ts (FilesModule)
 //   - @nestjs/schedule (ScheduleModule) : tâches planifiées (purge, US10)
 //   - @nestjs/throttler + common/rate-limits.ts : limitation des tentatives
+//   - common/request-logger.middleware.ts : journal de chaque requête
 // Utilisé par :
 //   - main.ts (NestFactory.create(AppModule))
 //   - test/e2e-app.ts (API démarrée pour les tests de bout en bout)
 // =============================================================================
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
@@ -28,6 +29,7 @@ import { UsersModule } from './users/users.module.js';
 import { AuthModule } from './auth/auth.module.js';
 import { FilesModule } from './files/files.module.js';
 import { GLOBAL_LIMIT, RATE_LIMIT_MESSAGE } from './common/rate-limits.js';
+import { RequestLoggerMiddleware } from './common/request-logger.middleware.js';
 
 // @Module : le "sommaire" de l'application. Il liste les briques à charger
 // (imports), les points d'entrée HTTP (controllers) et la logique métier
@@ -99,4 +101,9 @@ import { GLOBAL_LIMIT, RATE_LIMIT_MESSAGE } from './common/rate-limits.js';
   // l'API (au-delà de la limite : 429 « Trop de tentatives »)
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  // Journal de chaque requête (logs structurés), appliqué à toutes les routes
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(RequestLoggerMiddleware).forRoutes('{*path}');
+  }
+}
