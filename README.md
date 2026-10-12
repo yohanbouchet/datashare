@@ -101,6 +101,15 @@ cd frontend
 npm run dev
 ```
 
+## Utilisation
+
+1. Ouvrir http://localhost:5173, créer un compte (« Se connecter » → « Créer un compte »), puis se connecter.
+2. Cliquer sur le bouton rond de l'accueil, choisir un fichier (1 Go maximum), et éventuellement un mot de passe, une durée d'expiration (1 à 7 jours) et des tags, puis « Téléverser ».
+3. Copier le lien de partage et l'envoyer au destinataire : il télécharge le fichier sans compte, avec le mot de passe s'il y en a un.
+4. « Mon espace » liste les fichiers envoyés (actifs, expirés ou tous) et permet de les supprimer.
+
+Parcours détaillé avec captures d'écran : [guide utilisateur](docs/guide-utilisateur.md).
+
 ## Commandes utiles
 
 Les commandes `npm run …` sont des **raccourcis** définis dans la section `scripts` de chaque `package.json` :
