@@ -35,6 +35,7 @@ Le front affiche `message` dans le composant « Callout » rouge des maquettes.
 | 409 Conflict | Conflit avec une donnée existante |
 | 410 Gone | Lien expiré (fichier pas encore purgé) |
 | 413 Payload Too Large | Fichier supérieur à 1 Go |
+| 429 Too Many Requests | Trop de tentatives (5 par minute pour l'inscription, la connexion et le mot de passe d'un fichier ; 10 téléchargements ; 100 requêtes pour les autres routes), en-tête `Retry-After` |
 
 ## 2. Vue d'ensemble
 
