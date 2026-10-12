@@ -99,7 +99,7 @@ Repères :
 
 | Sujet | État |
 |---|---|
-| Logs de l'API en JSON sur la sortie standard | Évolution (PERF.md, section 5) : utiles dès qu'ils sont centralisés |
+| Logs de l'API en JSON sur la sortie standard | ✅ une ligne par événement et par requête (méthode, adresse, code, durée, tailles) ; format et analyse : PERF.md, section 3 |
 | Rotation des journaux du conteneur PostgreSQL | ✅ 3 fichiers de 10 Mo au plus (`logging: json-file`, `max-size`, `max-file` dans `docker-compose.yml`) — par défaut, Docker ne limite pas leur taille et peut remplir le disque |
 | Centralisation (ex. Loki + Grafana) | Évolution hors MVP, pertinente avec plusieurs serveurs |
 

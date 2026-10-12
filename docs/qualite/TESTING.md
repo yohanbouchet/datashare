@@ -67,6 +67,7 @@
 | 11/10/2026 | base de données | Image PostgreSQL maison (`database/Dockerfile`, sans `gosu`, utilisateur `postgres`) : démarrage sur une base neuve et sur une copie de la base de développement (données lues), puis sur la vraie base ; tests e2e de l'API ; `scripts/scan-security.sh` | ✅ utilisateur 70 · ✅ 27/27 e2e · ✅ trivy 0 faille, hadolint 0 remarque | — |
 | 11/10/2026 | frontend | Correction des écarts avec l'énoncé (historique « Actifs » par défaut, taille et dates ; type et date d'expiration avant téléchargement) : tests unitaires et scénarios Cypress adaptés | ✅ 41/41 · ✅ Cypress | — |
 | 11/10/2026 | performance | k6 (API en mode production) : 30 téléversements de 10 Mo, 91 lectures, 9 téléchargements de 10 Mo (fichier identique), rafale bloquée ; Lighthouse sur 3 pages (mobile et ordinateur), avant et après correction des contrastes | ✅ tous les seuils tenus · accessibilité 100 | [k6](../rapports/k6-resultats.png) · [Lighthouse](../rapports/lighthouse-connexion-apres.png) |
+| 12/10/2026 | backend | Logs structurés : tests unitaires du journal des requêtes (une ligne à la fin de la réponse, jeton masqué) ; test k6 relancé, 185 lignes JSON analysées (PERF.md) | ✅ 77/77 unitaires · ✅ 27/27 e2e · ✅ k6 | [Capture](../rapports/logs-structures.png) |
 
 ### Rapports (captures du 10/10/2026, dossier [`docs/rapports/`](../rapports/))
 

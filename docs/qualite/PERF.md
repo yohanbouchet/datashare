@@ -135,12 +135,54 @@ npx lighthouse@13.5.0 http://localhost:4173/connexion --preset=desktop --view   
 
 Lighthouse est aussi disponible dans Chrome : outils de développement (F12), onglet « Lighthouse ».
 
-## 3. Suivi des métriques
+## 3. Logs structurés et suivi des métriques
+
+### Journal de l'API au format JSON
+
+Depuis le 12/10/2026, l'API écrit **tous** ses journaux en JSON (une ligne par événement), et **une ligne par requête HTTP**, écrite quand la réponse est entièrement envoyée :
+
+```json
+{"level":"log","pid":50887,"timestamp":1791790626824,"message":{"method":"POST","url":"/api/files","status":201,"durationMs":38,"bytesIn":10486128,"bytesOut":274},"context":"HTTP"}
+```
+
+| Champ | Contenu |
+|---|---|
+| `method`, `url` | Requête ; 🔒 le jeton d'un lien de partage est remplacé par `:token` (un journal ne doit pas permettre de télécharger un fichier) |
+| `status` | Code de réponse, y compris les refus des gardes (401, 429) |
+| `durationMs` | **Temps de réponse**, jusqu'à la fin de l'envoi (fichier compris) |
+| `bytesIn`, `bytesOut` | **Taille transférée** en octets : fichier reçu (US01) ou envoyé (US02) |
+
+Mise en œuvre : `backend/src/main.ts` (`ConsoleLogger` en mode JSON) et `backend/src/common/request-logger.middleware.ts` (middleware appliqué à toutes les routes ; un middleware voit aussi les requêtes refusées par une garde, contrairement à un intercepteur).
+Format lisible par un outil de centralisation (Loki, Elasticsearch…) sans configuration de découpage.
+
+### Analyse des journaux du test k6 (12/10/2026)
+
+Les 185 lignes `HTTP` écrites pendant le test k6 (section 1), regroupées par route et par code de réponse :
+
+| Requête | Code | Nombre | Durée moyenne | 95e centile | Volume |
+|---|---|---|---|---|---|
+| `GET /api/download/:token` | 200 | 91 | 4,2 ms | 6 ms | — |
+| `POST /api/files` | 201 | 31 | 72 ms | 98 ms | 310 Mo reçus |
+| `DELETE /api/files/:id` | 204 | 31 | 3,7 ms | 4 ms | — (nettoyage du test) |
+| `POST /api/download/:token` | 200 | 9 | 45 ms | 54 ms | 90 Mo envoyés |
+| `POST /api/auth/login` | 401 | 5 | 205 ms | 209 ms | — |
+| `POST /api/auth/login` | 429 | 15 | **0 ms** | 0 ms | — |
+| Autres (inscription, connexion, liste) | 200 / 201 | 3 | 15 à 245 ms | — | — |
+
+Capture : [`docs/rapports/logs-structures.png`](../rapports/logs-structures.png).
+
+**Ce que montrent les journaux :**
+- les temps de réponse confirment ceux mesurés par k6 (côté client) : la mesure côté serveur et la mesure côté client concordent ;
+- une **connexion** prend environ **200 ms** : c'est le coût **voulu** de bcrypt (coût 12), qui rend la devinette de mots de passe très lente ;
+- une connexion **bloquée (429)** répond en **0 ms** : la limitation des tentatives arrête l'attaque **avant** le calcul bcrypt, elle protège donc aussi le processeur du serveur ;
+- aucune erreur serveur (5xx) sur 185 requêtes.
+
+### Tableau de bord des métriques
 
 | Métrique | Où la lire | Valeur de référence (11/10/2026) |
 |---|---|---|
-| Temps de réponse de l'API | Résumé k6 (moyenne, médiane, 95e centile par scénario) | 5 ms (lecture), 68 ms (envoi de 10 Mo), 36 ms (téléchargement de 10 Mo) |
-| Taille des fichiers et volume transféré | Résumé k6 (`data_sent`, `data_received`) ; colonne `files.size` en base | 10 Mo par fichier ; 325 Mo envoyés et 95 Mo reçus en 1 min |
+| Temps de réponse de l'API | Journal JSON (`durationMs`, chaque requête) ; résumé k6 (moyenne, médiane, 95e centile par scénario) | 5 ms (lecture), 68 ms (envoi de 10 Mo), 36 ms (téléchargement de 10 Mo) |
+| Taille des fichiers et volume transféré | Journal JSON (`bytesIn`, `bytesOut`) ; résumé k6 (`data_sent`, `data_received`) ; colonne `files.size` en base | 10 Mo par fichier ; 325 Mo envoyés et 95 Mo reçus en 1 min |
 | Débit | Métriques personnalisées k6 `upload_mo_par_s`, `download_mo_par_s` | ≈ 200 et ≈ 310 Mo/s (local) |
 | Mémoire et processeur | `ps` (API), `docker stats` (base) | API : environ 130 Mo stables ; base : environ 35 Mo |
 | Poids du site | Sortie de `npm run build` | 88,5 Ko de JavaScript (gzip) |
@@ -171,4 +213,4 @@ Les résultats dépassent largement les besoins d'un MVP : aucune optimisation n
 | Découper le JavaScript par page (chargement à la demande, `React.lazy`) | Si le site grossit | Lighthouse signale du JavaScript inutilisé sur la première page : chaque page ne chargerait que son code |
 | Compression et HTTP/2 par un serveur web (ex. Nginx) devant le site | Mise en production | Pages plus légères sur le réseau, connexions plus efficaces |
 | Stockage sur AWS S3, avec liens de téléchargement directs | Plusieurs serveurs ou gros volumes | Les fichiers ne transitent plus par l'API (MAINTENANCE.md) |
-| Journaux JSON de l'API (route, code, temps de réponse, taille) centralisés (Loki, Grafana) et métriques (Prometheus) | Mise en production | Suivi continu des temps de réponse et alertes, au lieu de mesures ponctuelles |
+| Centralisation des journaux JSON (Loki, Grafana) et métriques (Prometheus) | Mise en production | Tableaux de bord et alertes en continu (ex. hausse des 429 ou des 5xx), au lieu d'analyses ponctuelles |
