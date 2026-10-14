@@ -77,6 +77,7 @@ Cliquez sur **Mon espace** en haut de la page.
 ![Mon espace](guide-utilisateur/07-mon-espace.png)
 
 - Chaque ligne indique le nom, la taille, la date d'envoi, la date d'expiration et le temps restant ; un **cadenas** signale un fichier protégé par mot de passe.
+- Les **tags** du fichier apparaissent dans une case orange, sous la taille et les dates (ex. `devis, client`). S'ils sont trop nombreux pour tenir sur la ligne, la fin est remplacée par « … » : **laissez la souris sur la case** pour voir la liste complète. Il en va de même pour un nom de fichier trop long.
 - Le filtre **Actifs** (par défaut) montre les fichiers encore disponibles ; **Expiré** montre ceux qui ont expiré ; **Tous** montre l'ensemble.
 - **Accéder** ouvre la page de téléchargement, telle que la voit votre destinataire.
 - **Supprimer** efface définitivement le fichier, après confirmation : le lien ne fonctionne plus.

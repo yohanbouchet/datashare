@@ -6,7 +6,7 @@ Auteur : Yohan Bouchet · Projet 3 du Master Expert DevOps (OpenClassrooms) · O
 
 Dépôt : https://github.com/yohanbouchet/datashare
 
-Fonctionnalités livrées : US01 à US06 (MVP), et US08 (tags), US09 (mot de passe de fichier), US10 (purge automatique) parmi les fonctionnalités facultatives.
+Fonctionnalités livrées : US01 à US06 (MVP), et US08 (tags saisis à l'envoi et affichés dans l'historique ; le filtre par tag, facultatif, n'est pas fait), US09 (mot de passe de fichier), US10 (purge automatique) parmi les fonctionnalités facultatives.
 
 ---
 
@@ -104,7 +104,7 @@ Correspondance avec l'**OWASP Top 10:2025**, scans et décisions : `docs/qualite
 
 | Fichier | Contenu | Résultats clés |
 |---|---|---|
-| **TESTING.md** | Plan de tests des fonctionnalités critiques (upload, téléchargement, authentification…), critères d'acceptation, commandes, anomalies détectées et corrigées | 77 tests unitaires et 27 tests de bout en bout de l'API, 42 tests unitaires du front, 3 scénarios Cypress dans un vrai navigateur ; couverture 88,7 % (back) et 85 % (front) pour un seuil de 70 % ; 22 anomalies consignées et corrigées |
+| **TESTING.md** | Plan de tests des fonctionnalités critiques (upload, téléchargement, authentification…), critères d'acceptation, commandes, anomalies détectées et corrigées | 78 tests unitaires et 27 tests de bout en bout de l'API, 43 tests unitaires du front, 3 scénarios Cypress dans un vrai navigateur ; couverture 88,7 % (back) et 85 % (front) pour un seuil de 70 % ; 24 anomalies consignées et corrigées |
 | **SECURITY.md** | Mesures de sécurité, correspondance OWASP, scans `npm audit`, `trivy` et `hadolint` avec analyse et décisions | 0 faille haute ou critique ; outil inutilisé retiré ; 25 failles de l'image PostgreSQL officielle supprimées par une image maison |
 | **PERF.md** | Test k6 sur l'envoi et le téléchargement, budget front (Lighthouse, poids du code), logs structurés et métriques | Envoi de 10 Mo en 100 ms et lecture d'un lien en 7 ms (95e centile) ; mémoire stable (traitement en flux) ; Lighthouse : performance 99-100, accessibilité 100 après correction des contrastes ; journal JSON par requête |
 | **MAINTENANCE.md** | Cycle de vie des technologies (endoflife.date), procédure de mise à jour mensuelle, contrôle de sécurité hebdomadaire, sauvegarde, purge, évolutions | Node.js 24 LTS jusqu'en avril 2028 (migration vers 26 prévue), PostgreSQL 18 jusqu'en 2030 ; sauvegarde et restauration testées |
