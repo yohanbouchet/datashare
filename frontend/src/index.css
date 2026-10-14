@@ -521,6 +521,25 @@ a {
   font-size: 0.75rem;
 }
 
+/* Tags (US08) : une case sur une seule ligne. Trop de tags (10 au plus, de
+   30 caractères) : la fin est coupée par « … », la liste complète est dans
+   l'infobulle (même principe que le nom du fichier) */
+.file-row__tags {
+  display: inline-block;
+  max-width: 100%;
+  margin: 0.25rem 0;
+  padding: 0.05rem 0.5rem;
+  overflow: hidden;
+  border: 1px solid var(--color-accent-border);
+  border-radius: 4px;
+  background: var(--color-accent-bg);
+  color: var(--color-accent-text);
+  font-size: 0.7rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: top;
+}
+
 .file-row__expiry {
   margin: 0;
   font-size: 0.8rem;

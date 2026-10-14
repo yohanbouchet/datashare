@@ -6,8 +6,9 @@
 //      filtre choisi : Tous, Actifs (par défaut : seuls les fichiers non
 //      expirés, règle de l'énoncé US06), Expiré ;
 //   2. affiche chaque fichier (US05) : nom, taille, date d'envoi, date
-//      d'expiration, état du lien (délai ou « Expiré »), cadenas s'il est
-//      protégé, boutons « Supprimer » et « Accéder » (menu « ⋮ » sur mobile) ;
+//      d'expiration, état du lien (délai ou « Expiré »), tags (US08),
+//      cadenas s'il est protégé, boutons « Supprimer » et « Accéder » (menu
+//      « ⋮ » sur mobile) ;
 //   3. supprime un fichier après confirmation (DELETE /api/files/:id).
 //   Session expirée (401) → déconnexion et retour à la page de connexion.
 // Utilise :
@@ -196,6 +197,15 @@ function FileRow({ file, onDelete }: FileRowProps) {
           {formatSize(file.size)} · envoyé le {formatDate(file.createdAt)} ·{' '}
           {file.isExpired ? 'expiré' : 'expire'} le {formatDate(file.expiresAt)}
         </p>
+        {/* Tags (US08) : une seule case « devis, client, 2026 », pour
+           retrouver et organiser ses fichiers. Trop de tags : la fin est
+           coupée par « … », la liste complète est dans l'infobulle (title) */}
+        {file.tags.length > 0 && (
+          <p className="file-row__tags" title={file.tags.join(', ')}>
+            <span className="visually-hidden">Tags : </span>
+            {file.tags.join(', ')}
+          </p>
+        )}
         <p
           className={`file-row__expiry${file.isExpired ? ' file-row__expiry--expired' : ''}`}
         >

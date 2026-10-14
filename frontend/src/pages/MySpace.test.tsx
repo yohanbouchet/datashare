@@ -1,8 +1,8 @@
 // =============================================================================
 // Fichier : MySpace.test.tsx
-// Rôle : Tests de la page « Mes fichiers » (US05, US06) : liste et filtre,
-//   cadenas des fichiers protégés, fichier expiré, suppression avec
-//   confirmation. Les appels à l'API sont des doublures.
+// Rôle : Tests de la page « Mes fichiers » (US05, US06, US08) : liste et
+//   filtre, tags, cadenas des fichiers protégés, fichier expiré, suppression
+//   avec confirmation. Les appels à l'API sont des doublures.
 // Utilise :
 //   - pages/MySpace.tsx (la pièce testée) ; test/render.tsx
 //   - services/api.ts (filesApi) ; Testing Library
@@ -81,6 +81,25 @@ describe('Page Mes fichiers', () => {
     expect(
       screen.getByText("Ce fichier a expiré, il n'est plus stocké chez nous"),
     ).toBeInTheDocument();
+  });
+
+  it('affiche les tags dans une seule case (US08)', async () => {
+    vi.mocked(filesApi.list).mockResolvedValue([
+      file({
+        id: 1,
+        originalName: 'devis.pdf',
+        tags: ['devis', 'client', '2026'],
+      }),
+      file({ id: 2, originalName: 'photo.jpg', tags: [] }),
+    ]);
+    renderPage(<MySpace />, { auth: { user } });
+
+    // La case porte la liste complète dans son infobulle…
+    const tags = await screen.findByTitle('devis, client, 2026');
+    // … et un lecteur d'écran entend « Tags : » avant la liste
+    expect(tags).toHaveTextContent('Tags : devis, client, 2026');
+    // Un fichier sans tag n'affiche pas de case vide
+    expect(screen.getAllByText('Tags :')).toHaveLength(1);
   });
 
   it('recharge la liste quand on choisit le filtre « Tous »', async () => {
