@@ -167,8 +167,10 @@ export class FilesService {
         passwordHash: true,
         tags: { id: true, label: true },
       },
-      // Les plus récents en premier
-      order: { createdAt: 'DESC' },
+      // Les plus récents en premier ; les tags de chaque fichier dans l'ordre
+      // de saisie (leur numéro croît à l'enregistrement). Sans tri explicite,
+      // PostgreSQL les rend dans un ordre quelconque.
+      order: { createdAt: 'DESC', tags: { id: 'ASC' } },
     });
 
     // map : transforme chaque fichier en ligne d'historique.

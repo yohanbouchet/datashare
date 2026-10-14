@@ -106,6 +106,16 @@ describe('FilesService', () => {
     expect(where).toEqual({ userId: 7 });
   });
 
+  it("trie par date et garde l'ordre de saisie des tags (US08)", async () => {
+    repository.find.mockResolvedValue([]);
+
+    await service.findForUser(7, 'all');
+
+    expect(repository.find.mock.calls[0][0]).toMatchObject({
+      order: { createdAt: 'DESC', tags: { id: 'ASC' } },
+    });
+  });
+
   it('renvoie des lignes sans empreinte, avec isExpired, isProtected et les libellés des tags', async () => {
     repository.find.mockResolvedValue([activeProtectedFile, expiredFile]);
 
