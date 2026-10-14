@@ -26,32 +26,34 @@ Fonctionnalités livrées : US01 à US06 (MVP), et US08 (tags), US09 (mot de pas
 
 ## 2. Choix technologiques justifiés
 
+Chaque choix part d'un **besoin** du projet, puis est fait dans la liste imposée par l'énoncé (front, back, base de données, stockage).
+
 ### Stack principale
 
-| Élément | Technologie choisie | Alternatives | Justification |
-|---|---|---|---|
-| Langage | TypeScript (back et front) | Java, C#, PHP | Un seul langage de bout en bout : mêmes types et mêmes outils ; le typage strict détecte les erreurs à la compilation |
-| Back-end | NestJS 12 sur Node.js 24 LTS | Spring Boot, .NET Core, Symfony | Organisation en modules, contrôleurs et services imposée par le framework ; validation, injection de dépendances et JWT intégrés ; Node.js traite les fichiers en flux, adapté à 1 Go |
-| Front-end | React 19 + Vite, React Router | Angular, Vue | Bibliothèque la plus répandue ; légère (bon budget de performance) ; composants réutilisables adaptés à la planche de composants Figma |
-| Base de données | PostgreSQL 18 (SQL) | MongoDB (NoSQL) | Données relationnelles (un utilisateur possède des fichiers, un fichier porte des tags) ; intégrité garantie par la base (clés étrangères, unicité) |
-| Accès aux données | TypeORM + migrations versionnées | Prisma, SQL manuel | Intégration documentée par NestJS ; chaque changement de structure est tracé dans Git et réversible |
-| Stockage des fichiers | Disque local | AWS S3 | Simple et sans coût pour un prototype ; isolé dans un service pour migrer vers S3 sans toucher au reste |
+| Besoin | Élément | Technologie choisie | Alternatives | Justification |
+|---|---|---|---|---|
+| Avancer vite, avec peu d'erreurs, sur le front et le back | Langage | TypeScript (back et front) | Java, C#, PHP | Un seul langage de bout en bout : mêmes types et mêmes outils ; le typage strict détecte les erreurs à la compilation |
+| Recevoir des fichiers de 1 Go sans saturer le serveur | Back-end | NestJS 12 sur Node.js 24 LTS | Spring Boot, .NET Core, Symfony | Organisation en modules, contrôleurs et services imposée par le framework ; validation, injection de dépendances et JWT intégrés ; Node.js traite les fichiers en flux, adapté à 1 Go |
+| Reproduire les maquettes, mêmes éléments sur chaque écran | Front-end | React 19 + Vite, React Router | Angular, Vue | Bibliothèque la plus répandue ; légère (bon budget de performance) ; composants réutilisables adaptés à la planche de composants Figma |
+| Relier comptes, fichiers et tags sans incohérence | Base de données | PostgreSQL 18 (SQL) | MongoDB (NoSQL) | Données relationnelles (un utilisateur possède des fichiers, un fichier porte des tags) ; intégrité garantie par la base (clés étrangères, unicité) |
+| Faire évoluer les tables sans casser les données | Accès aux données | TypeORM + migrations versionnées | Prisma, SQL manuel | Intégration documentée par NestJS ; chaque changement de structure est tracé dans Git et réversible |
+| Un prototype en 4 semaines, sans coût, évolutif | Stockage des fichiers | Disque local | AWS S3 | Simple et sans coût pour un prototype ; isolé dans un service pour migrer vers S3 sans toucher au reste |
 
 ### Sécurité, services et outils
 
-| Élément | Technologie choisie | Alternatives | Justification |
-|---|---|---|---|
-| Authentification | JWT (`@nestjs/jwt`), durée 1 h | Sessions serveur, OAuth2 | Demandé par les spécifications ; sans état côté serveur |
-| Mots de passe | bcrypt, coût 12 | argon2 | Algorithme éprouvé, sel intégré, volontairement lent contre la force brute |
-| Validation des entrées | class-validator, `ValidationPipe` global | Validation manuelle | Règles déclarées une fois ; champs inattendus refusés ; messages en français |
-| Protection HTTP | helmet ; `@nestjs/throttler` | Configuration manuelle | En-têtes de sécurité ; limitation des tentatives par adresse IP |
-| Documentation d'API | OpenAPI 3 (`@nestjs/swagger`) | Rédaction manuelle | Générée à partir du code, donc toujours à jour |
-| Hébergement | Docker Compose (PostgreSQL), image construite sans root | Installation locale | Même base sur toutes les machines ; démarrage en une commande |
-| Tests | Vitest, supertest, Cypress, k6, Lighthouse | Jest, Playwright, JMeter | Outils par défaut de NestJS et Vite ; un outil par niveau de test |
-| Qualité | Oxlint, Prettier, *conventional commits* | ESLint | Installés par les générateurs ; historique lisible par type de changement |
-| Sécurité de la chaîne | npm audit, trivy, hadolint | Snyk | Gratuits, lancés en une commande (`scripts/scan-security.sh`) |
-| Outils | Git + GitHub, npm, VS Code | GitLab, pnpm | Demandés ou fournis avec Node.js ; versions verrouillées par `package-lock.json` |
-| CI/CD | Non mise en place (MVP) | GitHub Actions | Évolution prévue : tests et contrôles de sécurité à chaque envoi de code |
+| Besoin | Élément | Technologie choisie | Alternatives | Justification |
+|---|---|---|---|---|
+| Savoir qui est connecté, sans session à conserver sur le serveur | Authentification | JWT (`@nestjs/jwt`), durée 1 h | Sessions serveur, OAuth2 | Demandé par les spécifications ; sans état côté serveur |
+| Ne jamais pouvoir lire un mot de passe, même en cas de fuite | Mots de passe | bcrypt, coût 12 | argon2 | Algorithme éprouvé, sel intégré, volontairement lent contre la force brute |
+| Refuser toute donnée invalide ou inattendue | Validation des entrées | class-validator, `ValidationPipe` global | Validation manuelle | Règles déclarées une fois ; champs inattendus refusés ; messages en français |
+| Se protéger des attaques web courantes et de la force brute | Protection HTTP | helmet ; `@nestjs/throttler` | Configuration manuelle | En-têtes de sécurité ; limitation des tentatives par adresse IP |
+| Un contrat d'interface toujours à jour | Documentation d'API | OpenAPI 3 (`@nestjs/swagger`) | Rédaction manuelle | Générée à partir du code, donc toujours à jour |
+| La même base sur toutes les machines, en une commande | Hébergement | Docker Compose (PostgreSQL), image construite sans root | Installation locale | Même base sur toutes les machines ; démarrage en une commande |
+| Vérifier chaque niveau : pièce, API, navigateur, performance | Tests | Vitest, supertest, Cypress, k6, Lighthouse | Jest, Playwright, JMeter | Outils par défaut de NestJS et Vite ; un outil par niveau de test |
+| Un code homogène et un historique lisible | Qualité | Oxlint, Prettier, *conventional commits* | ESLint | Installés par les générateurs ; historique lisible par type de changement |
+| Détecter les failles des dépendances et des images | Sécurité de la chaîne | npm audit, trivy, hadolint | Snyk | Gratuits, lancés en une commande (`scripts/scan-security.sh`) |
+| Versionner le code et installer à l'identique | Outils | Git + GitHub, npm, VS Code | GitLab, pnpm | Demandés ou fournis avec Node.js ; versions verrouillées par `package-lock.json` |
+| Automatiser les tests et les contrôles | CI/CD | Non mise en place (MVP) | GitHub Actions | Évolution prévue : tests et contrôles de sécurité à chaque envoi de code |
 
 Détail complet : `docs/conception/choix-techniques.md`.
 
