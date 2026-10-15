@@ -70,15 +70,16 @@
 | 11/10/2026 | performance | k6 (API en mode production) : 30 téléversements de 10 Mo, 91 lectures, 9 téléchargements de 10 Mo (fichier identique), rafale bloquée ; Lighthouse sur 3 pages (mobile et ordinateur), avant et après correction des contrastes | ✅ tous les seuils tenus · accessibilité 100 | [k6](../rapports/k6-resultats.png) · [Lighthouse](../rapports/lighthouse-connexion-apres.png) |
 | 12/10/2026 | backend | Logs structurés : tests unitaires du journal des requêtes (une ligne à la fin de la réponse, jeton masqué) ; test k6 relancé, 185 lignes JSON analysées (PERF.md) | ✅ 77/77 unitaires · ✅ 27/27 e2e · ✅ k6 | [Capture](../rapports/logs-structures.png) |
 | 14/10/2026 | backend + frontend | Tags dans Mon espace (US08) : test unitaire de l'affichage (une case, infobulle, aucune case sans tag) et du tri des tags ; test manuel avec 10 tags de 30 caractères (ordinateur, mobile portrait et paysage) ; non-régression complète | ✅ 78/78 unitaires · ✅ 27/27 e2e (back) · ✅ 43/43 (front) · ✅ 3/3 Cypress | 88,7 % des instructions (back), 85 % (front) |
+| 15/10/2026 | backend + frontend | Vérification finale avant la soutenance : compilation TypeScript, Oxlint, Prettier, `npm audit`, tous les tests avec couverture, scénarios Cypress, en-têtes des fichiers ; captures des rapports refaites | ✅ 78/78 · ✅ 27/27 · ✅ 43/43 · ✅ 3/3 Cypress · 0 vulnérabilité | [Résultats](../rapports/resultats-tests.png) |
 
-### Rapports (captures du 10/10/2026, dossier [`docs/rapports/`](../rapports/))
+### Rapports (captures du 15/10/2026, dossier [`docs/rapports/`](../rapports/))
 
 | Rapport | Capture | Commande pour le régénérer |
 |---|---|---|
-| Résultats des 3 suites Vitest (139 tests) | [resultats-tests.png](../rapports/resultats-tests.png) | `npm test` et `npm run test:e2e` (back), `npm test` (front) |
-| Couverture des tests unitaires du back (89,7 % des lignes) | [couverture-backend-unitaires.png](../rapports/couverture-backend-unitaires.png) | `npm run test:cov` (dans `backend/`) |
-| Couverture des tests de bout en bout du back (87,8 % des lignes) | [couverture-backend-e2e.png](../rapports/couverture-backend-e2e.png) | `npm run test:e2e:cov` (dans `backend/`) |
-| Couverture des tests unitaires du front (84,3 % des lignes) | [couverture-frontend.png](../rapports/couverture-frontend.png) | `npm run test:cov` (dans `frontend/`) |
+| Résultats des 3 suites Vitest (148 tests : 78 + 27 + 43), avec la couverture de chacune | [resultats-tests.png](../rapports/resultats-tests.png) | `npm test` et `npm run test:e2e` (back), `npm test` (front) |
+| Couverture des tests unitaires du back (88,7 % des instructions, 89,9 % des lignes) | [couverture-backend-unitaires.png](../rapports/couverture-backend-unitaires.png) | `npm run test:cov` (dans `backend/`) |
+| Couverture des tests de bout en bout du back (88,7 % des instructions, 88,4 % des lignes) | [couverture-backend-e2e.png](../rapports/couverture-backend-e2e.png) | `npm run test:e2e:cov` (dans `backend/`) |
+| Couverture des tests unitaires du front (85 % des instructions, 85,3 % des lignes) | [couverture-frontend.png](../rapports/couverture-frontend.png) | `npm run test:cov` (dans `frontend/`) |
 | Scénarios Cypress (3/3) | [cypress-resultats.png](../rapports/cypress-resultats.png) | `npm run cy:run`, ou `npm run cy:video` pour filmer chaque scénario (`frontend/cypress/videos/`) |
 
 Les rapports de couverture complets (détail ligne par ligne) sont générés en HTML dans `coverage/` et `coverage-e2e/` (non versionnés). La couverture compte **tout** le code source : les dossiers à 0 % du rapport unitaire du back (`app.module.ts`, `app.setup.ts`, modules) ne contiennent que de l'assemblage, vérifié par les tests de bout en bout.
