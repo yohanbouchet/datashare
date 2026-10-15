@@ -148,7 +148,8 @@ a {
   font: inherit;
   text-decoration: none;
   cursor: pointer;
-  white-space: nowrap; /* le texte du bouton reste sur une seule ligne, même sur petit écran */
+  /* Le texte du bouton reste sur une seule ligne, même sur petit écran */
+  white-space: nowrap;
 }
 
 /* flex: 1 : le contenu prend toute la hauteur disponible et centre la carte */
@@ -341,7 +342,7 @@ a {
 
 /* =============================================================================
    Accessibilité : texte lu par les lecteurs d'écran mais invisible à l'écran
-   ============================================================================= */
+   ========================================================================== */
 .visually-hidden {
   position: absolute;
   width: 1px;
@@ -353,7 +354,7 @@ a {
 
 /* =============================================================================
    Espace connecté (« Mon espace ») : barre latérale + barre du haut + contenu
-   ============================================================================= */
+   ========================================================================== */
 .space {
   display: flex;
   min-height: 100vh;
@@ -721,7 +722,7 @@ a {
 
 /* =============================================================================
    Téléversement (US01) : carte « Ajouter un fichier » (maquette Figma)
-   ============================================================================= */
+   ========================================================================== */
 /* Le bouton rond de l'accueil peut être un <button> (connecté) : on retire
    la bordure et le fond par défaut du navigateur */
 button.home__button {

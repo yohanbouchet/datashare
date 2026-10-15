@@ -35,8 +35,8 @@ export function Header() {
       <Link to="/" className="header__logo">
         DataShare
       </Link>
-      {/* Choix en cascade « condition ? A : B » :
-          vérification en cours → rien ; connecté → « Mon espace » ; sinon → « Se connecter » */}
+      {/* Choix en cascade « condition ? A : B » : vérification en cours →
+          rien ; connecté → « Mon espace » ; sinon → « Se connecter » */}
       {loading ? null : user ? (
         <Link to="/mon-espace" className="button-dark">
           Mon espace
