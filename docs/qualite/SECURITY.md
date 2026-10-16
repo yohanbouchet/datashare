@@ -22,6 +22,7 @@ Légende : ✅ en place · 🔜 prévu (étape indiquée)
 |---|---|---|
 | Base non exposée sur le réseau | ✅ | Port publié uniquement sur `127.0.0.1` (`docker-compose.yml`) |
 | Conteneur sans root, image minimale | ✅ | Image construite à partir de l'officielle (`database/Dockerfile`, version fixée `postgres:18.6-alpine3.24`) : le conteneur démarre directement sous l'utilisateur `postgres` (70) et l'outil `gosu`, devenu inutile, est supprimé (voir le scan trivy ci-dessous) |
+| Compte de l'API aux droits limités (moindre privilège) | 🔜 évolution | Limite relevée le 16/10/2026 : l'API se connecte avec l'utilisateur créé par l'image PostgreSQL (`POSTGRES_USER`), qui est **superutilisateur**. Simple pour le prototype, trop large en production. Évolution : deux comptes, un compte de migration propriétaire des tables (utilisé seulement par `npm run migration:run`) et un compte pour l'API limité à `SELECT`, `INSERT`, `UPDATE` et `DELETE` sur `users`, `files` et `tags` : une API compromise ne pourrait ni supprimer les tables ni agir sur le reste du serveur |
 | Unicité de l'email garantie par la base | ✅ | Contrainte `UNIQUE` (migration `CreateUsers`) : protège aussi contre deux inscriptions simultanées |
 | Empreinte du mot de passe jamais lue par défaut | ✅ | `select: false` sur `password_hash` : elle ne peut pas être renvoyée par erreur dans une réponse |
 | Fichier rattaché à un compte existant | ✅ | Clé étrangère `files.user_id` → `users.id` (`ON DELETE CASCADE`) |
@@ -94,6 +95,7 @@ Légende : ✅ en place · 🔜 prévu (étape indiquée)
 | Sujet | Dans le MVP | Pour une mise en production |
 |---|---|---|
 | Minimisation des données (RGPD) | Seuls l'email et l'empreinte du mot de passe sont conservés pour un compte | — |
+| Aucun appel à des tiers | Aucun traqueur ni outil de statistiques. Seule exception, relevée le 16/10/2026 : la police DM Sans des maquettes est chargée depuis Google Fonts (`frontend/index.html`), ce qui transmet l'adresse IP de chaque visiteur à Google | Héberger la police avec le site (fichiers de police dans `frontend/public/`) et retirer les liens `fonts.googleapis.com` : plus aucune requête vers un tiers |
 | Durée de conservation limitée | Fichiers expirés après 1 à 7 jours, effacés du disque par la purge ; leur ligne d'historique (nom, taille, dates) est supprimée après `HISTORY_RETENTION_DAYS` jours (30 par défaut, réglable) | Durée de conservation des comptes inactifs à définir |
 | Sécurité des données | Hachage bcrypt, JWT à durée limitée, secrets hors du code ; HTTPS en production | Chiffrement du stockage (ex. *bucket* S3 chiffré) |
 | Droits des personnes | — | Suppression de son compte et de ses fichiers (droit à l'effacement), export de ses données ; page de confidentialité et mentions légales |
