@@ -5,7 +5,7 @@ un utilisateur connecté dépose un fichier et obtient un **lien de télécharge
 
 Projet 3 du Master Expert DevOps – OpenClassrooms (« Pilotez le développement d'une solution informatique »).
 
-> 🚧 **Projet en cours de développement.** Ce README est complété à chaque étape.
+> ✅ **Projet terminé et validé** le 23/10/2026 : 9 user stories sur 10 livrées (l'US07, dépôt sans compte, est proposée en évolution). Pistes d'amélioration en fin de document.
 
 ## Stack technique
 
@@ -201,5 +201,23 @@ Conception :
 - [x] Étape 2 – Initialisation (dépôt, PostgreSQL, API, front)
 - [x] Étape 3 – Inscription (US03) et connexion (US04)
 - [x] Étape 4 – Téléversement, téléchargement, historique, suppression, purge (US01, US02, US05, US06, US10), tags et mot de passe de fichier (US08, US09)
-- [ ] Étape 5 – Tests, sécurité, performance
-- [ ] Étape 6 – Documentation finale
+- [x] Étape 5 – Tests, sécurité, performance
+- [x] Étape 6 – Documentation finale
+
+## Pistes d'amélioration
+
+Limites connues du prototype, relevées par nos propres analyses et lors de l'évaluation finale :
+
+| Domaine | Amélioration | Détail |
+|---|---|---|
+| Sécurité | Compte PostgreSQL de l'API aux droits limités (lecture et écriture des lignes de ses trois tables) au lieu du superutilisateur | [SECURITY.md](docs/qualite/SECURITY.md) |
+| Sécurité | Révocation de la session à la déconnexion : token d'accès court et *refresh token* enregistré en base | aujourd'hui, le JWT reste valable jusqu'à son expiration (1 h) |
+| Sécurité | En-têtes de sécurité (CSP, interdiction de l'affichage dans un cadre) aussi sur les pages du site, via le serveur web | aujourd'hui, seules les réponses de l'API les portent (`helmet`) |
+| Sécurité | Analyse antivirus des fichiers reçus (ClamAV) | [MAINTENANCE.md](docs/qualite/MAINTENANCE.md), section 5 |
+| Qualité | Intégration continue lançant les tests et `scripts/scan-security.sh` à chaque modification, puis un test de sécurité dynamique | [MAINTENANCE.md](docs/qualite/MAINTENANCE.md), section 5 |
+| Performance | Pagination de l'historique | aujourd'hui, une seule requête renvoie tous les fichiers de l'utilisateur |
+| Performance | Validation des champs du formulaire avant l'écriture du fichier sur le disque | aujourd'hui, le fichier reçu est effacé si un champ est invalide |
+| Performance | Envoi par morceaux avec reprise (et délai de réception allongé) | [PERF.md](docs/qualite/PERF.md), section 5 |
+| Interface | Boîte de confirmation de suppression au style du site, au lieu de celle du navigateur | — |
+| RGPD | Suppression de son compte, police hébergée avec le site au lieu de Google Fonts | [SECURITY.md](docs/qualite/SECURITY.md) |
+| Architecture | Stockage sur S3 (plusieurs serveurs, réplication) | [MAINTENANCE.md](docs/qualite/MAINTENANCE.md), section 5 |
